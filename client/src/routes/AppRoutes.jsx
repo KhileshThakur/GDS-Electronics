@@ -11,7 +11,7 @@ import NotFoundPage from "../features/not-found/pages/NotFoundPage";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminRoute from "./AdminRoute";
 import DashboardPage from "../features/admin/dashboard/pages/DashboardPage";
-
+import AdminCategoryPage from "../features/category/pages/AdminCategoryPage";
 
 const AppRoutes = () => {
 
@@ -51,6 +51,10 @@ const AppRoutes = () => {
                             element={<DashboardPage />}
                         />
                     </Route>
+                    <Route
+                        path="/admin/categories"
+                        element={<AdminCategoryPage />}
+                    />
                 </Route>
 
                 <Route
