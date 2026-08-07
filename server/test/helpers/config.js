@@ -5,6 +5,11 @@ export default {
         password: "123456"
     },
 
+    user: {
+        email: "khilesht@test.com",
+        password: "123456"
+    },
+
     category: {
         name: "Test Category"
     },

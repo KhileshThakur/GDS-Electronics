@@ -8,19 +8,20 @@ const cartItemSchema = new mongoose.Schema(
             required: true
         },
 
-        variantId: {
+        variantSku: {
             type: String,
-            default: null
+            default: ""
         },
 
         quantity: {
             type: Number,
+            required: true,
             default: 1,
             min: 1
         }
     },
     {
-        _id: false
+        _id: true
     }
 );
 

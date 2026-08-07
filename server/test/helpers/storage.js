@@ -7,8 +7,13 @@ const storage = {
     productSlug: "",
 
     variantProductId: "",
-    variantProductSlug: ""
+    variantProductSlug: "",
 
+    cartItemId: "",
+    variantCartItemId: "",
+
+    cartProductId: "",
+    cartVariantProductId: "",
 };
 
 export default storage;

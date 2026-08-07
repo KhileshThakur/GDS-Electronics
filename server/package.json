@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "nodemon ../index.js",
     "start": "node ../index.js",
-    "test:product": "node test/product.test.js"
+    "test:product": "node test/product.test.js",
+    "test:cart": "node test/cart.test.js",
+    "test:wishlist": "node test/wishlist.test.js",
+    "test:address": "node test/address.test.js",
+    "test:order": "node test/order.test.js"
   },
   "keywords": [],
   "author": "",
