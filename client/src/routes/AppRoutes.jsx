@@ -15,6 +15,15 @@ import AdminCategoryPage from "../features/category/pages/AdminCategoryPage";
 import ProductListPage from "../features/product/pages/ProductListPage";
 import ProductFormPage from "../features/product/pages/ProductFormPage";
 import ShopProductListPage from "../features/product/pages/ShopProductListPage";
+import ProductDetailsPage from "../features/product/pages/ProductDetailsPage";
+import CartPage from "../features/cart/pages/CartPage";
+import WishlistPage from "../features/wishlist/pages/WishlistPage";
+import AddressPage from "../features/address/pages/AddressPage";
+import CheckoutPage from "../features/checkout/pages/CheckoutPage";
+import OrderListPage from "../features/order/pages/OrderListPage";
+import OrderDetailsPage from "../features/order/pages/OrderDetailsPage";
+
+
 
 const AppRoutes = () => {
 
@@ -30,10 +39,40 @@ const AppRoutes = () => {
                         path="/products"
                         element={<ShopProductListPage />}
                     />
+                    <Route
+                        path="/products/:slug"
+                        element={<ProductDetailsPage />}
+                    />
+                    <Route
+                        path="/cart"
+                        element={<CartPage />}
+                    />
+
+                    <Route
+                        path="/wishlist"
+                        element={<WishlistPage />}
+                    />
+
+                    <Route
+                        path="/addresses"
+                        element={<AddressPage />}
+                    />
+                    <Route
+                        path="/checkout"
+                        element={<CheckoutPage />}
+                    />
                     <Route element={<ProtectedRoute />}>
                         <Route
                             path="/profile"
                             element={<ProfilePage />}
+                        />
+                        <Route
+                            path="/orders"
+                            element={<OrderListPage />}
+                        />
+                        <Route
+                            path="/orders/:id"
+                            element={<OrderDetailsPage />}
                         />
                     </Route>
                 </Route>
