@@ -7,7 +7,6 @@ import "./index.css";
 
 import "./assets/styles/variables.css";
 import "./assets/styles/reset.css";
-import "./assets/styles/components.css";
 
 import App from "./App.jsx";
 import AuthInitializer from "./features/auth/components/AuthInitializer";

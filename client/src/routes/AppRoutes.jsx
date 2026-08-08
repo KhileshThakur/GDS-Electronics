@@ -1,6 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+    BrowserRouter,
+    Routes,
+    Route
+} from "react-router-dom";
+
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
+import AdminRoute from "./AdminRoute";
+
 import ProfilePage from "../features/profile/pages/ProfilePage";
 import CustomerLayout from "../layouts/CustomerLayout";
 import HomePage from "../features/home/pages/HomePage";
@@ -9,7 +16,6 @@ import LoginPage from "../features/auth/pages/LoginPage";
 import RegisterPage from "../features/auth/pages/Register";
 import NotFoundPage from "../features/not-found/pages/NotFoundPage";
 import AdminLayout from "../layouts/AdminLayout";
-import AdminRoute from "./AdminRoute";
 import DashboardPage from "../features/admin/dashboard/pages/DashboardPage";
 import AdminCategoryPage from "../features/category/pages/AdminCategoryPage";
 import ProductListPage from "../features/product/pages/ProductListPage";
@@ -24,12 +30,11 @@ import OrderListPage from "../features/order/pages/OrderListPage";
 import OrderDetailsPage from "../features/order/pages/OrderDetailsPage";
 
 
-
 const AppRoutes = () => {
-
     return (
         <BrowserRouter>
             <Routes>
+
                 <Route element={<CustomerLayout />}>
                     <Route
                         path="/"
@@ -43,25 +48,24 @@ const AppRoutes = () => {
                         path="/products/:slug"
                         element={<ProductDetailsPage />}
                     />
-                    <Route
-                        path="/cart"
-                        element={<CartPage />}
-                    />
 
-                    <Route
-                        path="/wishlist"
-                        element={<WishlistPage />}
-                    />
-
-                    <Route
-                        path="/addresses"
-                        element={<AddressPage />}
-                    />
-                    <Route
-                        path="/checkout"
-                        element={<CheckoutPage />}
-                    />
                     <Route element={<ProtectedRoute />}>
+                        <Route
+                            path="/cart"
+                            element={<CartPage />}
+                        />
+                        <Route
+                            path="/wishlist"
+                            element={<WishlistPage />}
+                        />
+                        <Route
+                            path="/addresses"
+                            element={<AddressPage />}
+                        />
+                        <Route
+                            path="/checkout"
+                            element={<CheckoutPage />}
+                        />
                         <Route
                             path="/profile"
                             element={<ProfilePage />}
@@ -78,7 +82,6 @@ const AppRoutes = () => {
                 </Route>
 
 
-
                 <Route element={<GuestRoute />}>
                     <Route element={<AuthLayout />}>
                         <Route
@@ -93,34 +96,31 @@ const AppRoutes = () => {
                 </Route>
 
 
-
-
                 <Route element={<AdminRoute />}>
                     <Route element={<AdminLayout />}>
                         <Route
                             path="/admin"
                             element={<DashboardPage />}
                         />
+                        <Route
+                            path="/admin/categories"
+                            element={<AdminCategoryPage />}
+                        />
+                        <Route
+                            path="/admin/products"
+                            element={<ProductListPage />}
+                        />
+                        <Route
+                            path="/admin/products/new"
+                            element={<ProductFormPage />}
+                        />
+                        <Route
+                            path="/admin/products/:id/edit"
+                            element={<ProductFormPage />}
+                        />
                     </Route>
-                    <Route
-                        path="/admin/categories"
-                        element={<AdminCategoryPage />}
-                    />
-                    <Route
-                        path="/admin/products"
-                        element={<ProductListPage />}
-                    />
-                    <Route
-                        path="/admin/products/new"
-                        element={<ProductFormPage />}
-                    />
 
-                    <Route
-                        path="/admin/products/:id/edit"
-                        element={<ProductFormPage />}
-                    />
                 </Route>
-
 
 
                 <Route

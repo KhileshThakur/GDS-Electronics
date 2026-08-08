@@ -1,42 +1,55 @@
 export const customerNavigation = [
-
     {
         label: "Home",
-        path: "/"
+        path: "/",
+        icon: "home"
     },
-
     {
         label: "Products",
-        path: "/products"
+        path: "/products",
+        icon: "products"
     },
-
     {
-        label: "Categories",
-        path: "/categories"
+        label: "Orders",
+        path: "/orders",
+        icon: "orders"
     },
-
+    {
+        label: "Wishlist",
+        path: "/wishlist",
+        icon: "wishlist"
+    },
     {
         label: "Cart",
-        path: "/cart"
+        path: "/cart",
+        icon: "cart"
+    },
+    {
+        label: "Profile",
+        path: "/profile",
+        icon: "profile"
     }
-
 ];
 
 export const adminNavigation = [
-
     {
         label: "Dashboard",
-        path: "/admin"
+        path: "/admin",
+        icon: "dashboard"
     },
-
     {
         label: "Products",
-        path: "/admin/products"
+        path: "/admin/products",
+        icon: "products"
     },
-
+    {
+        label: "Categories",
+        path: "/admin/categories",
+        icon: "categories"
+    },
     {
         label: "Orders",
-        path: "/admin/orders"
+        path: "/admin/orders",
+        icon: "orders"
     }
-
 ];

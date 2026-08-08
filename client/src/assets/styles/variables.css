@@ -12,7 +12,7 @@
     --background: #F7F9FC;
     --surface: #FFFFFF;
 
-    /* Sidebar */
+    /* Sidebar / Dark */
     --sidebar: #0A0F44;
 
     /* Text */
@@ -35,4 +35,10 @@
     /* Shadow */
     --shadow:
         0 5px 20px rgba(0, 0, 0, .08);
+
+    /* Additional UI */
+    --surface-hover: #F8FAFC;
+    --text-muted: #94A3B8;
+    --primary-soft: #EAF6FF;
+
 }
