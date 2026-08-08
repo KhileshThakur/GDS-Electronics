@@ -12,6 +12,9 @@ import AdminLayout from "../layouts/AdminLayout";
 import AdminRoute from "./AdminRoute";
 import DashboardPage from "../features/admin/dashboard/pages/DashboardPage";
 import AdminCategoryPage from "../features/category/pages/AdminCategoryPage";
+import ProductListPage from "../features/product/pages/ProductListPage";
+import ProductFormPage from "../features/product/pages/ProductFormPage";
+import ShopProductListPage from "../features/product/pages/ShopProductListPage";
 
 const AppRoutes = () => {
 
@@ -23,6 +26,10 @@ const AppRoutes = () => {
                         path="/"
                         element={<HomePage />}
                     />
+                    <Route
+                        path="/products"
+                        element={<ShopProductListPage />}
+                    />
                     <Route element={<ProtectedRoute />}>
                         <Route
                             path="/profile"
@@ -30,6 +37,8 @@ const AppRoutes = () => {
                         />
                     </Route>
                 </Route>
+
+
 
                 <Route element={<GuestRoute />}>
                     <Route element={<AuthLayout />}>
@@ -44,6 +53,9 @@ const AppRoutes = () => {
                     </Route>
                 </Route>
 
+
+
+
                 <Route element={<AdminRoute />}>
                     <Route element={<AdminLayout />}>
                         <Route
@@ -55,7 +67,22 @@ const AppRoutes = () => {
                         path="/admin/categories"
                         element={<AdminCategoryPage />}
                     />
+                    <Route
+                        path="/admin/products"
+                        element={<ProductListPage />}
+                    />
+                    <Route
+                        path="/admin/products/new"
+                        element={<ProductFormPage />}
+                    />
+
+                    <Route
+                        path="/admin/products/:id/edit"
+                        element={<ProductFormPage />}
+                    />
                 </Route>
+
+
 
                 <Route
                     path="*"

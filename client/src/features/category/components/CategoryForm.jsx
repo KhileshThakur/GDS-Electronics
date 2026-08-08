@@ -5,7 +5,11 @@ import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 
 import { createCategory, updateCategory } from "../services/category.service";
-
+import {
+    FormCard,
+    FormSection,
+    FormActions
+} from "../../../components/admin/form";
 
 const CategoryForm = ({ onSuccess, selectedCategory, clearSelection }) => {
 
@@ -77,42 +81,57 @@ const CategoryForm = ({ onSuccess, selectedCategory, clearSelection }) => {
     }, [selectedCategory])
 
     return (
+
         <form
             onSubmit={handleSubmit}
-            className="space-y-4"
         >
-            <Input
-                label="Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-            />
-
-            <Input
-                label="Description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-            />
-
-            <Input
-                label="Sort Order"
-                name="sortOrder"
-                type="number"
-                value={formData.sortOrder}
-                onChange={handleChange}
-            />
-
-            <Button
-                type="submit"
-                disabled={loading}
-            >
-                {loading
-                    ? "Saving..."
-                    : selectedCategory
+            <FormCard
+                title={
+                    selectedCategory
                         ? "Update Category"
-                        : "Add Category"}
-            </Button>
+                        : "Add Category"
+                }
+            >
+                <FormSection>
+                    <Input
+                        label="Name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                    />
+                    <Input
+                        label="Description"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                    />
+                    <Input
+                        label="Sort Order"
+                        name="sortOrder"
+                        type="number"
+                        value={formData.sortOrder}
+                        onChange={handleChange}
+                    />
+                </FormSection>
+            </FormCard>
+
+            <FormActions
+                loading={loading}
+                submitText={
+                    selectedCategory
+                        ? "Update Category"
+                        : "Add Category"
+                }
+
+                onCancel={() => {
+                    clearSelection();
+                    setFormData({
+                        name: "",
+                        description: "",
+                        sortOrder: 0
+                    });
+                }}
+            />
         </form>
     );
 };

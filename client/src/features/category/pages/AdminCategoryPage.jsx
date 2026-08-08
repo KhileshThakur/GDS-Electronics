@@ -1,30 +1,69 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 import CategoryForm from "../components/CategoryForm";
-import CategoryTable from "../components/CategoryTable";
-import { deleteCategory } from "../services/category.service";
-import { toast } from "react-hot-toast";
+import {
+    getCategories,
+    deleteCategory
+} from "../services/category.service";
+
+import {
+    PageHeader,
+    DataTable,
+    StatusBadge,
+    ActionButtons
+} from "../../../components/admin";
 
 const AdminCategoryPage = () => {
 
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [refresh, setRefresh] = useState(false);
+
+    const fetchCategories = async () => {
+
+        try {
+            setLoading(true);
+            const response = await getCategories();
+            setCategories(response.data);
+        }
+        catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                "Failed to fetch categories"
+            );
+        }
+
+        finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+    }, [refresh]);
+
+    const handleRefresh = () => {
+        setRefresh(prev => !prev);
+    };
 
     const handleEdit = (category) => {
         setSelectedCategory(category);
     };
+
     const handleDelete = async (category) => {
 
         const confirmed = window.confirm(
             `Delete "${category.name}"?`
         );
 
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         try {
-            const response = await deleteCategory(category._id);
+            const response = await deleteCategory(
+                category._id
+            );
             toast.success(response.message);
             handleRefresh();
         }
@@ -36,24 +75,64 @@ const AdminCategoryPage = () => {
             );
         }
     };
-    const handleRefresh = () => {
-        setRefresh(prev => !prev);
-    };
+
+    const columns = [
+        {
+            key: "name",
+            label: "Name"
+        },
+        {
+            key: "slug",
+            label: "Slug"
+        },
+        {
+            key: "status",
+            label: "Status",
+            render: (category) => (
+                <StatusBadge
+                    status={category.status}
+                />
+            )
+        },
+
+        {
+            key: "sortOrder",
+            label: "Sort Order"
+        }
+    ];
 
     return (
+        <div className="space-y-8">
 
-        <div>
-            <h1>Categories</h1>
+            <PageHeader
+                title="Categories"
+                subtitle="Manage product categories"
+            />
+
             <CategoryForm
                 selectedCategory={selectedCategory}
                 onSuccess={handleRefresh}
-                clearSelection={() => setSelectedCategory(null)}
+                clearSelection={() =>
+                    setSelectedCategory(null)
+                }
             />
-            <hr />
-            <CategoryTable
-                refresh={refresh}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+
+            <DataTable
+                columns={columns}
+                data={categories}
+                loading={loading}
+                emptyTitle="No Categories Found"
+
+                renderActions={(category) => (
+                    <ActionButtons
+                        onEdit={() =>
+                            handleEdit(category)
+                        }
+                        onDelete={() =>
+                            handleDelete(category)
+                        }
+                    />
+                )}
             />
         </div>
     );
