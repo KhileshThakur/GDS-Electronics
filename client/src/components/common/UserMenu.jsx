@@ -71,12 +71,70 @@ const UserMenu = () => {
 
     if (!isAuthenticated) {
 
-        return (
+    return (
+
+        <div className="
+            flex
+            items-center
+
+            gap-2
+            sm:gap-3
+        ">
+
+            {/* Login */}
 
             <button
                 type="button"
                 onClick={() =>
                     navigate("/login")
+                }
+
+                className="
+                    h-9
+                    sm:h-10
+
+                    px-4
+                    sm:px-5
+
+                    inline-flex
+                    items-center
+                    justify-center
+
+                    rounded-[var(--radius-md)]
+
+                    border
+                    border-[var(--primary)]
+
+                    bg-transparent
+
+                    text-[var(--primary)]
+
+                    text-xs
+                    sm:text-sm
+
+                    font-semibold
+
+                    whitespace-nowrap
+
+                    hover:bg-[var(--primary)]
+                    hover:text-white
+
+                    active:scale-[0.98]
+
+                    transition-all
+                    duration-200
+                "
+            >
+                Login
+            </button>
+
+
+            {/* Register */}
+
+            <button
+                type="button"
+                onClick={() =>
+                    navigate("/register")
                 }
 
                 className="
@@ -110,12 +168,14 @@ const UserMenu = () => {
                     duration-200
                 "
             >
-                Login
+                Register
             </button>
 
-        );
+        </div>
 
-    }
+    );
+
+}
 
 
     /* =====================================

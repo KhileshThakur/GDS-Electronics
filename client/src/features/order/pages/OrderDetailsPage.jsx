@@ -1,22 +1,55 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import {
+    useEffect,
+    useState
+} from "react";
+
+import {
+    Link,
+    useParams
+} from "react-router-dom";
+
+import {
+    toast
+} from "react-hot-toast";
 
 import Container from "../../../components/ui/Container";
-import Card from "../../../components/ui/Card";
 
 import {
     getOrder,
     cancelOrder
 } from "../services/order.service";
 
+import "./OrderCustomer.css";
+
+
 const OrderDetailsPage = () => {
 
-    const { id } = useParams();
+    const {
+        id
+    } = useParams();
 
-    const [order, setOrder] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [cancelling, setCancelling] = useState(false);
+
+    const [
+        order,
+        setOrder
+    ] = useState(null);
+
+
+    const [
+        loading,
+        setLoading
+    ] = useState(true);
+
+
+    const [
+        cancelling,
+        setCancelling
+    ] = useState(false);
+
+
+    /* =========================================
+       Fetch Order
+    ========================================= */
 
     const fetchOrder = async () => {
 
@@ -24,9 +57,12 @@ const OrderDetailsPage = () => {
 
             setLoading(true);
 
-            const response = await getOrder(id);
+            const response =
+                await getOrder(id);
 
-            setOrder(response.data);
+            setOrder(
+                response.data
+            );
 
         }
         catch (error) {
@@ -45,26 +81,45 @@ const OrderDetailsPage = () => {
 
     };
 
+
     useEffect(() => {
 
         fetchOrder();
 
     }, [id]);
 
+
+    /* =========================================
+       Cancel Order
+    ========================================= */
+
     const handleCancel = async () => {
+
+        const confirmed =
+            window.confirm(
+                "Are you sure you want to cancel this order?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
 
         try {
 
             setCancelling(true);
 
-            const response = await cancelOrder(id);
+            const response =
+                await cancelOrder(id);
 
             toast.success(
                 response.message ||
                 "Order cancelled successfully"
             );
 
-            setOrder(response.data);
+            setOrder(
+                response.data
+            );
 
         }
         catch (error) {
@@ -83,123 +138,293 @@ const OrderDetailsPage = () => {
 
     };
 
+
+    /* =========================================
+       Loading
+    ========================================= */
+
     if (loading) {
 
         return (
+
             <Container>
 
-                <div className="py-16 text-center">
-                    Loading order...
+                <div className="order-page">
+
+                    <div className="order-loading">
+
+                        <div className="order-loading__spinner" />
+
+                        <p>
+                            Loading order...
+                        </p>
+
+                    </div>
+
                 </div>
 
             </Container>
+
         );
 
     }
+
+
+    /* =========================================
+       Not Found
+    ========================================= */
 
     if (!order) {
 
         return (
+
             <Container>
 
-                <div className="py-16 text-center">
+                <div className="order-page">
 
-                    <h1 className="text-2xl font-bold">
-                        Order not found
-                    </h1>
+                    <div className="order-empty">
 
-                    <Link
-                        to="/orders"
-                        className="
-                            inline-block
-                            mt-6
-                            underline
-                        "
-                    >
-                        Back to Orders
-                    </Link>
+                        <div className="order-empty__icon">
+                            !
+                        </div>
+
+                        <h2>
+                            Order not found
+                        </h2>
+
+                        <p>
+                            We couldn't find this order.
+                        </p>
+
+                        <Link
+                            to="/orders"
+                            className="
+                                order-button
+                                order-button--primary
+                            "
+                        >
+                            Back to Orders
+                        </Link>
+
+                    </div>
 
                 </div>
 
             </Container>
+
         );
 
     }
 
+
+    /* =========================================
+       Helpers
+    ========================================= */
+
+    const formatDate = (
+        date
+    ) => {
+
+        if (!date) {
+            return "-";
+        }
+
+        return new Date(
+            date
+        ).toLocaleDateString(
+            "en-IN",
+            {
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+    };
+
+
+    const formatDateTime = (
+        date
+    ) => {
+
+        if (!date) {
+            return "-";
+        }
+
+        return new Date(
+            date
+        ).toLocaleString(
+            "en-IN"
+        );
+
+    };
+
+
+    const formatCurrency = (
+        value
+    ) => {
+
+        return `₹${Number(
+            value || 0
+        ).toLocaleString(
+            "en-IN"
+        )}`;
+
+    };
+
+
+    const statusClass =
+        (
+            order.status ||
+            ""
+        )
+            .toLowerCase()
+            .replace(
+                /\s+/g,
+                "-"
+            );
+
+
     const canCancel =
-        ["Pending", "Confirmed"].includes(
+        [
+            "Pending",
+            "Confirmed"
+        ].includes(
             order.status
         );
+
 
     return (
 
         <Container>
 
-            <div className="py-10">
+            <div className="
+                order-page
+                order-details-page
+            ">
 
-                {/* Header */}
+
+                {/* =================================
+                    Header
+                ================================= */}
 
                 <div className="
-                    flex
-                    flex-col
-                    md:flex-row
-                    md:items-center
-                    md:justify-between
-                    gap-4
-                    mb-8
+                    order-details-header
                 ">
 
                     <div>
 
-                        <Link
-                            to="/orders"
-                            className="
-                                text-sm
-                                text-gray-500
-                            "
-                        >
-                            ← Back to Orders
-                        </Link>
-
-                        <h1 className="
-                            text-3xl
-                            font-bold
-                            mt-2
+                        <span className="
+                            order-page-header__eyebrow
                         ">
+                            ORDER DETAILS
+                        </span>
+
+
+                        <h1>
                             {order.orderNumber}
                         </h1>
 
+
+                        <p>
+                            Placed on{" "}
+                            {formatDate(
+                                order.createdAt
+                            )}
+                        </p>
+
                     </div>
 
-                    <span className="
-                        inline-block
-                        bg-gray-100
-                        px-4
-                        py-2
-                        rounded-full
-                    ">
+
+                    <span
+                        className={`
+                            order-status
+                            order-status--${statusClass}
+                        `}
+                    >
                         {order.status}
                     </span>
 
                 </div>
 
 
-                {/* Order Items */}
+                {/* =================================
+                    Estimated Delivery
+                ================================= */}
 
-                <Card>
+                {order.estimatedDelivery && (
 
-                    <h2 className="
-                        text-xl
-                        font-semibold
-                        mb-6
+                    <div className="
+                        order-delivery-banner
                     ">
-                        Order Items
-                    </h2>
 
-                    <div className="space-y-5">
+                        <div className="
+                            order-delivery-banner__icon
+                        ">
+                            ✓
+                        </div>
+
+
+                        <div>
+
+                            <span>
+                                Estimated Delivery
+                            </span>
+
+                            <strong>
+                                {formatDate(
+                                    order.estimatedDelivery
+                                )}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                )}
+
+
+                {/* =================================
+                    Items
+                ================================= */}
+
+                <section className="
+                    order-section
+                ">
+
+                    <div className="
+                        order-section__header
+                    ">
+
+                        <div>
+
+                            <span>
+                                PURCHASE
+                            </span>
+
+                            <h2>
+                                Order Items
+                            </h2>
+
+                        </div>
+
+
+                        <span>
+                            {order.items?.length || 0} items
+                        </span>
+
+                    </div>
+
+
+                    <div className="
+                        order-items
+                    ">
 
                         {order.items?.map(
-                            (item, index) => (
+                            (
+                                item,
+                                index
+                            ) => (
 
                                 <div
                                     key={
@@ -207,107 +432,109 @@ const OrderDetailsPage = () => {
                                         index
                                     }
                                     className="
-                                        flex
-                                        gap-4
-                                        border-b
-                                        pb-5
-                                        last:border-b-0
-                                        last:pb-0
+                                        order-item
                                     "
                                 >
+
 
                                     {/* Image */}
 
                                     <div className="
-                                        w-20
-                                        h-20
-                                        bg-gray-100
-                                        rounded
-                                        overflow-hidden
-                                        shrink-0
+                                        order-item__image
                                     ">
 
                                         {item.image ? (
 
                                             <img
-                                                src={item.image}
-                                                alt={item.name}
-                                                className="
-                                                    w-full
-                                                    h-full
-                                                    object-cover
-                                                "
+                                                src={
+                                                    item.image
+                                                }
+                                                alt={
+                                                    item.name
+                                                }
                                             />
 
                                         ) : (
 
-                                            <div className="
-                                                w-full
-                                                h-full
-                                                flex
-                                                items-center
-                                                justify-center
-                                                text-xs
-                                                text-gray-400
-                                            ">
+                                            <span>
                                                 No Image
-                                            </div>
+                                            </span>
 
                                         )}
 
                                     </div>
 
 
-                                    {/* Product Info */}
+                                    {/* Product Information */}
 
-                                    <div className="flex-1">
+                                    <div className="
+                                        order-item__info
+                                    ">
 
-                                        <h3 className="
-                                            font-semibold
-                                        ">
+                                        <h3>
                                             {item.name}
                                         </h3>
 
-                                        {item.variantSku && (
 
-                                            <p className="
-                                                text-sm
-                                                text-gray-500
-                                                mt-1
-                                            ">
-                                                SKU:{" "}
-                                                {item.variantSku}
-                                            </p>
-
-                                        )}
-
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                            mt-1
+                                        <div className="
+                                            order-item__codes
                                         ">
-                                            Quantity:{" "}
-                                            {item.quantity}
-                                        </p>
 
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                            mt-1
+                                            {item.sku && (
+
+                                                <span>
+                                                    SKU:{" "}
+                                                    {item.sku}
+                                                </span>
+
+                                            )}
+
+
+                                            {item.variantSku && (
+
+                                                <span>
+                                                    Variant:{" "}
+                                                    {item.variantSku}
+                                                </span>
+
+                                            )}
+
+                                        </div>
+
+
+                                        <div className="
+                                            order-item__meta
                                         ">
-                                            Price: ₹{item.price}
-                                        </p>
+
+                                            <span>
+                                                Qty:{" "}
+                                                {item.quantity}
+                                            </span>
+
+
+                                            <span>
+                                                Unit:{" "}
+                                                {formatCurrency(
+                                                    item.discountPrice ||
+                                                    item.price
+                                                )}
+                                            </span>
+
+                                        </div>
 
                                     </div>
 
 
-                                    {/* Item Total */}
+                                    {/* Subtotal */}
 
                                     <div className="
-                                        font-semibold
-                                        whitespace-nowrap
+                                        order-item__total
                                     ">
-                                        ₹{item.subtotal}
+
+                                        {formatCurrency(
+                                            item.subtotal
+                                        )}
+
                                     </div>
 
                                 </div>
@@ -317,213 +544,411 @@ const OrderDetailsPage = () => {
 
                     </div>
 
-                </Card>
+                </section>
 
 
-                {/* Address + Summary */}
+                {/* =================================
+                    Address + Payment
+                ================================= */}
 
                 <div className="
-                    grid
-                    grid-cols-1
-                    lg:grid-cols-2
-                    gap-6
-                    mt-6
+                    order-two-column
                 ">
 
-                    {/* Delivery Address */}
 
-                    <Card>
+                    {/* =================================
+                        Delivery Address
+                    ================================= */}
 
-                        <h2 className="
-                            text-xl
-                            font-semibold
-                            mb-4
+                    <section className="
+                        order-section
+                    ">
+
+                        <div className="
+                            order-section__header
                         ">
-                            Delivery Address
-                        </h2>
 
-                        <p className="font-medium">
-                            {order.shippingAddress?.fullName}
-                        </p>
-
-                        <p className="
-                            text-gray-600
-                            mt-2
-                        ">
-                            {order.shippingAddress?.mobile}
-                        </p>
-
-                        <p className="
-                            text-gray-600
-                            mt-2
-                        ">
-                            {order.shippingAddress?.addressLine1}
-                        </p>
-
-                        {order.shippingAddress?.addressLine2 && (
-
-                            <p className="text-gray-600">
-                                {
-                                    order.shippingAddress
-                                        .addressLine2
-                                }
-                            </p>
-
-                        )}
-
-                        {order.shippingAddress?.landmark && (
-
-                            <p className="text-gray-600">
-                                Landmark:{" "}
-                                {
-                                    order.shippingAddress
-                                        .landmark
-                                }
-                            </p>
-
-                        )}
-
-                        <p className="text-gray-600">
-
-                            {order.shippingAddress?.city}
-                            {", "}
-                            {order.shippingAddress?.state}
-                            {" - "}
-                            {order.shippingAddress?.pincode}
-
-                        </p>
-
-                        <p className="text-gray-600">
-
-                            {order.shippingAddress?.country}
-
-                        </p>
-
-                    </Card>
-
-
-                    {/* Payment + Summary */}
-
-                    <Card>
-
-                        <h2 className="
-                            text-xl
-                            font-semibold
-                            mb-4
-                        ">
-                            Payment & Summary
-                        </h2>
-
-                        <div className="space-y-3">
-
-                            <div className="
-                                flex
-                                justify-between
-                                gap-4
-                            ">
+                            <div>
 
                                 <span>
-                                    Payment
+                                    DELIVERY
                                 </span>
 
+                                <h2>
+                                    Delivery Address
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <div className="
+                            delivery-address
+                        ">
+
+                            <div className="
+                                delivery-address__name
+                            ">
+
+                                <strong>
+                                    {
+                                        order.shippingAddress
+                                            ?.fullName
+                                    }
+                                </strong>
+
                                 <span>
-                                    {order.payment?.method}
+                                    {
+                                        order.shippingAddress
+                                            ?.mobile
+                                    }
                                 </span>
 
                             </div>
 
+
                             <div className="
-                                flex
-                                justify-between
-                                gap-4
+                                delivery-address__lines
                             ">
+
+                                <p>
+                                    {
+                                        order.shippingAddress
+                                            ?.addressLine1
+                                    }
+                                </p>
+
+
+                                {order.shippingAddress?.addressLine2 && (
+
+                                    <p>
+                                        {
+                                            order.shippingAddress
+                                                .addressLine2
+                                        }
+                                    </p>
+
+                                )}
+
+
+                                {order.shippingAddress?.landmark && (
+
+                                    <p>
+                                        Landmark:{" "}
+                                        {
+                                            order.shippingAddress
+                                                .landmark
+                                        }
+                                    </p>
+
+                                )}
+
+
+                                <p>
+                                    {
+                                        order.shippingAddress
+                                            ?.city
+                                    }
+                                    ,{" "}
+                                    {
+                                        order.shippingAddress
+                                            ?.state
+                                    }
+                                    {" - "}
+                                    {
+                                        order.shippingAddress
+                                            ?.pincode
+                                    }
+                                </p>
+
+
+                                <p>
+                                    {
+                                        order.shippingAddress
+                                            ?.country
+                                    }
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    {/* =================================
+                        Payment & Pricing
+                    ================================= */}
+
+                    <section className="
+                        order-section
+                    ">
+
+                        <div className="
+                            order-section__header
+                        ">
+
+                            <div>
+
+                                <span>
+                                    PAYMENT
+                                </span>
+
+                                <h2>
+                                    Payment Summary
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <div className="
+                            payment-summary
+                        ">
+
+
+                            {/* Payment Method */}
+
+                            <div>
+
+                                <span>
+                                    Payment Method
+                                </span>
+
+                                <strong>
+                                    {
+                                        order.payment
+                                            ?.method ||
+                                        "-"
+                                    }
+                                </strong>
+
+                            </div>
+
+
+                            {/* Payment Status */}
+
+                            <div>
 
                                 <span>
                                     Payment Status
                                 </span>
 
-                                <span>
-                                    {order.payment?.status}
-                                </span>
+                                <strong>
+                                    {
+                                        order.payment
+                                            ?.status ||
+                                        "-"
+                                    }
+                                </strong>
 
                             </div>
 
+
+                            {/* Transaction */}
+
+                            {order.payment?.transactionId && (
+
+                                <div>
+
+                                    <span>
+                                        Transaction ID
+                                    </span>
+
+                                    <strong>
+                                        {
+                                            order.payment
+                                                .transactionId
+                                        }
+                                    </strong>
+
+                                </div>
+
+                            )}
+
+
+                            {/* Paid At */}
+
+                            {order.payment?.paidAt && (
+
+                                <div>
+
+                                    <span>
+                                        Paid On
+                                    </span>
+
+                                    <strong>
+                                        {formatDateTime(
+                                            order.payment
+                                                .paidAt
+                                        )}
+                                    </strong>
+
+                                </div>
+
+                            )}
+
+
                             <div className="
-                                flex
-                                justify-between
-                                gap-4
-                            ">
+                                payment-summary__divider
+                            " />
+
+
+                            {/* Subtotal */}
+
+                            <div>
 
                                 <span>
                                     Subtotal
                                 </span>
 
-                                <span>
-                                    ₹{order.pricing?.subtotal}
-                                </span>
+                                <strong>
+                                    {formatCurrency(
+                                        order.pricing
+                                            ?.subtotal
+                                    )}
+                                </strong>
 
                             </div>
 
-                            <div className="
-                                flex
-                                justify-between
-                                gap-4
-                            ">
+
+                            {/* Discount */}
+
+                            {order.pricing?.discount > 0 && (
+
+                                <div>
+
+                                    <span>
+                                        Discount
+                                    </span>
+
+                                    <strong>
+                                        -
+                                        {formatCurrency(
+                                            order.pricing
+                                                .discount
+                                        )}
+                                    </strong>
+
+                                </div>
+
+                            )}
+
+
+                            {/* Tax */}
+
+                            {order.pricing?.tax > 0 && (
+
+                                <div>
+
+                                    <span>
+                                        Tax
+                                    </span>
+
+                                    <strong>
+                                        {formatCurrency(
+                                            order.pricing
+                                                .tax
+                                        )}
+                                    </strong>
+
+                                </div>
+
+                            )}
+
+
+                            {/* Shipping */}
+
+                            <div>
 
                                 <span>
                                     Shipping
                                 </span>
 
-                                <span>
-                                    ₹{order.pricing?.shipping}
-                                </span>
+                                <strong>
+
+                                    {order.pricing?.shipping > 0
+
+                                        ? formatCurrency(
+                                            order.pricing
+                                                .shipping
+                                        )
+
+                                        : "FREE"
+
+                                    }
+
+                                </strong>
 
                             </div>
 
+
+                            {/* Total */}
+
                             <div className="
-                                flex
-                                justify-between
-                                gap-4
-                                border-t
-                                pt-3
-                                font-bold
+                                payment-summary__total
                             ">
 
                                 <span>
                                     Total
                                 </span>
 
-                                <span>
-                                    ₹{order.pricing?.total}
-                                </span>
+                                <strong>
+                                    {formatCurrency(
+                                        order.pricing
+                                            ?.total
+                                    )}
+                                </strong>
 
                             </div>
 
                         </div>
 
-                    </Card>
+                    </section>
 
                 </div>
 
 
-                {/* Order Timeline */}
+                {/* =================================
+                    Timeline
+                ================================= */}
 
-                <Card className="mt-6">
+                <section className="
+                    order-section
+                ">
 
-                    <h2 className="
-                        text-xl
-                        font-semibold
-                        mb-6
+                    <div className="
+                        order-section__header
                     ">
-                        Order Timeline
-                    </h2>
+
+                        <div>
+
+                            <span>
+                                PROGRESS
+                            </span>
+
+                            <h2>
+                                Order Timeline
+                            </h2>
+
+                        </div>
+
+                    </div>
+
 
                     {order.timeline?.length > 0 ? (
 
-                        <div className="space-y-5">
+                        <div className="
+                            order-timeline
+                        ">
 
                             {order.timeline.map(
-                                (event, index) => (
+                                (
+                                    event,
+                                    index
+                                ) => (
 
                                     <div
                                         key={
@@ -531,49 +956,48 @@ const OrderDetailsPage = () => {
                                             index
                                         }
                                         className="
-                                            flex
-                                            gap-4
+                                            timeline-item
                                         "
                                     >
 
                                         <div className="
-                                            w-3
-                                            h-3
-                                            bg-black
-                                            rounded-full
-                                            mt-1.5
-                                            shrink-0"
-                                        />
+                                            timeline-item__marker
+                                        ">
 
-                                        <div>
+                                            <span />
 
-                                            <p className="
-                                                font-medium
+                                        </div>
+
+
+                                        <div className="
+                                            timeline-item__content
+                                        ">
+
+                                            <div className="
+                                                timeline-item__top
                                             ">
-                                                {event.status}
-                                            </p>
+
+                                                <strong>
+                                                    {
+                                                        event.status
+                                                    }
+                                                </strong>
+
+                                                <time>
+                                                    {formatDateTime(
+                                                        event.updatedAt
+                                                    )}
+                                                </time>
+
+                                            </div>
+
 
                                             {event.note && (
 
-                                                <p className="
-                                                    text-sm
-                                                    text-gray-500
-                                                ">
-                                                    {event.note}
-                                                </p>
-
-                                            )}
-
-                                            {event.updatedAt && (
-
-                                                <p className="
-                                                    text-xs
-                                                    text-gray-400
-                                                    mt-1
-                                                ">
-                                                    {new Date(
-                                                        event.updatedAt
-                                                    ).toLocaleString()}
+                                                <p>
+                                                    {
+                                                        event.note
+                                                    }
                                                 </p>
 
                                             )}
@@ -590,44 +1014,67 @@ const OrderDetailsPage = () => {
                     ) : (
 
                         <p className="
-                            text-gray-500
+                            order-no-timeline
                         ">
                             No timeline information available.
                         </p>
 
                     )}
 
-                </Card>
+                </section>
 
 
-                {/* Actions */}
+                {/* =================================
+                    Notes
+                ================================= */}
+
+                {order.notes && (
+
+                    <section className="
+                        order-notes
+                    ">
+
+                        <span>
+                            ORDER NOTE
+                        </span>
+
+                        <p>
+                            {order.notes}
+                        </p>
+
+                    </section>
+
+                )}
+
+
+                {/* =================================
+                    Cancel
+                ================================= */}
 
                 {canCancel && (
 
                     <div className="
-                        mt-6
-                        flex
-                        justify-end
+                        order-details-actions
                     ">
 
                         <button
                             type="button"
-                            onClick={handleCancel}
-                            disabled={cancelling}
+                            onClick={
+                                handleCancel
+                            }
+                            disabled={
+                                cancelling
+                            }
                             className="
-                                border
-                                border-red-300
-                                text-red-600
-                                px-6
-                                py-3
-                                rounded-lg
-                                disabled:opacity-50
+                                order-cancel-button
                             "
                         >
+
                             {cancelling
                                 ? "Cancelling..."
                                 : "Cancel Order"
                             }
+
                         </button>
 
                     </div>
@@ -641,5 +1088,6 @@ const OrderDetailsPage = () => {
     );
 
 };
+
 
 export default OrderDetailsPage;

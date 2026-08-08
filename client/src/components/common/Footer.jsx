@@ -1,5 +1,8 @@
 import Container from "../ui/Container";
 
+import contact from "../../utils/contact";
+
+
 const Footer = () => {
 
     return (
@@ -17,72 +20,384 @@ const Footer = () => {
             <Container>
 
                 <div className="
-                    min-h-[140px]
-
-                    py-8
-                    sm:py-10
-
-                    flex
-                    flex-col
-                    items-center
-                    justify-center
-
-                    gap-3
+                    py-10
+                    sm:py-12
+                    lg:py-14
                 ">
 
-                    {/* Brand */}
+
+                    {/* =================================
+                        Main Footer
+                    ================================= */}
 
                     <div className="
-                        text-center
+                        grid
+                        grid-cols-1
+
+                        sm:grid-cols-2
+                        lg:grid-cols-3
+
+                        gap-8
+                        lg:gap-12
                     ">
 
-                        <h2 className="
-                            text-base
-                            sm:text-lg
 
-                            font-bold
+                        {/* =================================
+                            Brand
+                        ================================= */}
 
-                            tracking-tight
-                        ">
-                            GDS Electronics
-                        </h2>
+                        <div>
 
-                        <p className="
-                            mt-1
+                            <div className="
+                                inline-flex
+                                flex-col
+                            ">
 
-                            text-xs
-                            sm:text-sm
+                                <h2 className="
+                                    text-xl
+                                    sm:text-2xl
 
-                            text-white/60
-                        ">
-                            Inventory & E-Commerce
-                        </p>
+                                    font-bold
+
+                                    tracking-tight
+                                ">
+                                    {contact.brand.name}
+                                </h2>
+
+
+                                <span className="
+                                    mt-1
+
+                                    h-1
+                                    w-10
+
+                                    rounded-full
+
+                                    bg-[var(--secondary)]"
+                                />
+
+                            </div>
+
+
+                            <p className="
+                                mt-4
+
+                                max-w-sm
+
+                                text-sm
+                                sm:text-[15px]
+
+                                leading-6
+
+                                text-white/60
+                            ">
+                                {contact.brand.tagline}
+                            </p>
+
+                        </div>
+
+
+                        {/* =================================
+                            Contact
+                        ================================= */}
+
+                        <div>
+
+                            <p className="
+                                text-xs
+
+                                font-semibold
+
+                                uppercase
+                                tracking-[0.12em]
+
+                                text-[var(--secondary)]
+                            ">
+                                Contact
+                            </p>
+
+
+                            <h3 className="
+                                mt-2
+
+                                text-lg
+
+                                font-semibold
+                            ">
+                                Get in touch
+                            </h3>
+
+
+                            <div className="
+                                mt-4
+
+                                flex
+                                flex-col
+
+                                gap-3
+                            ">
+
+
+                                {/* Email */}
+
+                                <a
+                                    href={
+                                        contact.links.email
+                                    }
+
+                                    className="
+                                        group
+
+                                        flex
+                                        items-center
+
+                                        gap-3
+
+                                        text-sm
+
+                                        text-white/65
+
+                                        transition-colors
+                                        duration-200
+
+                                        hover:text-[var(--secondary)]
+                                    "
+                                >
+
+                                    <span className="
+                                        w-8
+                                        h-8
+
+                                        shrink-0
+
+                                        flex
+                                        items-center
+                                        justify-center
+
+                                        rounded-lg
+
+                                        bg-white/5
+
+                                        text-[var(--secondary)]"
+                                    >
+                                        @
+                                    </span>
+
+
+                                    <span className="
+                                        break-all
+                                    ">
+                                        {
+                                            contact.contact.email
+                                        }
+                                    </span>
+
+                                </a>
+
+
+                                {/* Phone */}
+
+                                <a
+                                    href={
+                                        contact.links.phone
+                                    }
+
+                                    className="
+                                        group
+
+                                        flex
+                                        items-center
+
+                                        gap-3
+
+                                        text-sm
+
+                                        text-white/65
+
+                                        transition-colors
+                                        duration-200
+
+                                        hover:text-[var(--secondary)]
+                                    "
+                                >
+
+                                    <span className="
+                                        w-8
+                                        h-8
+
+                                        shrink-0
+
+                                        flex
+                                        items-center
+                                        justify-center
+
+                                        rounded-lg
+
+                                        bg-white/5
+
+                                        text-[var(--secondary)]
+                                    ">
+                                        ☎
+                                    </span>
+
+
+                                    <span>
+                                        {
+                                            contact.contact.phone
+                                        }
+                                    </span>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+
+                        {/* =================================
+                            Address
+                        ================================= */}
+
+                        <div>
+
+                            <p className="
+                                text-xs
+
+                                font-semibold
+
+                                uppercase
+                                tracking-[0.12em]
+
+                                text-[var(--secondary)]
+                            ">
+                                Visit Us
+                            </p>
+
+
+                            <h3 className="
+                                mt-2
+
+                                text-lg
+
+                                font-semibold
+                            ">
+                                Our Location
+                            </h3>
+
+
+                            <div className="
+                                mt-4
+
+                                flex
+                                items-start
+
+                                gap-3
+                            ">
+
+                                <span className="
+                                    w-8
+                                    h-8
+
+                                    shrink-0
+
+                                    flex
+                                    items-center
+                                    justify-center
+
+                                    rounded-lg
+
+                                    bg-white/5
+
+                                    text-[var(--secondary)]
+                                ">
+                                    ●
+                                </span>
+
+
+                                <div className="
+                                    text-sm
+
+                                    leading-6
+
+                                    text-white/60
+                                ">
+
+                                    <p>
+                                        {
+                                            contact.address.line1
+                                        }
+                                    </p>
+
+                                    <p>
+                                        {
+                                            contact.address.line2
+                                        }
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
 
-                    {/* Divider */}
+                    {/* =================================
+                        Divider
+                    ================================= */}
 
                     <div className="
-                        w-12
-                        h-px
+                        mt-10
+                        sm:mt-12
 
-                        bg-white/15
+                        h-px
+                        w-full
+
+                        bg-white/10
                     " />
 
 
-                    {/* Copyright */}
+                    {/* =================================
+                        Bottom
+                    ================================= */}
 
-                    <p className="
-                        text-[11px]
-                        sm:text-xs
+                    <div className="
+                        pt-5
+                        sm:pt-6
 
-                        text-white/50
+                        flex
+                        flex-col
+                        sm:flex-row
 
-                        text-center
+                        items-center
+                        justify-between
+
+                        gap-3
                     ">
-                        © 2026 GDS Electronics. All rights reserved.
-                    </p>
+
+                        <p className="
+                            text-xs
+                            sm:text-sm
+
+                            text-white/40
+
+                            text-center
+                            sm:text-left
+                        ">
+                            {contact.copyright}
+                        </p>
+
+
+                        <p className="
+                            text-xs
+
+                            text-white/35
+                        ">
+                            Built with care by GDS Electronics
+                        </p>
+
+                    </div>
 
                 </div>
 
@@ -93,5 +408,6 @@ const Footer = () => {
     );
 
 };
+
 
 export default Footer;

@@ -9,6 +9,94 @@ import { getCart } from "../../cart/services/cart.service";
 import { getAddresses } from "../../address/services/address.service";
 import { createOrder } from "../services/checkout.service";
 
+import "./CheckoutPage.css";
+
+
+/* =========================================
+   Icons
+========================================= */
+
+const LocationIcon = () => (
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        width="20"
+        height="20"
+        stroke="currentColor"
+        strokeWidth="1.8"
+    >
+        <path
+            d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"
+            strokeLinejoin="round"
+        />
+        <circle
+            cx="12"
+            cy="10"
+            r="2.5"
+        />
+    </svg>
+);
+
+
+const PaymentIcon = () => (
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        width="20"
+        height="20"
+        stroke="currentColor"
+        strokeWidth="1.8"
+    >
+        <rect
+            x="3"
+            y="5"
+            width="18"
+            height="14"
+            rx="2"
+        />
+        <path
+            d="M3 10h18"
+        />
+        <path
+            d="M7 15h4"
+            strokeLinecap="round"
+        />
+    </svg>
+);
+
+
+const ShieldIcon = () => (
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        width="18"
+        height="18"
+        stroke="currentColor"
+        strokeWidth="1.8"
+    >
+        <path
+            d="
+                M12 3
+                20 6
+                v6
+                c0 4.5-3.2 7.5-8 9
+                -4.8-1.5-8-4.5-8-9V6l8-3Z
+            "
+            strokeLinejoin="round"
+        />
+        <path
+            d="m9 12 2 2 4-4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+    </svg>
+);
+
+
+/* =========================================
+   Checkout Page
+========================================= */
+
 const CheckoutPage = () => {
 
     const navigate = useNavigate();
@@ -17,7 +105,8 @@ const CheckoutPage = () => {
         items: []
     });
 
-    const [addresses, setAddresses] = useState([]);
+    const [addresses, setAddresses] =
+        useState([]);
 
     const [selectedAddress, setSelectedAddress] =
         useState("");
@@ -27,6 +116,11 @@ const CheckoutPage = () => {
 
     const [placingOrder, setPlacingOrder] =
         useState(false);
+
+
+    /* =========================================
+       Fetch Data
+    ========================================= */
 
     const fetchCheckoutData = async () => {
 
@@ -66,6 +160,7 @@ const CheckoutPage = () => {
                 );
 
             }
+
         }
         catch (error) {
 
@@ -83,16 +178,21 @@ const CheckoutPage = () => {
 
     };
 
+
     useEffect(() => {
 
         fetchCheckoutData();
 
     }, []);
 
+
+    /* =========================================
+       Price
+    ========================================= */
+
     const getItemPrice = (item) => {
 
-        const product =
-            item.product;
+        const product = item.product;
 
         if (
             item.variantSku &&
@@ -102,7 +202,8 @@ const CheckoutPage = () => {
             const variant =
                 product.variants.find(
                     variant =>
-                        variant.sku === item.variantSku
+                        variant.sku ===
+                        item.variantSku
                 );
 
             if (variant) {
@@ -124,20 +225,20 @@ const CheckoutPage = () => {
 
     };
 
+
     const subtotal =
         cart.items.reduce(
-            (
-                total,
-                item
-            ) => {
-
-                return total +
-                    getItemPrice(item) *
-                    item.quantity;
-
-            },
+            (total, item) =>
+                total +
+                getItemPrice(item) *
+                item.quantity,
             0
         );
+
+
+    /* =========================================
+       Place Order
+    ========================================= */
 
     const handlePlaceOrder = async () => {
 
@@ -205,57 +306,81 @@ const CheckoutPage = () => {
 
     };
 
+
+    /* =========================================
+       Loading
+    ========================================= */
+
     if (loading) {
 
         return (
+
             <Container>
 
                 <div className="
-                    py-16
-                    text-center
+                    checkout-loading
                 ">
-                    Loading checkout...
+
+                    <div className="
+                        checkout-spinner
+                    " />
+
+                    <p>
+                        Preparing your checkout...
+                    </p>
+
                 </div>
 
             </Container>
+
         );
 
     }
 
+
+    /* =========================================
+       Empty Cart
+    ========================================= */
+
     if (cart.items.length === 0) {
 
         return (
+
             <Container>
 
-                <div className="py-16">
+                <div className="
+                    checkout-empty-wrapper
+                ">
 
                     <Card>
 
                         <div className="
-                            text-center
-                            py-10
+                            checkout-empty
                         ">
 
-                            <h1 className="
-                                text-2xl
-                                font-bold
+                            <div className="
+                                checkout-empty-icon
                             ">
+                                🛒
+                            </div>
+
+                            <h1>
                                 Your cart is empty
                             </h1>
+
+                            <p>
+                                Add some products before
+                                proceeding to checkout.
+                            </p>
 
                             <Link
                                 to="/products"
                                 className="
-                                    inline-block
-                                    mt-6
-                                    bg-black
-                                    text-white
-                                    px-6
-                                    py-3
-                                    rounded-lg
+                                    checkout-primary-btn
                                 "
                             >
                                 Continue Shopping
+                                <span>→</span>
                             </Link>
 
                         </div>
@@ -265,58 +390,109 @@ const CheckoutPage = () => {
                 </div>
 
             </Container>
+
         );
 
     }
+
 
     return (
 
         <Container>
 
-            <div className="py-10">
+            <div className="
+                checkout-page
+            ">
 
-                <h1 className="
-                    text-3xl
-                    font-bold
-                    mb-8
-                ">
-                    Checkout
-                </h1>
+
+                {/* =================================
+                    Header
+                ================================= */}
 
                 <div className="
-                    grid
-                    grid-cols-1
-                    lg:grid-cols-3
-                    gap-6
+                    checkout-header
                 ">
 
-                    {/* Address */}
+                    <div>
+
+                        <span className="
+                            checkout-eyebrow
+                        ">
+                            SECURE CHECKOUT
+                        </span>
+
+                        <h1>
+                            Checkout
+                        </h1>
+
+                        <p>
+                            Review your order and
+                            choose where you'd like it delivered.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {/* =================================
+                    Main Grid
+                ================================= */}
+
+                <div className="
+                    checkout-grid
+                ">
+
+
+                    {/* =================================
+                        Left
+                    ================================= */}
 
                     <div className="
-                        lg:col-span-2
+                        checkout-main
                     ">
+
+
+                        {/* =================================
+                            Address
+                        ================================= */}
 
                         <Card>
 
                             <div className="
-                                flex
-                                items-center
-                                justify-between
-                                mb-6
+                                checkout-section-header
                             ">
 
-                                <h2 className="
-                                    text-xl
-                                    font-semibold
+                                <div className="
+                                    checkout-section-title
                                 ">
-                                    Delivery Address
-                                </h2>
+
+                                    <div className="
+                                        checkout-section-icon
+                                    ">
+                                        <LocationIcon />
+                                    </div>
+
+                                    <div>
+
+                                        <h2>
+                                            Delivery Address
+                                        </h2>
+
+                                        <p>
+                                            Where should we
+                                            deliver your order?
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
 
                                 <Link
                                     to="/addresses"
                                     className="
-                                        text-sm
-                                        underline
+                                        checkout-manage-link
                                     "
                                 >
                                     Manage Addresses
@@ -324,13 +500,14 @@ const CheckoutPage = () => {
 
                             </div>
 
+
                             {addresses.length === 0 ? (
 
-                                <div>
+                                <div className="
+                                    checkout-no-address
+                                ">
 
-                                    <p className="
-                                        text-gray-500
-                                    ">
+                                    <p>
                                         You don't have an
                                         address yet.
                                     </p>
@@ -338,13 +515,7 @@ const CheckoutPage = () => {
                                     <Link
                                         to="/addresses"
                                         className="
-                                            inline-block
-                                            mt-4
-                                            bg-black
-                                            text-white
-                                            px-5
-                                            py-2
-                                            rounded-lg
+                                            checkout-secondary-btn
                                         "
                                     >
                                         Add Address
@@ -355,7 +526,7 @@ const CheckoutPage = () => {
                             ) : (
 
                                 <div className="
-                                    space-y-4
+                                    checkout-address-list
                                 ">
 
                                     {addresses.map(
@@ -365,121 +536,108 @@ const CheckoutPage = () => {
                                                 key={
                                                     address._id
                                                 }
+
                                                 className={`
-                                                    block
-                                                    border
-                                                    rounded-lg
-                                                    p-4
-                                                    cursor-pointer
+                                                    checkout-address-card
                                                     ${
                                                         selectedAddress ===
                                                         address._id
-                                                            ? "border-black"
-                                                            : "border-gray-200"
+                                                            ? "selected"
+                                                            : ""
                                                     }
                                                 `}
                                             >
 
+                                                <input
+                                                    type="radio"
+                                                    name="address"
+                                                    value={
+                                                        address._id
+                                                    }
+                                                    checked={
+                                                        selectedAddress ===
+                                                        address._id
+                                                    }
+                                                    onChange={() =>
+                                                        setSelectedAddress(
+                                                            address._id
+                                                        )
+                                                    }
+                                                />
+
+
+                                                <span className="
+                                                    checkout-radio
+                                                " />
+
+
                                                 <div className="
-                                                    flex
-                                                    gap-3
+                                                    checkout-address-content
                                                 ">
 
-                                                    <input
-                                                        type="radio"
-                                                        name="address"
-                                                        value={
-                                                            address._id
-                                                        }
-                                                        checked={
-                                                            selectedAddress ===
-                                                            address._id
-                                                        }
-                                                        onChange={() =>
-                                                            setSelectedAddress(
-                                                                address._id
-                                                            )
-                                                        }
-                                                    />
+                                                    <div className="
+                                                        checkout-address-top
+                                                    ">
 
-                                                    <div>
-
-                                                        <div className="
-                                                            flex
-                                                            items-center
-                                                            gap-2
-                                                        ">
-
-                                                            <p className="
-                                                                font-semibold
-                                                            ">
-                                                                {
-                                                                    address.fullName
-                                                                }
-                                                            </p>
-
-                                                            {address.isDefault && (
-
-                                                                <span className="
-                                                                    text-xs
-                                                                    text-green-600
-                                                                ">
-                                                                    Default
-                                                                </span>
-
-                                                            )}
-
-                                                        </div>
-
-                                                        <p className="
-                                                            text-sm
-                                                            text-gray-600
-                                                            mt-1
-                                                        ">
+                                                        <strong>
                                                             {
-                                                                address.mobile
+                                                                address.fullName
                                                             }
-                                                        </p>
+                                                        </strong>
 
-                                                        <p className="
-                                                            text-sm
-                                                            text-gray-600
-                                                            mt-1
-                                                        ">
-                                                            {
-                                                                address.addressLine1
-                                                            }
-                                                        </p>
+                                                        {address.isDefault && (
 
-                                                        {address.addressLine2 && (
-
-                                                            <p className="
-                                                                text-sm
-                                                                text-gray-600
+                                                            <span className="
+                                                                checkout-default
                                                             ">
-                                                                {
-                                                                    address.addressLine2
-                                                                }
-                                                            </p>
+                                                                Default
+                                                            </span>
 
                                                         )}
 
-                                                        <p className="
-                                                            text-sm
-                                                            text-gray-600
-                                                        ">
+                                                    </div>
+
+
+                                                    <p className="
+                                                        checkout-mobile
+                                                    ">
+                                                        {
+                                                            address.mobile
+                                                        }
+                                                    </p>
+
+
+                                                    <p>
+                                                        {
+                                                            address.addressLine1
+                                                        }
+                                                    </p>
+
+
+                                                    {address.addressLine2 && (
+
+                                                        <p>
                                                             {
-                                                                address.city
-                                                            },{" "}
-                                                            {
-                                                                address.state
-                                                            } -{" "}
-                                                            {
-                                                                address.pincode
+                                                                address.addressLine2
                                                             }
                                                         </p>
 
-                                                    </div>
+                                                    )}
+
+
+                                                    <p>
+                                                        {
+                                                            address.city
+                                                        }
+                                                        ,{" "}
+                                                        {
+                                                            address.state
+                                                        }
+                                                        {" - "}
+                                                        {
+                                                            address.pincode
+                                                        }
+                                                    </p>
 
                                                 </div>
 
@@ -495,89 +653,124 @@ const CheckoutPage = () => {
                         </Card>
 
 
-                        {/* Payment */}
+                        {/* =================================
+                            Payment
+                        ================================= */}
 
-                        <Card className="mt-6">
-
-                            <h2 className="
-                                text-xl
-                                font-semibold
-                                mb-4
-                            ">
-                                Payment Method
-                            </h2>
+                        <Card className="
+                            checkout-payment-card
+                        ">
 
                             <div className="
-                                border
-                                rounded-lg
-                                p-4
+                                checkout-section-title
                             ">
 
                                 <div className="
-                                    flex
-                                    items-center
-                                    gap-3
+                                    checkout-section-icon
                                 ">
+                                    <PaymentIcon />
+                                </div>
 
-                                    <input
-                                        type="radio"
-                                        checked
-                                        readOnly
-                                    />
+                                <div>
 
-                                    <div>
+                                    <h2>
+                                        Payment Method
+                                    </h2>
 
-                                        <p className="
-                                            font-semibold
-                                        ">
-                                            Cash on Delivery
-                                        </p>
-
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                        ">
-                                            Pay when your order
-                                            arrives.
-                                        </p>
-
-                                    </div>
+                                    <p>
+                                        Choose how you'd like
+                                        to pay.
+                                    </p>
 
                                 </div>
 
                             </div>
 
-                            <p className="
-                                text-sm
-                                text-gray-500
-                                mt-3
+
+                            <div className="
+                                checkout-payment-option
                             ">
+
+                                <input
+                                    type="radio"
+                                    checked
+                                    readOnly
+                                />
+
+                                <div className="
+                                    checkout-payment-content
+                                ">
+
+                                    <strong>
+                                        Cash on Delivery
+                                    </strong>
+
+                                    <span>
+                                        Pay when your order
+                                        arrives.
+                                    </span>
+
+                                </div>
+
+                                <span className="
+                                    checkout-payment-badge
+                                ">
+                                    COD
+                                </span>
+
+                            </div>
+
+
+                            <div className="
+                                checkout-payment-note
+                            ">
+
                                 Online payment will be
-                                available once Razorpay is
-                                integrated.
-                            </p>
+                                available once Razorpay
+                                is integrated.
+
+                            </div>
 
                         </Card>
 
                     </div>
 
 
-                    {/* Summary */}
+                    {/* =================================
+                        Summary
+                    ================================= */}
 
                     <Card className="
-                        h-fit
+                        checkout-summary
                     ">
 
-                        <h2 className="
-                            text-xl
-                            font-semibold
+                        <div className="
+                            checkout-summary-header
                         ">
-                            Order Summary
-                        </h2>
+
+                            <div>
+
+                                <span>
+                                    YOUR ORDER
+                                </span>
+
+                                <h2>
+                                    Order Summary
+                                </h2>
+
+                            </div>
+
+                            <div className="
+                                checkout-item-count
+                            ">
+                                {cart.items.length}
+                            </div>
+
+                        </div>
+
 
                         <div className="
-                            mt-6
-                            space-y-4
+                            checkout-items
                         ">
 
                             {cart.items.map(
@@ -586,41 +779,82 @@ const CheckoutPage = () => {
                                     <div
                                         key={item._id}
                                         className="
-                                            flex
-                                            justify-between
-                                            gap-4
+                                            checkout-item
                                         "
                                     >
 
-                                        <div>
+                                        <div className="
+                                            checkout-item-image
+                                        ">
 
-                                            <p className="
-                                                font-medium
-                                            ">
-                                                {
-                                                    item.product.name
-                                                }
-                                            </p>
+                                            {item.product.images?.[0]?.url ? (
 
-                                            <p className="
-                                                text-sm
-                                                text-gray-500
-                                            ">
-                                                Qty: {
-                                                    item.quantity
-                                                }
-                                            </p>
+                                                <img
+                                                    src={
+                                                        item.product
+                                                            .images[0]
+                                                            .url
+                                                    }
+                                                    alt={
+                                                        item.product.name
+                                                    }
+                                                />
+
+                                            ) : (
+
+                                                <span>
+                                                    No Image
+                                                </span>
+
+                                            )}
 
                                         </div>
 
-                                        <span>
-                                            ₹{
-                                                getItemPrice(
-                                                    item
-                                                ) *
-                                                item.quantity
+
+                                        <div className="
+                                            checkout-item-info
+                                        ">
+
+                                            <strong>
+                                                {
+                                                    item.product.name
+                                                }
+                                            </strong>
+
+                                            {item.variantSku && (
+
+                                                <span className="
+                                                    checkout-variant
+                                                ">
+                                                    {item.variantSku}
+                                                </span>
+
+                                            )}
+
+                                            <span>
+                                                Qty: {
+                                                    item.quantity
+                                                }
+                                            </span>
+
+                                        </div>
+
+
+                                        <strong className="
+                                            checkout-item-price
+                                        ">
+                                            ₹
+                                            {
+                                                (
+                                                    getItemPrice(
+                                                        item
+                                                    ) *
+                                                    item.quantity
+                                                ).toLocaleString(
+                                                    "en-IN"
+                                                )
                                             }
-                                        </span>
+                                        </strong>
 
                                     </div>
 
@@ -629,63 +863,69 @@ const CheckoutPage = () => {
 
                         </div>
 
+
+                        {/* =================================
+                            Totals
+                        ================================= */}
+
                         <div className="
-                            border-t
-                            mt-6
-                            pt-4
-                            space-y-3
+                            checkout-totals
                         ">
 
-                            <div className="
-                                flex
-                                justify-between
-                            ">
+                            <div>
 
                                 <span>
                                     Subtotal
                                 </span>
 
-                                <span>
-                                    ₹{subtotal}
-                                </span>
+                                <strong>
+                                    ₹
+                                    {subtotal.toLocaleString(
+                                        "en-IN"
+                                    )}
+                                </strong>
 
                             </div>
 
-                            <div className="
-                                flex
-                                justify-between
-                            ">
+
+                            <div>
 
                                 <span>
                                     Shipping
                                 </span>
 
-                                <span>
+                                <strong className="
+                                    checkout-free
+                                ">
                                     Free
-                                </span>
+                                </strong>
 
                             </div>
 
+
                             <div className="
-                                border-t
-                                pt-3
-                                flex
-                                justify-between
-                                font-bold
-                                text-lg
+                                checkout-total
                             ">
 
                                 <span>
                                     Total
                                 </span>
 
-                                <span>
-                                    ₹{subtotal}
-                                </span>
+                                <strong>
+                                    ₹
+                                    {subtotal.toLocaleString(
+                                        "en-IN"
+                                    )}
+                                </strong>
 
                             </div>
 
                         </div>
+
+
+                        {/* =================================
+                            Place Order
+                        ================================= */}
 
                         <button
                             type="button"
@@ -697,20 +937,35 @@ const CheckoutPage = () => {
                                 !selectedAddress
                             }
                             className="
-                                w-full
-                                mt-6
-                                bg-black
-                                text-white
-                                py-3
-                                rounded-lg
-                                disabled:opacity-50
+                                checkout-place-btn
                             "
                         >
+
                             {placingOrder
                                 ? "Placing Order..."
                                 : "Place Order"
                             }
+
+                            {!placingOrder && (
+                                <span>
+                                    →
+                                </span>
+                            )}
+
                         </button>
+
+
+                        <div className="
+                            checkout-secure
+                        ">
+
+                            <ShieldIcon />
+
+                            <span>
+                                Secure checkout
+                            </span>
+
+                        </div>
 
                     </Card>
 

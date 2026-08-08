@@ -1,0 +1,558 @@
+/* =========================================
+   Profile Page
+========================================= */
+
+.profile-page {
+    width: 100%;
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    padding: 48px 0 70px;
+}
+
+
+/* =========================================
+   Header
+========================================= */
+
+.profile-page-header {
+    margin-bottom: 28px;
+}
+
+.profile-label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.14em;
+
+    color: var(--primary);
+}
+
+.profile-page-header h1 {
+    margin: 0;
+
+    font-size: 34px;
+    line-height: 1.15;
+
+    font-weight: 800;
+
+    letter-spacing: -0.025em;
+
+    color: var(--text);
+}
+
+.profile-page-header p {
+    margin: 9px 0 0;
+
+    font-size: 15px;
+
+    color: var(--text-light);
+}
+
+
+/* =========================================
+   Profile Hero
+========================================= */
+
+.profile-hero {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    gap: 24px;
+
+    padding: 30px;
+
+    margin-bottom: 20px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-lg);
+
+    background: var(--sidebar);
+
+    color: white;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.08);
+}
+
+
+/* Yellow decorative shape */
+
+.profile-hero::after {
+    content: "";
+
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    right: -100px;
+    top: -120px;
+
+    border-radius: 50%;
+
+    background: var(--secondary);
+
+    opacity: 0.14;
+}
+
+
+/* =========================================
+   Avatar
+========================================= */
+
+.profile-avatar {
+    position: relative;
+
+    z-index: 1;
+
+    width: 112px;
+    height: 112px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 28px;
+
+    border: 3px solid var(--secondary);
+
+    background: var(--background);
+
+    color: var(--primary);
+
+    font-size: 36px;
+    font-weight: 800;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+/* =========================================
+   Hero Content
+========================================= */
+
+.profile-hero-content {
+    position: relative;
+
+    z-index: 1;
+
+    min-width: 0;
+}
+
+.profile-name-row {
+    display: flex;
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+.profile-name-row h2 {
+    margin: 0;
+
+    font-size: 27px;
+    font-weight: 800;
+
+    letter-spacing: -0.02em;
+}
+
+.profile-badge {
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 193, 7, 0.16);
+
+    border: 1px solid rgba(255, 193, 7, 0.35);
+
+    color: var(--secondary);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.profile-email {
+    margin: 7px 0 0;
+
+    font-size: 14px;
+
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.profile-hero-meta {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 13px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.profile-meta-dot {
+    color: var(--secondary);
+}
+
+
+/* =========================================
+   Info Card
+========================================= */
+
+.profile-info-card,
+.profile-account-card {
+    padding: 26px;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-lg);
+
+    background: var(--surface);
+
+    box-shadow:
+        0 5px 22px rgba(0, 0, 0, 0.035);
+}
+
+
+/* =========================================
+   Card Heading
+========================================= */
+
+.profile-card-heading {
+    margin-bottom: 22px;
+}
+
+.profile-card-heading span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.13em;
+
+    color: var(--primary);
+}
+
+.profile-card-heading h2 {
+    margin: 0;
+
+    font-size: 20px;
+    font-weight: 750;
+
+    color: var(--text);
+}
+
+
+/* =========================================
+   Information Grid
+========================================= */
+
+.profile-info-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    border-top: 1px solid var(--border);
+}
+
+
+.profile-info-item {
+    padding: 18px 12px 16px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.profile-info-item:nth-child(even) {
+    padding-left: 20px;
+
+    border-left: 1px solid var(--border);
+}
+
+
+.profile-info-item span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: var(--text-light);
+}
+
+
+.profile-info-item strong {
+    display: block;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    color: var(--text);
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================
+   Status
+========================================= */
+
+.profile-status {
+    display: flex !important;
+    align-items: center;
+
+    gap: 7px;
+}
+
+.profile-status i {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+}
+
+
+/* =========================================
+   Account
+========================================= */
+
+.profile-account-card {
+    margin-top: 20px;
+}
+
+.profile-action-list {
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius-md);
+}
+
+
+.profile-action {
+    display: flex;
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 18px;
+
+    text-decoration: none;
+
+    background: var(--surface);
+
+    transition:
+        background 0.2s ease,
+        padding 0.2s ease;
+}
+
+.profile-action + .profile-action {
+    border-top: 1px solid var(--border);
+}
+
+
+.profile-action:hover {
+    padding-left: 22px;
+
+    background: var(--surface-hover);
+}
+
+
+/* =========================================
+   Action Icon
+========================================= */
+
+.profile-action-icon {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: rgba(255, 193, 7, 0.1);
+
+    color: var(--primary);
+
+    font-size: 18px;
+}
+
+
+/* =========================================
+   Action Content
+========================================= */
+
+.profile-action-content {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.profile-action-content h3 {
+    margin: 0;
+
+    font-size: 16px;
+    font-weight: 750;
+
+    color: var(--text);
+}
+
+.profile-action-content p {
+    margin: 4px 0 0;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+    color: var(--text-light);
+}
+
+
+/* =========================================
+   Arrow
+========================================= */
+
+.profile-action-arrow {
+    flex-shrink: 0;
+
+    font-size: 21px;
+    font-weight: 500;
+
+    color: var(--text-light);
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease;
+}
+
+.profile-action:hover .profile-action-arrow {
+    transform: translateX(4px);
+
+    color: var(--primary);
+}
+
+
+/* =========================================
+   Responsive
+========================================= */
+
+@media (max-width: 640px) {
+
+    .profile-page {
+        padding: 30px 0 50px;
+    }
+
+
+    .profile-page-header h1 {
+        font-size: 29px;
+    }
+
+
+    .profile-page-header p {
+        font-size: 14px;
+    }
+
+
+    .profile-hero {
+        align-items: flex-start;
+
+        gap: 17px;
+
+        padding: 20px;
+    }
+
+
+    .profile-avatar {
+        width: 78px;
+        height: 78px;
+
+        border-radius: 20px;
+
+        font-size: 25px;
+    }
+
+
+    .profile-name-row h2 {
+        font-size: 20px;
+    }
+
+
+    .profile-hero-meta {
+        flex-wrap: wrap;
+
+        margin-top: 9px;
+    }
+
+
+    .profile-info-card,
+    .profile-account-card {
+        padding: 20px 16px;
+    }
+
+
+    .profile-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .profile-info-item,
+    .profile-info-item:nth-child(even) {
+        padding: 15px 0;
+
+        border-left: 0;
+    }
+
+
+    .profile-action {
+        padding: 16px;
+    }
+
+
+    .profile-action:hover {
+        padding-left: 16px;
+    }
+
+
+    .profile-action-content p {
+        font-size: 12px;
+    }
+
+}

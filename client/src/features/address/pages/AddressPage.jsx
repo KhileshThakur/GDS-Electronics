@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import Container from "../../../components/ui/Container";
-import Card from "../../../components/ui/Card";
 
 import {
     getAddresses,
@@ -11,6 +10,9 @@ import {
     deleteAddress,
     setDefaultAddress
 } from "../services/address.service";
+
+import "./AddressPage.css";
+
 
 const emptyForm = {
     fullName: "",
@@ -21,12 +23,15 @@ const emptyForm = {
     city: "",
     state: "",
     country: "India",
-    pincode: ""
+    pincode: "",
+    type: "home"
 };
+
 
 const AddressPage = () => {
 
-    const [addresses, setAddresses] = useState([]);
+    const [addresses, setAddresses] =
+        useState([]);
 
     const [formData, setFormData] =
         useState(emptyForm);
@@ -39,6 +44,17 @@ const AddressPage = () => {
 
     const [saving, setSaving] =
         useState(false);
+
+    const [deletingId, setDeletingId] =
+        useState(null);
+
+    const [defaultId, setDefaultId] =
+        useState(null);
+
+
+    /* =========================================
+       Fetch Addresses
+    ========================================= */
 
     const fetchAddresses = async () => {
 
@@ -70,11 +86,17 @@ const AddressPage = () => {
 
     };
 
+
     useEffect(() => {
 
         fetchAddresses();
 
     }, []);
+
+
+    /* =========================================
+       Form Change
+    ========================================= */
 
     const handleChange = (event) => {
 
@@ -90,13 +112,25 @@ const AddressPage = () => {
 
     };
 
+
+    /* =========================================
+       Reset
+    ========================================= */
+
     const resetForm = () => {
 
-        setFormData(emptyForm);
+        setFormData({
+            ...emptyForm
+        });
 
         setEditingId(null);
 
     };
+
+
+    /* =========================================
+       Submit
+    ========================================= */
 
     const handleSubmit = async (event) => {
 
@@ -152,9 +186,16 @@ const AddressPage = () => {
 
     };
 
+
+    /* =========================================
+       Edit
+    ========================================= */
+
     const handleEdit = (address) => {
 
-        setEditingId(address._id);
+        setEditingId(
+            address._id
+        );
 
         setFormData({
 
@@ -183,7 +224,10 @@ const AddressPage = () => {
                 address.country || "India",
 
             pincode:
-                address.pincode || ""
+                address.pincode || "",
+
+            type:
+                address.type || "home"
 
         });
 
@@ -194,11 +238,27 @@ const AddressPage = () => {
 
     };
 
+
+    /* =========================================
+       Delete
+    ========================================= */
+
     const handleDelete = async (
         addressId
     ) => {
 
+        const confirmed =
+            window.confirm(
+                "Are you sure you want to delete this address?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
         try {
+
+            setDeletingId(addressId);
 
             const response =
                 await deleteAddress(
@@ -227,14 +287,26 @@ const AddressPage = () => {
             );
 
         }
+        finally {
+
+            setDeletingId(null);
+
+        }
 
     };
+
+
+    /* =========================================
+       Set Default
+    ========================================= */
 
     const handleSetDefault = async (
         addressId
     ) => {
 
         try {
+
+            setDefaultId(addressId);
 
             const response =
                 await setDefaultAddress(
@@ -257,180 +329,382 @@ const AddressPage = () => {
             );
 
         }
+        finally {
+
+            setDefaultId(null);
+
+        }
 
     };
+
+
+    /* =========================================
+       Loading
+    ========================================= */
 
     if (loading) {
 
         return (
+
             <Container>
 
-                <div className="py-16 text-center">
-                    Loading addresses...
+                <div className="address-page">
+
+                    <div className="address-loading">
+
+                        <div className="address-spinner" />
+
+                        <p>
+                            Loading your addresses...
+                        </p>
+
+                    </div>
+
                 </div>
 
             </Container>
+
         );
 
     }
+
 
     return (
 
         <Container>
 
-            <div className="py-10">
+            <div className="address-page">
 
-                <h1 className="
-                    text-3xl
-                    font-bold
-                    mb-8
-                ">
-                    My Addresses
-                </h1>
 
-                {/* Address Form */}
+                {/* =================================
+                    Page Header
+                ================================= */}
 
-                <Card className="mb-8">
+                <header className="address-page__header">
 
-                    <h2 className="
-                        text-xl
-                        font-semibold
-                        mb-6
-                    ">
-                        {editingId
-                            ? "Edit Address"
-                            : "Add Address"
-                        }
-                    </h2>
+                    <div>
+
+                        <span className="address-page__eyebrow">
+                            ACCOUNT
+                        </span>
+
+                        <h1 className="address-page__title">
+                            My Addresses
+                        </h1>
+
+                        <p className="address-page__subtitle">
+                            Manage your saved delivery addresses.
+                        </p>
+
+                    </div>
+
+                    <div className="address-page__count">
+
+                        <strong>
+                            {addresses.length}
+                        </strong>
+
+                        <span>
+                            {addresses.length === 1
+                                ? "Address"
+                                : "Addresses"
+                            }
+                        </span>
+
+                    </div>
+
+                </header>
+
+
+                {/* =================================
+                    Address Form
+                ================================= */}
+
+                <section className="address-form-card">
+
+                    <div className="address-form-card__header">
+
+                        <div>
+
+                            <span className="address-section-label">
+                                {editingId
+                                    ? "UPDATE ADDRESS"
+                                    : "NEW ADDRESS"
+                                }
+                            </span>
+
+                            <h2>
+                                {editingId
+                                    ? "Edit your address"
+                                    : "Add a delivery address"
+                                }
+                            </h2>
+
+                        </div>
+
+
+                        <div className="address-form-card__accent" />
+
+                    </div>
+
 
                     <form
                         onSubmit={handleSubmit}
-                        className="
-                            grid
-                            grid-cols-1
-                            md:grid-cols-2
-                            gap-4
-                        "
+                        className="address-form"
                     >
 
-                        <input
-                            name="fullName"
-                            value={formData.fullName}
-                            onChange={handleChange}
-                            placeholder="Full Name"
-                            required
-                            className="border rounded-lg px-4 py-3"
-                        />
 
-                        <input
-                            name="mobile"
-                            value={formData.mobile}
-                            onChange={handleChange}
-                            placeholder="Mobile Number"
-                            maxLength={10}
-                            required
-                            className="border rounded-lg px-4 py-3"
-                        />
+                        {/* Name */}
 
-                        <input
-                            name="addressLine1"
-                            value={formData.addressLine1}
-                            onChange={handleChange}
-                            placeholder="Address Line 1"
-                            required
-                            className="
-                                border
-                                rounded-lg
-                                px-4
-                                py-3
-                                md:col-span-2
-                            "
-                        />
+                        <div className="address-field">
 
-                        <input
-                            name="addressLine2"
-                            value={formData.addressLine2}
-                            onChange={handleChange}
-                            placeholder="Address Line 2"
-                            className="
-                                border
-                                rounded-lg
-                                px-4
-                                py-3
-                                md:col-span-2
-                            "
-                        />
+                            <label>
+                                Full Name
+                            </label>
 
-                        <input
-                            name="landmark"
-                            value={formData.landmark}
-                            onChange={handleChange}
-                            placeholder="Landmark"
-                            className="border rounded-lg px-4 py-3"
-                        />
+                            <input
+                                name="fullName"
+                                value={formData.fullName}
+                                onChange={handleChange}
+                                placeholder="Enter full name"
+                                required
+                            />
 
-                        <input
-                            name="city"
-                            value={formData.city}
-                            onChange={handleChange}
-                            placeholder="City"
-                            required
-                            className="border rounded-lg px-4 py-3"
-                        />
+                        </div>
 
-                        <input
-                            name="state"
-                            value={formData.state}
-                            onChange={handleChange}
-                            placeholder="State"
-                            required
-                            className="border rounded-lg px-4 py-3"
-                        />
 
-                        <input
-                            name="country"
-                            value={formData.country}
-                            onChange={handleChange}
-                            placeholder="Country"
-                            required
-                            className="border rounded-lg px-4 py-3"
-                        />
+                        {/* Mobile */}
 
-                        <input
-                            name="pincode"
-                            value={formData.pincode}
-                            onChange={handleChange}
-                            placeholder="Pincode"
-                            maxLength={6}
-                            required
-                            className="border rounded-lg px-4 py-3"
-                        />
+                        <div className="address-field">
 
-                        <div className="
-                            md:col-span-2
-                            flex
-                            gap-3
-                        ">
+                            <label>
+                                Mobile Number
+                            </label>
+
+                            <input
+                                name="mobile"
+                                value={formData.mobile}
+                                onChange={handleChange}
+                                placeholder="10 digit mobile number"
+                                maxLength={10}
+                                inputMode="numeric"
+                                required
+                            />
+
+                        </div>
+
+
+                        {/* Address Line 1 */}
+
+                        <div className="address-field address-field--full">
+
+                            <label>
+                                Address Line 1
+                            </label>
+
+                            <input
+                                name="addressLine1"
+                                value={formData.addressLine1}
+                                onChange={handleChange}
+                                placeholder="House / Flat / Building"
+                                required
+                            />
+
+                        </div>
+
+
+                        {/* Address Line 2 */}
+
+                        <div className="address-field address-field--full">
+
+                            <label>
+                                Address Line 2
+                                <span>
+                                    Optional
+                                </span>
+                            </label>
+
+                            <input
+                                name="addressLine2"
+                                value={formData.addressLine2}
+                                onChange={handleChange}
+                                placeholder="Street / Area"
+                            />
+
+                        </div>
+
+
+                        {/* Landmark */}
+
+                        <div className="address-field">
+
+                            <label>
+                                Landmark
+                                <span>
+                                    Optional
+                                </span>
+                            </label>
+
+                            <input
+                                name="landmark"
+                                value={formData.landmark}
+                                onChange={handleChange}
+                                placeholder="Nearby landmark"
+                            />
+
+                        </div>
+
+
+                        {/* City */}
+
+                        <div className="address-field">
+
+                            <label>
+                                City
+                            </label>
+
+                            <input
+                                name="city"
+                                value={formData.city}
+                                onChange={handleChange}
+                                placeholder="City"
+                                required
+                            />
+
+                        </div>
+
+
+                        {/* State */}
+
+                        <div className="address-field">
+
+                            <label>
+                                State
+                            </label>
+
+                            <input
+                                name="state"
+                                value={formData.state}
+                                onChange={handleChange}
+                                placeholder="State"
+                                required
+                            />
+
+                        </div>
+
+
+                        {/* Pincode */}
+
+                        <div className="address-field">
+
+                            <label>
+                                Pincode
+                            </label>
+
+                            <input
+                                name="pincode"
+                                value={formData.pincode}
+                                onChange={handleChange}
+                                placeholder="6 digit pincode"
+                                maxLength={6}
+                                inputMode="numeric"
+                                required
+                            />
+
+                        </div>
+
+
+                        {/* Country */}
+
+                        <div className="address-field">
+
+                            <label>
+                                Country
+                            </label>
+
+                            <input
+                                name="country"
+                                value={formData.country}
+                                onChange={handleChange}
+                                placeholder="Country"
+                                required
+                            />
+
+                        </div>
+
+
+                        {/* Type */}
+
+                        <div className="address-field">
+
+                            <label>
+                                Address Type
+                            </label>
+
+                            <div className="address-type-group">
+
+                                {[
+                                    {
+                                        value: "home",
+                                        label: "Home"
+                                    },
+                                    {
+                                        value: "office",
+                                        label: "Office"
+                                    },
+                                    {
+                                        value: "other",
+                                        label: "Other"
+                                    }
+                                ].map(option => (
+
+                                    <button
+                                        key={option.value}
+                                        type="button"
+                                        className={
+                                            formData.type === option.value
+                                                ? "address-type address-type--active"
+                                                : "address-type"
+                                        }
+                                        onClick={() =>
+                                            setFormData(
+                                                previous => ({
+                                                    ...previous,
+                                                    type: option.value
+                                                })
+                                            )
+                                        }
+                                    >
+                                        {option.label}
+                                    </button>
+
+                                ))}
+
+                            </div>
+
+                        </div>
+
+
+                        {/* Actions */}
+
+                        <div className="address-form__actions">
 
                             <button
                                 type="submit"
                                 disabled={saving}
                                 className="
-                                    bg-black
-                                    text-white
-                                    px-6
-                                    py-3
-                                    rounded-lg
-                                    disabled:opacity-50
+                                    address-button
+                                    address-button--primary
                                 "
                             >
                                 {saving
                                     ? "Saving..."
                                     : editingId
                                         ? "Update Address"
-                                        : "Add Address"
+                                        : "Save Address"
                                 }
                             </button>
+
 
                             {editingId && (
 
@@ -438,10 +712,8 @@ const AddressPage = () => {
                                     type="button"
                                     onClick={resetForm}
                                     className="
-                                        border
-                                        px-6
-                                        py-3
-                                        rounded-lg
+                                        address-button
+                                        address-button--secondary
                                     "
                                 >
                                     Cancel
@@ -453,96 +725,134 @@ const AddressPage = () => {
 
                     </form>
 
-                </Card>
+                </section>
 
-                {/* Address List */}
 
-                {addresses.length === 0 ? (
+                {/* =================================
+                    Saved Addresses
+                ================================= */}
 
-                    <Card>
+                <section className="saved-addresses">
 
-                        <div className="
-                            py-12
-                            text-center
-                            text-gray-500
-                        ">
-                            No addresses saved yet.
+                    <div className="saved-addresses__header">
+
+                        <div>
+
+                            <span className="address-section-label">
+                                SAVED LOCATIONS
+                            </span>
+
+                            <h2>
+                                Your addresses
+                            </h2>
+
                         </div>
 
-                    </Card>
+                    </div>
 
-                ) : (
 
-                    <div className="
-                        grid
-                        grid-cols-1
-                        md:grid-cols-2
-                        gap-6
-                    ">
+                    {addresses.length === 0 ? (
 
-                        {addresses.map(address => (
+                        <div className="address-empty">
 
-                            <Card
-                                key={address._id}
-                            >
+                            <div className="address-empty__icon">
+                                +
+                            </div>
 
-                                <div className="
-                                    flex
-                                    justify-between
-                                    gap-4
-                                ">
+                            <h3>
+                                No addresses yet
+                            </h3>
 
-                                    <div>
+                            <p>
+                                Add your first delivery address
+                                using the form above.
+                            </p>
 
-                                        <div className="
-                                            flex
-                                            items-center
-                                            gap-2
-                                        ">
+                        </div>
 
-                                            <h3 className="
-                                                font-semibold
-                                                text-lg
-                                            ">
-                                                {address.fullName}
-                                            </h3>
+                    ) : (
 
-                                            {address.isDefault && (
+                        <div className="address-grid">
 
-                                                <span className="
-                                                    text-xs
-                                                    bg-green-100
-                                                    text-green-700
-                                                    px-2
-                                                    py-1
-                                                    rounded
-                                                ">
-                                                    Default
+                            {addresses.map(address => (
+
+                                <article
+                                    key={address._id}
+                                    className={
+                                        address.isDefault
+                                            ? "address-card address-card--default"
+                                            : "address-card"
+                                    }
+                                >
+
+
+                                    {/* Card Header */}
+
+                                    <div className="address-card__top">
+
+                                        <div className="address-card__identity">
+
+                                            <div className="address-card__type-icon">
+                                                {address.type === "office"
+                                                    ? "O"
+                                                    : address.type === "other"
+                                                        ? "A"
+                                                        : "H"
+                                                }
+                                            </div>
+
+                                            <div>
+
+                                                <h3>
+                                                    {address.fullName}
+                                                </h3>
+
+                                                <span>
+                                                    {address.type
+                                                        ?.charAt(0)
+                                                        .toUpperCase() +
+                                                        address.type?.slice(1)
+                                                    }
                                                 </span>
 
-                                            )}
+                                            </div>
 
                                         </div>
 
-                                        <p className="
-                                            text-gray-600
-                                            mt-2
-                                        ">
-                                            {address.mobile}
-                                        </p>
 
-                                        <p className="
-                                            text-gray-600
-                                            mt-2
-                                        ">
+                                        {address.isDefault && (
+
+                                            <span className="address-default-badge">
+                                                DEFAULT
+                                            </span>
+
+                                        )}
+
+                                    </div>
+
+
+                                    {/* Contact */}
+
+                                    <div className="address-card__contact">
+
+                                        <span>
+                                            {address.mobile}
+                                        </span>
+
+                                    </div>
+
+
+                                    {/* Address */}
+
+                                    <div className="address-card__body">
+
+                                        <p>
                                             {address.addressLine1}
                                         </p>
 
                                         {address.addressLine2 && (
 
-                                            <p className="
-                                                text-gray-600
-                                            ">
+                                            <p>
                                                 {address.addressLine2}
                                             </p>
 
@@ -550,106 +860,101 @@ const AddressPage = () => {
 
                                         {address.landmark && (
 
-                                            <p className="
-                                                text-gray-600
-                                            ">
-                                                {address.landmark}
+                                            <p className="address-card__muted">
+                                                Near {address.landmark}
                                             </p>
 
                                         )}
 
-                                        <p className="
-                                            text-gray-600
-                                        ">
+                                        <p>
                                             {address.city},{" "}
                                             {address.state} -{" "}
                                             {address.pincode}
                                         </p>
 
-                                        <p className="
-                                            text-gray-600
-                                        ">
+                                        <p>
                                             {address.country}
                                         </p>
 
                                     </div>
 
-                                </div>
 
-                                <div className="
-                                    flex
-                                    flex-wrap
-                                    gap-3
-                                    mt-6
-                                ">
+                                    {/* Actions */}
 
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleEdit(
-                                                address
-                                            )
-                                        }
-                                        className="
-                                            border
-                                            px-4
-                                            py-2
-                                            rounded-lg
-                                        "
-                                    >
-                                        Edit
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleDelete(
-                                                address._id
-                                            )
-                                        }
-                                        className="
-                                            border
-                                            border-red-300
-                                            text-red-600
-                                            px-4
-                                            py-2
-                                            rounded-lg
-                                        "
-                                    >
-                                        Delete
-                                    </button>
-
-                                    {!address.isDefault && (
+                                    <div className="address-card__actions">
 
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                handleSetDefault(
+                                                handleEdit(address)
+                                            }
+                                            className="
+                                                address-card-button
+                                                address-card-button--edit
+                                            "
+                                        >
+                                            Edit
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            disabled={
+                                                deletingId === address._id
+                                            }
+                                            onClick={() =>
+                                                handleDelete(
                                                     address._id
                                                 )
                                             }
                                             className="
-                                                bg-black
-                                                text-white
-                                                px-4
-                                                py-2
-                                                rounded-lg
+                                                address-card-button
+                                                address-card-button--delete
                                             "
                                         >
-                                            Set Default
+                                            {deletingId === address._id
+                                                ? "Deleting..."
+                                                : "Delete"
+                                            }
                                         </button>
 
-                                    )}
 
-                                </div>
+                                        {!address.isDefault && (
 
-                            </Card>
+                                            <button
+                                                type="button"
+                                                disabled={
+                                                    defaultId === address._id
+                                                }
+                                                onClick={() =>
+                                                    handleSetDefault(
+                                                        address._id
+                                                    )
+                                                }
+                                                className="
+                                                    address-card-button
+                                                    address-card-button--default
+                                                "
+                                            >
+                                                {defaultId === address._id
+                                                    ? "Updating..."
+                                                    : "Set Default"
+                                                }
+                                            </button>
 
-                        ))}
+                                        )}
 
-                    </div>
+                                    </div>
 
-                )}
+                                </article>
+
+                            ))}
+
+                        </div>
+
+                    )}
+
+                </section>
 
             </div>
 

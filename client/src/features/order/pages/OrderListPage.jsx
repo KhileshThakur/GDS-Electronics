@@ -1,18 +1,42 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import {
+    useEffect,
+    useState
+} from "react";
+
+import {
+    Link
+} from "react-router-dom";
+
+import {
+    toast
+} from "react-hot-toast";
 
 import Container from "../../../components/ui/Container";
-import Card from "../../../components/ui/Card";
 
 import {
     getOrders
 } from "../services/order.service";
 
+import "./OrderCustomer.css";
+
+
 const OrderListPage = () => {
 
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [
+        orders,
+        setOrders
+    ] = useState([]);
+
+
+    const [
+        loading,
+        setLoading
+    ] = useState(true);
+
+
+    /* =========================================
+       Fetch Orders
+    ========================================= */
 
     const fetchOrders = async () => {
 
@@ -44,198 +68,315 @@ const OrderListPage = () => {
 
     };
 
+
     useEffect(() => {
 
         fetchOrders();
 
     }, []);
 
+
+    /* =========================================
+       Loading
+    ========================================= */
+
     if (loading) {
 
         return (
+
             <Container>
 
-                <div className="
-                    py-16
-                    text-center
-                ">
-                    Loading orders...
+                <div className="order-page">
+
+                    <div className="order-loading">
+
+                        <div className="order-loading__spinner" />
+
+                        <p>
+                            Loading orders...
+                        </p>
+
+                    </div>
+
                 </div>
 
             </Container>
+
         );
 
     }
+
 
     return (
 
         <Container>
 
-            <div className="py-10">
+            <div className="order-page">
 
-                <h1 className="
-                    text-3xl
-                    font-bold
-                    mb-8
-                ">
-                    My Orders
-                </h1>
 
-                {orders.length === 0 ? (
+                {/* =================================
+                    Page Header
+                ================================= */}
 
-                    <Card>
+                <div className="order-page-header">
 
-                        <div className="
-                            py-16
-                            text-center
-                        ">
+                    <div>
 
-                            <h2 className="
-                                text-xl
-                                font-semibold
-                            ">
-                                No orders yet
-                            </h2>
+                        <span className="order-page-header__eyebrow">
+                            ACCOUNT
+                        </span>
 
-                            <p className="
-                                text-gray-500
-                                mt-2
-                            ">
-                                Your placed orders will appear here.
-                            </p>
+                        <h1>
+                            My Orders
+                        </h1>
 
-                            <Link
-                                to="/products"
-                                className="
-                                    inline-block
-                                    mt-6
-                                    bg-black
-                                    text-white
-                                    px-6
-                                    py-3
-                                    rounded-lg
-                                "
-                            >
-                                Start Shopping
-                            </Link>
+                        <p>
+                            View and track your recent orders.
+                        </p>
+
+                    </div>
+
+
+                    {orders.length > 0 && (
+
+                        <div className="order-count">
+
+                            <strong>
+                                {orders.length}
+                            </strong>
+
+                            <span>
+                                {orders.length === 1
+                                    ? "Order"
+                                    : "Orders"
+                                }
+                            </span>
 
                         </div>
 
-                    </Card>
+                    )}
+
+                </div>
+
+
+                {/* =================================
+                    Empty State
+                ================================= */}
+
+                {orders.length === 0 ? (
+
+                    <div className="order-empty">
+
+                        <div className="order-empty__icon">
+                            +
+                        </div>
+
+                        <h2>
+                            No orders yet
+                        </h2>
+
+                        <p>
+                            Your placed orders will appear here.
+                        </p>
+
+                        <Link
+                            to="/products"
+                            className="
+                                order-button
+                                order-button--primary
+                            "
+                        >
+                            Start Shopping
+                        </Link>
+
+                    </div>
 
                 ) : (
 
-                    <div className="space-y-4">
+                    /* =================================
+                       Orders
+                    ================================= */
 
-                        {orders.map(order => (
+                    <div className="order-list">
 
-                            <Card
-                                key={order._id}
-                            >
+                        {orders.map(
+                            (order) => (
 
-                                <div className="
-                                    flex
-                                    flex-col
-                                    md:flex-row
-                                    md:items-center
-                                    md:justify-between
-                                    gap-4
-                                ">
+                                <article
+                                    key={
+                                        order._id
+                                    }
+                                    className="order-card"
+                                >
 
-                                    <div>
 
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                        ">
-                                            Order
-                                        </p>
+                                    {/* =========================
+                                        Card Header
+                                    ========================== */}
 
-                                        <h2 className="
-                                            font-semibold
-                                            text-lg
-                                        ">
-                                            {order.orderNumber}
-                                        </h2>
+                                    <div className="order-card__header">
 
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                            mt-1
-                                        ">
-                                            {new Date(
-                                                order.createdAt
-                                            ).toLocaleDateString()}
-                                        </p>
+                                        <div>
 
-                                    </div>
+                                            <span className="order-card__label">
+                                                ORDER
+                                            </span>
 
-                                    <div>
+                                            <h2>
+                                                {
+                                                    order.orderNumber
+                                                }
+                                            </h2>
 
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                        ">
-                                            Items
-                                        </p>
+                                            <p>
+                                                {new Date(
+                                                    order.createdAt
+                                                ).toLocaleDateString(
+                                                    "en-IN",
+                                                    {
+                                                        day: "numeric",
+                                                        month: "short",
+                                                        year: "numeric"
+                                                    }
+                                                )}
+                                            </p>
 
-                                        <p>
-                                            {order.items?.length || 0}
-                                        </p>
+                                        </div>
 
-                                    </div>
 
-                                    <div>
-
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                        ">
-                                            Total
-                                        </p>
-
-                                        <p className="
-                                            font-semibold
-                                        ">
-                                            ₹{order.pricing?.total || 0}
-                                        </p>
-
-                                    </div>
-
-                                    <div>
-
-                                        <span className="
-                                            inline-block
-                                            px-3
-                                            py-1
-                                            rounded-full
-                                            text-sm
-                                            bg-gray-100
-                                        ">
-                                            {order.status}
+                                        <span
+                                            className={`
+                                                order-status
+                                                order-status--${(
+                                                    order.status ||
+                                                    ""
+                                                )
+                                                    .toLowerCase()
+                                                    .replace(
+                                                        /\s+/g,
+                                                        "-"
+                                                    )}
+                                            `}
+                                        >
+                                            {
+                                                order.status
+                                            }
                                         </span>
 
                                     </div>
 
-                                    <Link
-                                        to={`/orders/${order._id}`}
-                                        className="
-                                            bg-black
-                                            text-white
-                                            px-4
-                                            py-2
-                                            rounded-lg
-                                            text-center
-                                        "
-                                    >
-                                        View Order
-                                    </Link>
 
-                                </div>
+                                    {/* =========================
+                                        Card Information
+                                    ========================== */}
 
-                            </Card>
+                                    <div className="order-card__body">
 
-                        ))}
+
+                                        <div className="order-info">
+
+                                            <span>
+                                                Items
+                                            </span>
+
+                                            <strong>
+                                                {
+                                                    order.items?.length ||
+                                                    0
+                                                }
+                                            </strong>
+
+                                        </div>
+
+
+                                        <div className="order-info">
+
+                                            <span>
+                                                Payment
+                                            </span>
+
+                                            <strong>
+                                                {
+                                                    order.payment?.method ||
+                                                    "-"
+                                                }
+                                            </strong>
+
+                                        </div>
+
+
+                                        <div className="order-info">
+
+                                            <span>
+                                                Total
+                                            </span>
+
+                                            <strong>
+                                                ₹
+                                                {
+                                                    Number(
+                                                        order.pricing?.total ||
+                                                        0
+                                                    ).toLocaleString(
+                                                        "en-IN"
+                                                    )
+                                                }
+                                            </strong>
+
+                                        </div>
+
+
+                                        <Link
+                                            to={
+                                                `/orders/${order._id}`
+                                            }
+                                            className="order-view-button"
+                                        >
+
+                                            View Order
+
+                                            <span>
+                                                →
+                                            </span>
+
+                                        </Link>
+
+                                    </div>
+
+
+                                    {/* =========================
+                                        Delivery
+                                    ========================== */}
+
+                                    {order.estimatedDelivery && (
+
+                                        <div className="order-card__footer">
+
+                                            <span>
+                                                Estimated delivery
+                                            </span>
+
+                                            <strong>
+                                                {new Date(
+                                                    order.estimatedDelivery
+                                                ).toLocaleDateString(
+                                                    "en-IN",
+                                                    {
+                                                        day: "numeric",
+                                                        month: "short",
+                                                        year: "numeric"
+                                                    }
+                                                )}
+                                            </strong>
+
+                                        </div>
+
+                                    )}
+
+                                </article>
+
+                            )
+                        )}
 
                     </div>
 
@@ -248,5 +389,6 @@ const OrderListPage = () => {
     );
 
 };
+
 
 export default OrderListPage;

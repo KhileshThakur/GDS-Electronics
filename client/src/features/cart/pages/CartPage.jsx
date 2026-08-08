@@ -12,6 +12,9 @@ import {
     clearCart
 } from "../services/cart.service";
 
+import "./CartPage.css";
+
+
 const CartPage = () => {
 
     const [cart, setCart] = useState({
@@ -19,6 +22,11 @@ const CartPage = () => {
     });
 
     const [loading, setLoading] = useState(true);
+
+
+    /* =========================================
+       Fetch Cart
+    ========================================= */
 
     const fetchCart = async () => {
 
@@ -52,16 +60,30 @@ const CartPage = () => {
 
     };
 
+
     useEffect(() => {
 
         fetchCart();
 
     }, []);
 
+
+    /* =========================================
+       Quantity
+    ========================================= */
+
     const handleQuantityChange = async (
         itemId,
         quantity
     ) => {
+
+        if (quantity < 1) {
+
+            handleRemove(itemId);
+
+            return;
+
+        }
 
         try {
 
@@ -86,6 +108,11 @@ const CartPage = () => {
         }
 
     };
+
+
+    /* =========================================
+       Remove
+    ========================================= */
 
     const handleRemove = async (
         itemId
@@ -118,6 +145,11 @@ const CartPage = () => {
 
     };
 
+
+    /* =========================================
+       Clear Cart
+    ========================================= */
+
     const handleClear = async () => {
 
         try {
@@ -147,73 +179,144 @@ const CartPage = () => {
 
     };
 
-    const subtotal =
-        cart.items.reduce(
-            (
-                total,
-                item
-            ) => {
 
-                const product =
-                    item.product;
+    /* =========================================
+       Item Price
+    ========================================= */
 
-                const price =
-                    product.discountPrice ||
-                    product.price ||
-                    0;
+    const getItemPrice = (item) => {
 
-                return total +
-                    price *
-                    item.quantity;
+        const product =
+            item.product;
 
-            },
+        if (!product) {
+            return 0;
+        }
+
+
+        /* Variant */
+
+        if (
+            item.variantSku &&
+            product.variants?.length
+        ) {
+
+            const variant =
+                product.variants.find(
+                    variant =>
+                        variant.sku ===
+                        item.variantSku
+                );
+
+            if (variant) {
+
+                return (
+                    variant.discountPrice ||
+                    variant.price ||
+                    0
+                );
+
+            }
+
+        }
+
+
+        /* Normal Product */
+
+        return (
+            product.discountPrice ||
+            product.price ||
             0
         );
+
+    };
+
+
+    /* =========================================
+       Subtotal
+    ========================================= */
+
+    const subtotal =
+        cart.items.reduce(
+            (total, item) =>
+                total +
+                getItemPrice(item) *
+                item.quantity,
+            0
+        );
+
+
+    /* =========================================
+       Loading
+    ========================================= */
 
     if (loading) {
 
         return (
+
             <Container>
 
-                <div className="py-16 text-center">
-                    Loading cart...
+                <div className="
+                    cart-loading
+                ">
+
+                    <div className="
+                        cart-loading-spinner
+                    " />
+
+                    <p>
+                        Loading your cart...
+                    </p>
+
                 </div>
 
             </Container>
+
         );
 
     }
+
+
+    /* =========================================
+       Page
+    ========================================= */
 
     return (
 
         <Container>
 
-            <div className="py-10">
+            <div className="
+                cart-page
+            ">
+
+
+                {/* =================================
+                    Header
+                ================================= */}
 
                 <div className="
-                    flex
-                    items-center
-                    justify-between
-                    mb-8
+                    cart-header
                 ">
 
                     <div>
 
-                        <h1 className="
-                            text-3xl
-                            font-bold
+                        <span className="
+                            cart-eyebrow
                         ">
+                            SHOPPING CART
+                        </span>
+
+                        <h1>
                             Your Cart
                         </h1>
 
-                        <p className="
-                            text-gray-500
-                            mt-2
-                        ">
-                            Review your items
+                        <p>
+                            Review your items before
+                            heading to checkout.
                         </p>
 
                     </div>
+
 
                     {cart.items.length > 0 && (
 
@@ -221,8 +324,7 @@ const CartPage = () => {
                             type="button"
                             onClick={handleClear}
                             className="
-                                text-red-600
-                                text-sm
+                                cart-clear-btn
                             "
                         >
                             Clear Cart
@@ -232,39 +334,38 @@ const CartPage = () => {
 
                 </div>
 
+
+                {/* =================================
+                    Empty
+                ================================= */}
+
                 {cart.items.length === 0 ? (
 
                     <Card>
 
                         <div className="
-                            py-16
-                            text-center
+                            cart-empty
                         ">
 
-                            <h2 className="
-                                text-xl
-                                font-semibold
+                            <div className="
+                                cart-empty-icon
                             ">
+                                🛒
+                            </div>
+
+                            <h2>
                                 Your cart is empty
                             </h2>
 
-                            <p className="
-                                text-gray-500
-                                mt-2
-                            ">
-                                Add some products to get started.
+                            <p>
+                                Looks like you haven't
+                                added anything yet.
                             </p>
 
                             <Link
                                 to="/products"
                                 className="
-                                    inline-block
-                                    mt-6
-                                    bg-black
-                                    text-white
-                                    px-6
-                                    py-3
-                                    rounded-lg
+                                    cart-primary-btn
                                 "
                             >
                                 Continue Shopping
@@ -277,266 +378,359 @@ const CartPage = () => {
                 ) : (
 
                     <div className="
-                        grid
-                        grid-cols-1
-                        lg:grid-cols-3
-                        gap-6
+                        cart-layout
                     ">
 
+
+                        {/* =================================
+                            Items
+                        ================================= */}
+
                         <div className="
-                            lg:col-span-2
-                            space-y-4
+                            cart-items
                         ">
 
-                            {cart.items.map(item => {
+                            {cart.items.map(
+                                item => {
 
-                                const product =
-                                    item.product;
+                                    const product =
+                                        item.product;
 
-                                const price =
-                                    product.discountPrice ||
-                                    product.price ||
-                                    0;
+                                    const price =
+                                        getItemPrice(
+                                            item
+                                        );
 
-                                return (
+                                    const variant =
+                                        item.variantSku &&
+                                        product?.variants?.find(
+                                            variant =>
+                                                variant.sku ===
+                                                item.variantSku
+                                        );
 
-                                    <Card
-                                        key={item._id}
-                                    >
+                                    const itemTotal =
+                                        price *
+                                        item.quantity;
 
-                                        <div className="
-                                            flex
-                                            gap-4
-                                        ">
 
-                                            <div className="
-                                                w-24
-                                                h-24
-                                                bg-gray-100
-                                                rounded
-                                                overflow-hidden
-                                                shrink-0
-                                            ">
+                                    return (
 
-                                                {product.images?.[0]?.url ? (
-
-                                                    <img
-                                                        src={
-                                                            product.images[0].url
-                                                        }
-                                                        alt={
-                                                            product.name
-                                                        }
-                                                        className="
-                                                            w-full
-                                                            h-full
-                                                            object-cover
-                                                        "
-                                                    />
-
-                                                ) : (
-
-                                                    <div className="
-                                                        w-full
-                                                        h-full
-                                                        flex
-                                                        items-center
-                                                        justify-center
-                                                        text-xs
-                                                        text-gray-400
-                                                    ">
-                                                        No Image
-                                                    </div>
-
-                                                )}
-
-                                            </div>
+                                        <Card
+                                            key={item._id}
+                                        >
 
                                             <div className="
-                                                flex-1
+                                                cart-item
                                             ">
+
+
+                                                {/* Image */}
 
                                                 <Link
                                                     to={`/products/${product.slug}`}
                                                     className="
-                                                        font-semibold
-                                                        hover:underline
+                                                        cart-item-image
                                                     "
                                                 >
-                                                    {product.name}
+
+                                                    {product.images?.[0]?.url ? (
+
+                                                        <img
+                                                            src={
+                                                                product.images[0].url
+                                                            }
+                                                            alt={
+                                                                product.name
+                                                            }
+                                                        />
+
+                                                    ) : (
+
+                                                        <div className="
+                                                            cart-no-image
+                                                        ">
+                                                            No Image
+                                                        </div>
+
+                                                    )}
+
                                                 </Link>
 
-                                                {item.variantSku && (
 
-                                                    <p className="
-                                                        text-sm
-                                                        text-gray-500
-                                                        mt-1
-                                                    ">
-                                                        SKU: {
-                                                            item.variantSku
-                                                        }
-                                                    </p>
-
-                                                )}
-
-                                                <p className="
-                                                    font-semibold
-                                                    mt-2
-                                                ">
-                                                    ₹{price}
-                                                </p>
+                                                {/* Details */}
 
                                                 <div className="
-                                                    flex
-                                                    items-center
-                                                    gap-3
-                                                    mt-3
+                                                    cart-item-details
                                                 ">
 
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            handleQuantityChange(
-                                                                item._id,
-                                                                item.quantity - 1
-                                                            )
-                                                        }
-                                                        className="
-                                                            border
-                                                            px-3
-                                                            py-1
-                                                            rounded
-                                                        "
-                                                    >
-                                                        -
-                                                    </button>
+                                                    <div>
 
-                                                    <span>
-                                                        {item.quantity}
-                                                    </span>
+                                                        <span className="
+                                                            cart-item-brand
+                                                        ">
+                                                            {product.brand}
+                                                        </span>
 
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            handleQuantityChange(
-                                                                item._id,
-                                                                item.quantity + 1
-                                                            )
-                                                        }
-                                                        className="
-                                                            border
-                                                            px-3
-                                                            py-1
-                                                            rounded
-                                                        "
-                                                    >
-                                                        +
-                                                    </button>
+                                                        <Link
+                                                            to={`/products/${product.slug}`}
+                                                            className="
+                                                                cart-item-name
+                                                            "
+                                                        >
+                                                            {product.name}
+                                                        </Link>
+
+
+                                                        {/* Variant */}
+
+                                                        {variant && (
+
+                                                            <div className="
+                                                                cart-variant
+                                                            ">
+
+                                                                <span>
+                                                                    {variant.name}
+                                                                </span>
+
+                                                                <small>
+                                                                    SKU: {
+                                                                        item.variantSku
+                                                                    }
+                                                                </small>
+
+                                                            </div>
+
+                                                        )}
+
+                                                    </div>
+
+
+                                                    {/* Price */}
+
+                                                    <div className="
+                                                        cart-item-price
+                                                    ">
+
+                                                        ₹
+                                                        {price.toLocaleString(
+                                                            "en-IN"
+                                                        )}
+
+                                                    </div>
+
+
+                                                    {/* Controls */}
+
+                                                    <div className="
+                                                        cart-item-bottom
+                                                    ">
+
+                                                        <div className="
+                                                            quantity-control
+                                                        ">
+
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    handleQuantityChange(
+                                                                        item._id,
+                                                                        item.quantity - 1
+                                                                    )
+                                                                }
+                                                            >
+                                                                −
+                                                            </button>
+
+                                                            <span>
+                                                                {item.quantity}
+                                                            </span>
+
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    handleQuantityChange(
+                                                                        item._id,
+                                                                        item.quantity + 1
+                                                                    )
+                                                                }
+                                                            >
+                                                                +
+                                                            </button>
+
+                                                        </div>
+
+
+                                                        <span className="
+                                                            cart-item-total
+                                                        ">
+                                                            ₹
+                                                            {itemTotal.toLocaleString(
+                                                                "en-IN"
+                                                            )}
+                                                        </span>
+
+                                                    </div>
 
                                                 </div>
 
+
+                                                {/* Remove */}
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleRemove(
+                                                            item._id
+                                                        )
+                                                    }
+                                                    className="
+                                                        cart-remove-btn
+                                                    "
+                                                    title="Remove item"
+                                                >
+                                                    ×
+                                                </button>
+
                                             </div>
 
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleRemove(
-                                                        item._id
-                                                    )
-                                                }
-                                                className="
-                                                    text-red-600
-                                                    text-sm
-                                                "
-                                            >
-                                                Remove
-                                            </button>
+                                        </Card>
 
-                                        </div>
+                                    );
 
-                                    </Card>
-
-                                );
-
-                            })}
+                                }
+                            )}
 
                         </div>
 
+
+                        {/* =================================
+                            Summary
+                        ================================= */}
+
                         <Card>
 
-                            <h2 className="
-                                text-xl
-                                font-semibold
-                            ">
-                                Order Summary
-                            </h2>
-
                             <div className="
-                                flex
-                                justify-between
-                                mt-6
+                                cart-summary
                             ">
 
-                                <span>
-                                    Subtotal
-                                </span>
+                                <div className="
+                                    cart-summary-heading
+                                ">
 
-                                <span>
-                                    ₹{subtotal}
-                                </span>
+                                    <span>
+                                        ORDER SUMMARY
+                                    </span>
+
+                                    <h2>
+                                        Your Order
+                                    </h2>
+
+                                </div>
+
+
+                                <div className="
+                                    cart-summary-row
+                                ">
+
+                                    <span>
+                                        Items
+                                    </span>
+
+                                    <span>
+                                        {cart.items.reduce(
+                                            (
+                                                total,
+                                                item
+                                            ) =>
+                                                total +
+                                                item.quantity,
+                                            0
+                                        )}
+                                    </span>
+
+                                </div>
+
+
+                                <div className="
+                                    cart-summary-row
+                                ">
+
+                                    <span>
+                                        Subtotal
+                                    </span>
+
+                                    <span>
+                                        ₹
+                                        {subtotal.toLocaleString(
+                                            "en-IN"
+                                        )}
+                                    </span>
+
+                                </div>
+
+
+                                <div className="
+                                    cart-summary-row
+                                ">
+
+                                    <span>
+                                        Shipping
+                                    </span>
+
+                                    <span className="
+                                        cart-free
+                                    ">
+                                        FREE
+                                    </span>
+
+                                </div>
+
+
+                                <div className="
+                                    cart-summary-total
+                                ">
+
+                                    <span>
+                                        Total
+                                    </span>
+
+                                    <strong>
+                                        ₹
+                                        {subtotal.toLocaleString(
+                                            "en-IN"
+                                        )}
+                                    </strong>
+
+                                </div>
+
+
+                                <Link
+                                    to="/checkout"
+                                    className="
+                                        cart-checkout-btn
+                                    "
+                                >
+                                    Proceed to Checkout
+
+                                    <span>
+                                        →
+                                    </span>
+
+                                </Link>
+
+
+                                <Link
+                                    to="/products"
+                                    className="
+                                        cart-shopping-link
+                                    "
+                                >
+                                    ← Continue Shopping
+                                </Link>
 
                             </div>
-
-                            <div className="
-                                flex
-                                justify-between
-                                mt-3
-                            ">
-
-                                <span>
-                                    Shipping
-                                </span>
-
-                                <span>
-                                    Free
-                                </span>
-
-                            </div>
-
-                            <div className="
-                                border-t
-                                mt-4
-                                pt-4
-                                flex
-                                justify-between
-                                font-bold
-                            ">
-
-                                <span>
-                                    Total
-                                </span>
-
-                                <span>
-                                    ₹{subtotal}
-                                </span>
-
-                            </div>
-
-                            <Link
-                                to="/checkout"
-                                className="
-                                    block
-                                    text-center
-                                    bg-black
-                                    text-white
-                                    py-3
-                                    rounded-lg
-                                    mt-6
-                                "
-                            >
-                                Checkout
-                            </Link>
 
                         </Card>
 
@@ -551,5 +745,6 @@ const CartPage = () => {
     );
 
 };
+
 
 export default CartPage;

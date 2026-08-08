@@ -1,18 +1,41 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import {
+    useEffect,
+    useState
+} from "react";
+
+import {
+    toast
+} from "react-hot-toast";
+
+import {
+    Link
+} from "react-router-dom";
 
 import Container from "../../../components/ui/Container";
-import Card from "../../../components/ui/Card";
 
 import {
     getProducts
 } from "../services/product.service";
 
+import "./ShopProductListPage.css";
+
+
 const ShopProductListPage = () => {
 
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [
+        products,
+        setProducts
+    ] = useState([]);
+
+    const [
+        loading,
+        setLoading
+    ] = useState(true);
+
+
+    /* =========================================
+       Fetch Products
+    ========================================= */
 
     const fetchProducts = async () => {
 
@@ -23,178 +46,366 @@ const ShopProductListPage = () => {
             const response =
                 await getProducts();
 
+
             const activeProducts =
-                (response.data || []).filter(
-                    product =>
-                        product.status === "active"
-                );
-            setProducts(activeProducts);
+                (response.data || [])
+                    .filter(
+                        product =>
+                            product.status === "active"
+                    );
+
+
+            setProducts(
+                activeProducts
+            );
+
         }
         catch (error) {
+
             toast.error(
                 error.response?.data?.message ||
                 "Failed to load products"
             );
+
         }
         finally {
+
             setLoading(false);
+
         }
+
     };
 
+
     useEffect(() => {
+
         fetchProducts();
+
     }, []);
 
+
+    /* =========================================
+       Loading
+    ========================================= */
+
     if (loading) {
+
         return (
-            <Container>
-                <div className="py-16 text-center">
-                    <p>
-                        Loading products...
-                    </p>
-                </div>
-            </Container>
+
+            <main className="shop-products">
+
+                <Container>
+
+                    <div className="
+                        shop-products__loading
+                    ">
+
+                        <div className="
+                            shop-products__loader
+                        " />
+
+                        <p>
+                            Loading products...
+                        </p>
+
+                    </div>
+
+                </Container>
+
+            </main>
+
         );
+
     }
 
-    return (
-        <Container>
-            <div className="py-10">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold">
-                        Products
-                    </h1>
-                    <p className="text-gray-500 mt-2">
-                        Explore our latest products
-                    </p>
-                </div>
 
-                {products.length === 0 ? (
-                    <Card>
-                        <div className="py-10 text-center">
-                            <h2 className="text-xl font-semibold">
+    /* =========================================
+       Render
+    ========================================= */
+
+    return (
+
+        <main className="shop-products">
+
+            <Container>
+
+                <div className="
+                    shop-products__content
+                ">
+
+
+                    {/* =================================
+                        Header
+                    ================================= */}
+
+                    <header className="
+                        shop-products__header
+                    ">
+
+                        <div>
+
+                            <span className="
+                                shop-products__eyebrow
+                            ">
+                                Our Collection
+                            </span>
+
+
+                            <h1>
+                                Products
+                            </h1>
+
+
+                            <p>
+                                Explore our latest
+                                products and find
+                                something you'll love.
+                            </p>
+
+                        </div>
+
+
+                        {products.length > 0 && (
+
+                            <span className="
+                                shop-products__count
+                            ">
+                                {products.length}
+                                {" "}
+                                {products.length === 1
+                                    ? "product"
+                                    : "products"
+                                }
+                            </span>
+
+                        )}
+
+                    </header>
+
+
+                    {/* =================================
+                        Empty State
+                    ================================= */}
+
+                    {products.length === 0 ? (
+
+                        <div className="
+                            shop-products__empty
+                        ">
+
+                            <div className="
+                                shop-products__empty-icon
+                            ">
+                                ⚡
+                            </div>
+
+
+                            <h2>
                                 No products available
                             </h2>
 
-                            <p className="text-gray-500 mt-2">
-                                Check back later.
+
+                            <p>
+                                Check back later for
+                                new products.
                             </p>
+
                         </div>
-                    </Card>
-                ) : (
 
-                    <div className="
-                        grid
-                        grid-cols-1
-                        sm:grid-cols-2
-                        lg:grid-cols-3
-                        xl:grid-cols-4
-                        gap-6
-                    ">
+                    ) : (
 
-                        {products.map(product => (
-                            <Link
-                                key={product._id}
-                                to={`/products/${product.slug}`}
-                            >
-                                <Card className="
-                                    h-full
-                                    overflow-hidden
-                                    hover:shadow-md
-                                    transition
-                                ">
-                                    <div className="
-                                        aspect-square
-                                        bg-gray-100
-                                        overflow-hidden
-                                    ">
-                                        {product.images?.[0]?.url ? (
-                                            <img
-                                                src={
-                                                    product.images[0].url
-                                                }
-                                                alt={product.name}
-                                                className="
-                                                    w-full
-                                                    h-full
-                                                    object-cover
-                                                "
-                                            />
-                                        ) : (
+
+                        /* =================================
+                           Product Grid
+                        ================================= */
+
+                        <div className="
+                            shop-products__grid
+                        ">
+
+                            {products.map(
+                                product => {
+
+                                    const hasDiscount =
+                                        product.discountPrice > 0;
+
+                                    const finalPrice =
+                                        hasDiscount
+                                            ? product.discountPrice
+                                            : product.price;
+
+
+                                    return (
+
+                                        <Link
+                                            key={
+                                                product._id
+                                            }
+                                            to={`/products/${product.slug}`}
+                                            className="
+                                                shop-product-card
+                                            "
+                                        >
+
+
+                                            {/* =========================
+                                                Image
+                                            ========================== */}
+
                                             <div className="
-                                                w-full
-                                                h-full
-                                                flex
-                                                items-center
-                                                justify-center
-                                                text-gray-400
+                                                shop-product-card__image
                                             ">
-                                                No Image
+
+                                                {product.images?.[0]?.url ? (
+
+                                                    <img
+                                                        src={
+                                                            product
+                                                                .images[0]
+                                                                .url
+                                                        }
+                                                        alt={
+                                                            product.name
+                                                        }
+                                                        loading="lazy"
+                                                    />
+
+                                                ) : (
+
+                                                    <div className="
+                                                        shop-product-card__no-image
+                                                    ">
+                                                        No Image
+                                                    </div>
+
+                                                )}
+
+
+                                                {hasDiscount && (
+
+                                                    <span className="
+                                                        shop-product-card__discount
+                                                    ">
+                                                        Sale
+                                                    </span>
+
+                                                )}
+
                                             </div>
-                                        )}
-                                    </div>
 
-                                    <div className="p-4">
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                        ">
-                                            {product.brand}
-                                        </p>
 
-                                        <h2 className="
-                                            font-semibold
-                                            text-lg
-                                            mt-1
-                                        ">
-                                            {product.name}
-                                        </h2>
+                                            {/* =========================
+                                                Content
+                                            ========================== */}
 
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                            mt-2
-                                        ">
-                                            {product.shortDescription}
-                                        </p>
-
-                                        <div className="
-                                            flex
-                                            items-center
-                                            gap-3
-                                            mt-4
-                                        ">
-                                            <span className="
-                                                font-bold
-                                                text-lg
+                                            <div className="
+                                                shop-product-card__content
                                             ">
-                                                ₹
-                                                {
-                                                    product.discountPrice > 0
-                                                        ? product.discountPrice
-                                                        : product.price
-                                                }
-                                            </span>
 
-                                            {product.discountPrice > 0 && (
-                                                <span className="
-                                                    text-sm
-                                                    text-gray-400
-                                                    line-through
+
+                                                {product.brand && (
+
+                                                    <span className="
+                                                        shop-product-card__brand
+                                                    ">
+                                                        {
+                                                            product.brand
+                                                        }
+                                                    </span>
+
+                                                )}
+
+
+                                                <h2 className="
+                                                    shop-product-card__name
                                                 ">
-                                                    ₹{product.price}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Link>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </Container>
+                                                    {
+                                                        product.name
+                                                    }
+                                                </h2>
+
+
+                                                {product.shortDescription && (
+
+                                                    <p className="
+                                                        shop-product-card__description
+                                                    ">
+                                                        {
+                                                            product.shortDescription
+                                                        }
+                                                    </p>
+
+                                                )}
+
+
+                                                {/* =====================
+                                                    Price
+                                                ====================== */}
+
+                                                <div className="
+                                                    shop-product-card__footer
+                                                ">
+
+                                                    <div className="
+                                                        shop-product-card__prices
+                                                    ">
+
+                                                        <span className="
+                                                            shop-product-card__price
+                                                        ">
+                                                            ₹
+                                                            {
+                                                                finalPrice
+                                                            }
+                                                        </span>
+
+
+                                                        {hasDiscount && (
+
+                                                            <span className="
+                                                                shop-product-card__old-price
+                                                            ">
+                                                                ₹
+                                                                {
+                                                                    product.price
+                                                                }
+                                                            </span>
+
+                                                        )}
+
+                                                    </div>
+
+
+                                                    <span className="
+                                                        shop-product-card__arrow
+                                                    ">
+                                                        →
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                        </Link>
+
+                                    );
+
+                                }
+                            )}
+
+                        </div>
+
+                    )}
+
+                </div>
+
+            </Container>
+
+        </main>
+
     );
+
 };
+
 
 export default ShopProductListPage;

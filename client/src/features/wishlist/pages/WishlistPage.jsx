@@ -11,6 +11,96 @@ import {
     clearWishlist
 } from "../services/wishlist.service";
 
+import "./WishlistPage.css";
+
+
+/* =========================================
+   Heart Icon
+========================================= */
+
+const HeartIcon = () => (
+
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        width="18"
+        height="18"
+        stroke="currentColor"
+        strokeWidth="1.8"
+    >
+
+        <path
+            d="
+                M20.8 8.8
+                c0 5.5-8.8 10.2-8.8 10.2
+                S3.2 14.3 3.2 8.8
+                C3.2 6.1 5.1 4 7.7 4
+                c1.7 0 3.3.9 4.3 2.3
+                C13 4.9 14.6 4 16.3 4
+                c2.6 0 4.5 2.1 4.5 4.8Z
+            "
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+
+    </svg>
+
+);
+
+
+/* =========================================
+   Trash Icon
+========================================= */
+
+const TrashIcon = () => (
+
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        width="16"
+        height="16"
+        stroke="currentColor"
+        strokeWidth="1.8"
+    >
+
+        <path
+            d="M4 7h16"
+            strokeLinecap="round"
+        />
+
+        <path
+            d="M10 11v6"
+            strokeLinecap="round"
+        />
+
+        <path
+            d="M14 11v6"
+            strokeLinecap="round"
+        />
+
+        <path
+            d="
+                M6 7l1 13h10l1-13
+            "
+            strokeLinejoin="round"
+        />
+
+        <path
+            d="
+                M9 7V4h6v3
+            "
+            strokeLinejoin="round"
+        />
+
+    </svg>
+
+);
+
+
+/* =========================================
+   Wishlist Page
+========================================= */
+
 const WishlistPage = () => {
 
     const [wishlist, setWishlist] = useState({
@@ -18,6 +108,11 @@ const WishlistPage = () => {
     });
 
     const [loading, setLoading] = useState(true);
+
+
+    /* =========================================
+       Fetch Wishlist
+    ========================================= */
 
     const fetchWishlist = async () => {
 
@@ -51,11 +146,17 @@ const WishlistPage = () => {
 
     };
 
+
     useEffect(() => {
 
         fetchWishlist();
 
     }, []);
+
+
+    /* =========================================
+       Remove
+    ========================================= */
 
     const handleRemove = async (
         productId
@@ -88,6 +189,11 @@ const WishlistPage = () => {
 
     };
 
+
+    /* =========================================
+       Clear
+    ========================================= */
+
     const handleClear = async () => {
 
         try {
@@ -114,50 +220,83 @@ const WishlistPage = () => {
 
     };
 
+
+    /* =========================================
+       Loading
+    ========================================= */
+
     if (loading) {
 
         return (
+
             <Container>
 
-                <div className="py-16 text-center">
-                    Loading wishlist...
+                <div className="
+                    wishlist-loading
+                ">
+
+                    <div className="
+                        wishlist-spinner
+                    " />
+
+                    <p>
+                        Loading your wishlist...
+                    </p>
+
                 </div>
 
             </Container>
+
         );
 
     }
+
 
     return (
 
         <Container>
 
-            <div className="py-10">
+            <div className="
+                wishlist-page
+            ">
+
+
+                {/* =================================
+                    Header
+                ================================= */}
 
                 <div className="
-                    flex
-                    items-center
-                    justify-between
-                    mb-8
+                    wishlist-header
                 ">
 
                     <div>
 
-                        <h1 className="
-                            text-3xl
-                            font-bold
+                        <span className="
+                            wishlist-eyebrow
                         ">
-                            Wishlist
-                        </h1>
+                            SAVED FOR LATER
+                        </span>
 
-                        <p className="
-                            text-gray-500
-                            mt-2
+                        <div className="
+                            wishlist-title-row
                         ">
-                            Products you saved
-                        </p>
+                            <div>
+
+                                <h1>
+                                    Wishlist
+                                </h1>
+
+                                <p>
+                                    Products you don't want
+                                    to lose track of.
+                                </p>
+
+                            </div>
+
+                        </div>
 
                     </div>
+
 
                     {wishlist.products.length > 0 && (
 
@@ -165,8 +304,7 @@ const WishlistPage = () => {
                             type="button"
                             onClick={handleClear}
                             className="
-                                text-red-600
-                                text-sm
+                                wishlist-clear-btn
                             "
                         >
                             Clear Wishlist
@@ -176,42 +314,44 @@ const WishlistPage = () => {
 
                 </div>
 
+
+                {/* =================================
+                    Empty State
+                ================================= */}
+
                 {wishlist.products.length === 0 ? (
 
                     <Card>
 
                         <div className="
-                            py-16
-                            text-center
+                            wishlist-empty
                         ">
 
-                            <h2 className="
-                                text-xl
-                                font-semibold
+                            <div className="
+                                wishlist-empty-icon
                             ">
+                                <HeartIcon />
+                            </div>
+
+                            <h2>
                                 Your wishlist is empty
                             </h2>
 
-                            <p className="
-                                text-gray-500
-                                mt-2
-                            ">
-                                Save products you like here.
+                            <p>
+                                Save products you love
+                                and find them here later.
                             </p>
 
                             <Link
                                 to="/products"
                                 className="
-                                    inline-block
-                                    mt-6
-                                    bg-black
-                                    text-white
-                                    px-6
-                                    py-3
-                                    rounded-lg
+                                    wishlist-primary-btn
                                 "
                             >
                                 Browse Products
+                                <span>
+                                    →
+                                </span>
                             </Link>
 
                         </div>
@@ -221,12 +361,7 @@ const WishlistPage = () => {
                 ) : (
 
                     <div className="
-                        grid
-                        grid-cols-1
-                        sm:grid-cols-2
-                        lg:grid-cols-3
-                        xl:grid-cols-4
-                        gap-6
+                        wishlist-grid
                     ">
 
                         {wishlist.products.map(
@@ -235,130 +370,196 @@ const WishlistPage = () => {
                                 <Card
                                     key={product._id}
                                     className="
-                                        overflow-hidden
+                                        wishlist-card-wrapper
                                     "
                                 >
 
-                                    <Link
-                                        to={`/products/${product.slug}`}
-                                    >
+                                    <article className="
+                                        wishlist-card
+                                    ">
 
-                                        <div className="
-                                            aspect-square
-                                            bg-gray-100
-                                            overflow-hidden
-                                        ">
 
-                                            {product.images?.[0]?.url ? (
-
-                                                <img
-                                                    src={
-                                                        product.images[0].url
-                                                    }
-                                                    alt={
-                                                        product.name
-                                                    }
-                                                    className="
-                                                        w-full
-                                                        h-full
-                                                        object-cover
-                                                    "
-                                                />
-
-                                            ) : (
-
-                                                <div className="
-                                                    w-full
-                                                    h-full
-                                                    flex
-                                                    items-center
-                                                    justify-center
-                                                    text-gray-400
-                                                ">
-                                                    No Image
-                                                </div>
-
-                                            )}
-
-                                        </div>
-
-                                    </Link>
-
-                                    <div className="p-4">
-
-                                        <p className="
-                                            text-sm
-                                            text-gray-500
-                                        ">
-                                            {product.brand}
-                                        </p>
+                                        {/* =================================
+                                            Image
+                                        ================================= */}
 
                                         <Link
                                             to={`/products/${product.slug}`}
+                                            className="
+                                                wishlist-image-link
+                                            "
                                         >
 
-                                            <h2 className="
-                                                font-semibold
-                                                text-lg
-                                                mt-1
+                                            <div className="
+                                                wishlist-image
                                             ">
-                                                {product.name}
-                                            </h2>
+
+                                                {product.images?.[0]?.url ? (
+
+                                                    <img
+                                                        src={
+                                                            product.images[0].url
+                                                        }
+                                                        alt={
+                                                            product.name
+                                                        }
+                                                    />
+
+                                                ) : (
+
+                                                    <div className="
+                                                        wishlist-no-image
+                                                    ">
+                                                        No Image
+                                                    </div>
+
+                                                )}
+
+
+                                                {/* Heart */}
+
+                                                <span className="
+                                                    wishlist-heart
+                                                ">
+                                                    <HeartIcon />
+                                                </span>
+
+
+                                                {/* Featured */}
+
+                                                {product.isFeatured && (
+
+                                                    <span className="
+                                                        wishlist-featured
+                                                    ">
+                                                        Featured
+                                                    </span>
+
+                                                )}
+
+                                            </div>
 
                                         </Link>
 
+
+                                        {/* =================================
+                                            Details
+                                        ================================= */}
+
                                         <div className="
-                                            flex
-                                            items-center
-                                            gap-3
-                                            mt-3
+                                            wishlist-details
                                         ">
 
                                             <span className="
-                                                font-bold
+                                                wishlist-brand
                                             ">
-                                                ₹
-                                                {
-                                                    product.discountPrice ||
-                                                    product.price
-                                                }
+                                                {product.brand}
                                             </span>
 
-                                            {product.discountPrice > 0 && (
 
-                                                <span className="
-                                                    text-sm
-                                                    text-gray-400
-                                                    line-through
+                                            <Link
+                                                to={`/products/${product.slug}`}
+                                                className="
+                                                    wishlist-product-link
+                                                "
+                                            >
+
+                                                <h2>
+                                                    {product.name}
+                                                </h2>
+
+                                            </Link>
+
+
+                                            {product.shortDescription && (
+
+                                                <p className="
+                                                    wishlist-description
                                                 ">
-                                                    ₹{product.price}
-                                                </span>
+                                                    {
+                                                        product.shortDescription
+                                                    }
+                                                </p>
 
                                             )}
 
+
+                                            {/* Price */}
+
+                                            <div className="
+                                                wishlist-price-row
+                                            ">
+
+                                                <span className="
+                                                    wishlist-price
+                                                ">
+                                                    ₹
+                                                    {
+                                                        (
+                                                            product.discountPrice ||
+                                                            product.price ||
+                                                            0
+                                                        ).toLocaleString(
+                                                            "en-IN"
+                                                        )
+                                                    }
+                                                </span>
+
+
+                                                {product.discountPrice > 0 && (
+
+                                                    <span className="
+                                                        wishlist-old-price
+                                                    ">
+                                                        ₹
+                                                        {
+                                                            product.price.toLocaleString(
+                                                                "en-IN"
+                                                            )
+                                                        }
+                                                    </span>
+
+                                                )}
+
+                                            </div>
+
+
+                                            {/* Actions */}
+
+                                            <div className="
+                                                wishlist-actions
+                                            ">
+
+                                                <Link
+                                                    to={`/products/${product.slug}`}
+                                                    className="
+                                                        wishlist-view-btn
+                                                    "
+                                                >
+                                                    View Product
+                                                </Link>
+
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleRemove(
+                                                            product._id
+                                                        )
+                                                    }
+                                                    className="
+                                                        wishlist-remove-btn
+                                                    "
+                                                    title="Remove from wishlist"
+                                                >
+                                                    <TrashIcon />
+                                                </button>
+
+                                            </div>
+
                                         </div>
 
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemove(
-                                                    product._id
-                                                )
-                                            }
-                                            className="
-                                                w-full
-                                                mt-4
-                                                border
-                                                border-red-300
-                                                text-red-600
-                                                py-2
-                                                rounded-lg
-                                            "
-                                        >
-                                            Remove
-                                        </button>
-
-                                    </div>
+                                    </article>
 
                                 </Card>
 
@@ -376,5 +577,6 @@ const WishlistPage = () => {
     );
 
 };
+
 
 export default WishlistPage;

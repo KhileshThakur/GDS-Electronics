@@ -4,132 +4,352 @@ import {
     Route
 } from "react-router-dom";
 
+
+/* =================================
+   Route Guards
+================================= */
+
 import ProtectedRoute from "./ProtectedRoute";
 import GuestRoute from "./GuestRoute";
 import AdminRoute from "./AdminRoute";
 
-import ProfilePage from "../features/profile/pages/ProfilePage";
+
+/* =================================
+   Layouts
+================================= */
+
 import CustomerLayout from "../layouts/CustomerLayout";
-import HomePage from "../features/home/pages/HomePage";
 import AuthLayout from "../layouts/AuthLayout";
-import LoginPage from "../features/auth/pages/LoginPage";
-import RegisterPage from "../features/auth/pages/Register";
-import NotFoundPage from "../features/not-found/pages/NotFoundPage";
 import AdminLayout from "../layouts/AdminLayout";
-import DashboardPage from "../features/admin/dashboard/pages/DashboardPage";
-import AdminCategoryPage from "../features/category/pages/AdminCategoryPage";
-import ProductListPage from "../features/product/pages/ProductListPage";
-import ProductFormPage from "../features/product/pages/ProductFormPage";
-import ShopProductListPage from "../features/product/pages/ShopProductListPage";
-import ProductDetailsPage from "../features/product/pages/ProductDetailsPage";
-import CartPage from "../features/cart/pages/CartPage";
-import WishlistPage from "../features/wishlist/pages/WishlistPage";
-import AddressPage from "../features/address/pages/AddressPage";
-import CheckoutPage from "../features/checkout/pages/CheckoutPage";
-import OrderListPage from "../features/order/pages/OrderListPage";
-import OrderDetailsPage from "../features/order/pages/OrderDetailsPage";
+
+
+/* =================================
+   Customer
+================================= */
+
+import HomePage from "../features/home/pages/HomePage";
+import ProfilePage from "../features/profile/pages/ProfilePage";
+
+import ShopProductListPage
+    from "../features/product/pages/ShopProductListPage";
+
+import ProductDetailsPage
+    from "../features/product/pages/ProductDetailsPage";
+
+import CartPage
+    from "../features/cart/pages/CartPage";
+
+import WishlistPage
+    from "../features/wishlist/pages/WishlistPage";
+
+import AddressPage
+    from "../features/address/pages/AddressPage";
+
+import CheckoutPage
+    from "../features/checkout/pages/CheckoutPage";
+
+import OrderListPage
+    from "../features/order/pages/OrderListPage";
+
+import OrderDetailsPage
+    from "../features/order/pages/OrderDetailsPage";
+
+import ChangePasswordPage
+    from "../features/auth/pages/ChangePasswordPage";
+
+
+/* =================================
+   Authentication
+================================= */
+
+import LoginPage
+    from "../features/auth/pages/LoginPage";
+
+import RegisterPage
+    from "../features/auth/pages/Register";
+
+import ForgotPasswordPage
+    from "../features/auth/pages/ForgotPasswordPage";
+
+import ResetPasswordPage
+    from "../features/auth/pages/ResetPasswordPage";
+
+
+/* =================================
+   Admin
+================================= */
+
+import DashboardPage
+    from "../features/admin/dashboard/pages/DashboardPage";
+
+import AdminCategoryPage
+    from "../features/category/pages/AdminCategoryPage";
+
+import ProductListPage
+    from "../features/product/pages/ProductListPage";
+
+import ProductFormPage
+    from "../features/product/pages/ProductFormPage";
+
+
+/* =================================
+   Other
+================================= */
+
+import NotFoundPage
+    from "../features/not-found/pages/NotFoundPage";
 
 
 const AppRoutes = () => {
+
     return (
+
         <BrowserRouter>
+
             <Routes>
 
-                <Route element={<CustomerLayout />}>
+
+                {/* =================================
+                    Customer Layout
+                ================================= */}
+
+                <Route
+                    element={
+                        <CustomerLayout />
+                    }
+                >
+
+                    {/* Public */}
+
                     <Route
                         path="/"
-                        element={<HomePage />}
+                        element={
+                            <HomePage />
+                        }
                     />
+
                     <Route
                         path="/products"
-                        element={<ShopProductListPage />}
+                        element={
+                            <ShopProductListPage />
+                        }
                     />
+
                     <Route
                         path="/products/:slug"
-                        element={<ProductDetailsPage />}
+                        element={
+                            <ProductDetailsPage />
+                        }
                     />
 
-                    <Route element={<ProtectedRoute />}>
+
+                    {/* Protected Customer */}
+
+                    <Route
+                        element={
+                            <ProtectedRoute />
+                        }
+                    >
+
                         <Route
                             path="/cart"
-                            element={<CartPage />}
+                            element={
+                                <CartPage />
+                            }
                         />
+
                         <Route
                             path="/wishlist"
-                            element={<WishlistPage />}
+                            element={
+                                <WishlistPage />
+                            }
                         />
+
                         <Route
                             path="/addresses"
-                            element={<AddressPage />}
+                            element={
+                                <AddressPage />
+                            }
                         />
+
                         <Route
                             path="/checkout"
-                            element={<CheckoutPage />}
+                            element={
+                                <CheckoutPage />
+                            }
                         />
+
                         <Route
                             path="/profile"
-                            element={<ProfilePage />}
+                            element={
+                                <ProfilePage />
+                            }
                         />
+
+                        <Route
+                            path="/change-password"
+                            element={
+                                <ChangePasswordPage />
+                            }
+                        />
+
                         <Route
                             path="/orders"
-                            element={<OrderListPage />}
+                            element={
+                                <OrderListPage />
+                            }
                         />
+
                         <Route
                             path="/orders/:id"
-                            element={<OrderDetailsPage />}
+                            element={
+                                <OrderDetailsPage />
+                            }
                         />
+
                     </Route>
+
                 </Route>
 
 
-                <Route element={<GuestRoute />}>
-                    <Route element={<AuthLayout />}>
+                {/* =================================
+                    Authentication
+                ================================= */}
+
+                <Route
+                    element={
+                        <GuestRoute />
+                    }
+                >
+
+                    <Route
+                        element={
+                            <AuthLayout />
+                        }
+                    >
+
                         <Route
                             path="/login"
-                            element={<LoginPage />}
+                            element={
+                                <LoginPage />
+                            }
                         />
+
                         <Route
                             path="/register"
-                            element={<RegisterPage />}
+                            element={
+                                <RegisterPage />
+                            }
                         />
+
                     </Route>
+
                 </Route>
 
 
-                <Route element={<AdminRoute />}>
-                    <Route element={<AdminLayout />}>
+                {/* =================================
+                    Password Recovery
+
+                    Intentionally outside GuestRoute
+                ================================= */}
+
+                <Route
+                    element={
+                        <AuthLayout />
+                    }
+                >
+
+                    <Route
+                        path="/forgot-password"
+                        element={
+                            <ForgotPasswordPage />
+                        }
+                    />
+
+                    <Route
+                        path="/reset-password/:token"
+                        element={
+                            <ResetPasswordPage />
+                        }
+                    />
+
+                </Route>
+
+
+                {/* =================================
+                    Admin
+                ================================= */}
+
+                <Route
+                    element={
+                        <AdminRoute />
+                    }
+                >
+
+                    <Route
+                        element={
+                            <AdminLayout />
+                        }
+                    >
+
                         <Route
                             path="/admin"
-                            element={<DashboardPage />}
+                            element={
+                                <DashboardPage />
+                            }
                         />
+
                         <Route
                             path="/admin/categories"
-                            element={<AdminCategoryPage />}
+                            element={
+                                <AdminCategoryPage />
+                            }
                         />
+
                         <Route
                             path="/admin/products"
-                            element={<ProductListPage />}
+                            element={
+                                <ProductListPage />
+                            }
                         />
+
                         <Route
                             path="/admin/products/new"
-                            element={<ProductFormPage />}
+                            element={
+                                <ProductFormPage />
+                            }
                         />
+
                         <Route
                             path="/admin/products/:id/edit"
-                            element={<ProductFormPage />}
+                            element={
+                                <ProductFormPage />
+                            }
                         />
+
                     </Route>
 
                 </Route>
 
+
+                {/* =================================
+                    404
+                ================================= */}
 
                 <Route
                     path="*"
-                    element={<NotFoundPage />}
+                    element={
+                        <NotFoundPage />
+                    }
                 />
+
             </Routes>
+
         </BrowserRouter>
+
     );
+
 };
+
 
 export default AppRoutes;
