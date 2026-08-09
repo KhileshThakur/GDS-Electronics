@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
+
 import Container from "../../../components/ui/Container";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
@@ -13,7 +14,9 @@ import {
 import AddressManager from "../../address/components/AddressManager";
 import { setUser } from "../../../redux/slices/authSlice";
 
+
 import "./ProfilePage.css";
+
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
