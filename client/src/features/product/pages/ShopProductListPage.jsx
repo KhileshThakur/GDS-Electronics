@@ -3,25 +3,18 @@ import {
     useMemo,
     useState
 } from "react";
-
 import {
     toast
 } from "react-hot-toast";
-
 import {
     Link,
     useSearchParams,
 } from "react-router-dom";
-
 import Container from "../../../components/ui/Container";
-
 import {
     getProducts
 } from "../services/product.service";
-
 import "./ShopProductListPage.css";
-
-
 const ShopProductListPage = () => {
 
     const [searchParams] = useSearchParams();
@@ -75,27 +68,18 @@ const ShopProductListPage = () => {
             setProducts(
                 response.data || []
             );
-
         }
         catch (error) {
-
             toast.error(
                 error.response?.data?.message ||
                 "Failed to load products"
             );
-
         }
         finally {
-
             setLoading(false);
-
         }
-
     };
-
-
     useEffect(() => {
-
         fetchProducts();
 
     }, [search]);
@@ -305,11 +289,8 @@ const ShopProductListPage = () => {
     */
 
     if (loading) {
-
         return (
-
             <main className="shop-products">
-
                 <Container>
 
                     <div className="shop-products__loading">
@@ -319,22 +300,15 @@ const ShopProductListPage = () => {
                         <p>
                             Loading products...
                         </p>
-
                     </div>
-
                 </Container>
-
             </main>
-
         );
-
     }
 
 
     return (
-
         <main className="shop-products">
-
             <Container>
 
                 <div className="shop-products__content">
@@ -358,13 +332,9 @@ const ShopProductListPage = () => {
                                 Our Collection
 
                             </span>
-
-
                             <h1>
                                 Products
                             </h1>
-
-
                             <p>
                                 Explore our latest products
                                 and find something you'll love.
@@ -586,7 +556,6 @@ const ShopProductListPage = () => {
                             )}
 
                         </div>
-
                     ) : (
 
 
@@ -598,7 +567,6 @@ const ShopProductListPage = () => {
 
                             {filteredProducts.map(
                                 product => {
-
                                     const hasDiscount =
                                         product.hasVariants
                                             ? product.variants?.some(
@@ -622,7 +590,6 @@ const ShopProductListPage = () => {
 
 
                                     return (
-
                                         <Link
                                             key={product._id}
                                             to={`/products/${product.slug}`}
@@ -635,7 +602,6 @@ const ShopProductListPage = () => {
                                             <div className="shop-product-card__image">
 
                                                 {product.images?.[0]?.url ? (
-
                                                     <img
                                                         src={
                                                             product.images[0].url
@@ -645,22 +611,17 @@ const ShopProductListPage = () => {
                                                         }
                                                         loading="lazy"
                                                     />
-
                                                 ) : (
 
                                                     <div className="shop-product-card__no-image">
                                                         No Image
                                                     </div>
-
                                                 )}
-
-
                                                 {hasDiscount && (
 
                                                     <span className="shop-product-card__discount">
                                                         Sale
                                                     </span>
-
                                                 )}
 
 
@@ -684,15 +645,12 @@ const ShopProductListPage = () => {
                                                     <span className="shop-product-card__brand">
                                                         {product.brand}
                                                     </span>
-
                                                 )}
 
 
                                                 <h2 className="shop-product-card__name">
                                                     {product.name}
                                                 </h2>
-
-
                                                 {product.shortDescription && (
 
                                                     <p className="shop-product-card__description">
@@ -700,7 +658,6 @@ const ShopProductListPage = () => {
                                                             product.shortDescription
                                                         }
                                                     </p>
-
                                                 )}
 
 
@@ -721,9 +678,7 @@ const ShopProductListPage = () => {
                                                                     )
                                                                 }
                                                             </span>
-
                                                         )}
-
                                                     </div>
 
 
@@ -742,105 +697,19 @@ const ShopProductListPage = () => {
                                                     )}
 
                                                 </div>
-
                                             </div>
-
                                         </Link>
-
                                     );
-
                                 }
                             )}
-
                         </div>
-
                     )}
-
                 </div>
-
             </Container>
-
         </main>
-
     );
-
 };
 
 
 /*
-================================
-PRICE HELPERS
-================================
-*/
-
-const getPrice = product => {
-
-    if (
-        product.hasVariants &&
-        product.variants?.length
-    ) {
-
-        const prices =
-            product.variants
-                .map(
-                    variant =>
-                        variant.discountPrice > 0
-                            ? variant.discountPrice
-                            : variant.price
-                )
-                .filter(
-                    price =>
-                        typeof price === "number"
-                );
-
-        if (prices.length) {
-
-            return Math.min(
-                ...prices
-            );
-
-        }
-
-    }
-
-    return product.discountPrice > 0
-        ? product.discountPrice
-        : product.price;
-
-};
-
-
-const getOldPrice = product => {
-
-    if (
-        product.hasVariants &&
-        product.variants?.length
-    ) {
-
-        const prices =
-            product.variants
-                .filter(
-                    variant =>
-                        variant.discountPrice > 0
-                )
-                .map(
-                    variant =>
-                        variant.price
-                );
-
-        if (prices.length) {
-
-            return Math.min(
-                ...prices
-            );
-
-        }
-
-    }
-
-    return product.price;
-
-};
-
-
 export default ShopProductListPage;

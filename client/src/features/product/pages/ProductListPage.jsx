@@ -138,42 +138,33 @@ const ProductListPage = () => {
     ========================================= */
 
     const columns = [
-
         {
             key: "name",
             label: "Name"
         },
-
         {
             key: "category.name",
             label: "Category"
         },
-
         {
             key: "price",
             label: "Price",
-
             render: (product) =>
                 `₹${product.price}`
         },
-
         {
             key: "stock",
             label: "Stock"
         },
-
         {
             key: "status",
             label: "Status",
-
             render: (product) => (
-
                 <StatusBadge
                     status={
                         product.status
                     }
                 />
-
             )
         },
 
@@ -182,7 +173,6 @@ const ProductListPage = () => {
             label: "Featured",
 
             render: (product) => (
-
                 <span
                     className={`
                         product-featured-badge
@@ -193,19 +183,15 @@ const ProductListPage = () => {
                         }
                     `}
                 >
-
                     <span>
                         {product.isFeatured
                             ? "Featured"
                             : "No"
                         }
                     </span>
-
                 </span>
-
             )
         }
-
     ];
 
 
@@ -214,11 +200,9 @@ const ProductListPage = () => {
     ========================================= */
 
     return (
-
         <section className="
             product-list-page
         ">
-
 
             {/* =================================
                 Page Header
@@ -227,14 +211,12 @@ const ProductListPage = () => {
             <div className="
                 product-list-page__header
             ">
-
                 <PageHeader
                     title="Products"
                     subtitle="Manage products"
                     buttonText="Add Product"
                     buttonLink="/admin/products/new"
                 />
-
             </div>
 
 
@@ -245,51 +227,39 @@ const ProductListPage = () => {
             <div className="
                 product-list-page__overview
             ">
-
                 <div className="
                     product-list-page__overview-accent
                 " />
 
-
                 <div>
-
                     <span className="
                         product-list-page__eyebrow
                     ">
                         Product Catalog
                     </span>
 
-
                     <h2>
                         Your Products
                     </h2>
-
 
                     <p>
                         Manage your inventory,
                         pricing and product
                         visibility from here.
                     </p>
-
                 </div>
-
 
                 <div className="
                     product-list-page__count
                 ">
-
                     <span>
                         Total
                     </span>
-
                     <strong>
                         {products.length}
                     </strong>
-
                 </div>
-
             </div>
-
 
             {/* =================================
                 Product Table
@@ -298,43 +268,30 @@ const ProductListPage = () => {
             <div className="
                 product-list-page__table
             ">
-
                 <DataTable
                     columns={columns}
                     data={products}
                     loading={loading}
-
                     emptyTitle="No Products Found"
-
                     renderActions={(
                         product
                     ) => (
-
                         <ActionButtons
-
                             onEdit={() =>
                                 handleEdit(
                                     product
                                 )
                             }
-
                             onDelete={() =>
                                 handleDelete(
                                     product
                                 )
                             }
-
                         />
-
                     )}
-
                 />
-
             </div>
-
-
         </section>
-
     );
 
 };

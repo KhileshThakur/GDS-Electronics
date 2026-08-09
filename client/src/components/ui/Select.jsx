@@ -12,7 +12,6 @@ const Select = ({
 }) => {
 
     return (
-
         <div className="
             w-full
             flex
@@ -21,15 +20,12 @@ const Select = ({
         ">
 
             {label && (
-
                 <label className="
                     flex
                     items-center
                     gap-1
-
                     text-sm
                     font-medium
-
                     text-[var(--text)]
                 ">
 
@@ -38,23 +34,18 @@ const Select = ({
                     </span>
 
                     {required && (
-
                         <span className="
                             text-[var(--danger)]
                         ">
                             *
                         </span>
-
                     )}
-
                 </label>
-
             )}
 
 
             <select
                 {...props}
-
                 name={name}
                 value={value}
                 onChange={onChange}
@@ -63,49 +54,33 @@ const Select = ({
 
                 className={`
                     w-full
-
                     h-11
-
                     px-4
-
                     rounded-[var(--radius-md)]
-
                     border
-
                     bg-[var(--surface)]
-
                     text-sm
                     text-[var(--text)]
-
                     outline-none
-
                     transition-all
                     duration-200
-
                     cursor-pointer
-
                     ${
                         error
                             ? `
                                 border-[var(--danger)]
-
                                 focus:border-[var(--danger)]
-
                                 focus:ring-2
                                 focus:ring-[var(--danger)]/10
                             `
                             : `
                                 border-[var(--border)]
-
                                 hover:border-slate-300
-
                                 focus:border-[var(--primary)]
-
                                 focus:ring-2
                                 focus:ring-[var(--primary)]/10
                             `
                     }
-
                     disabled:
                         cursor-not-allowed
 
@@ -114,18 +89,13 @@ const Select = ({
 
                     disabled:
                         opacity-60
-
                     ${className}
                 `}
             >
-
                 {children}
-
             </select>
 
-
             {error && (
-
                 <p className="
                     text-xs
                     font-medium
@@ -133,13 +103,9 @@ const Select = ({
                 ">
                     {error}
                 </p>
-
             )}
-
         </div>
-
     );
-
 };
 
 export default Select;
