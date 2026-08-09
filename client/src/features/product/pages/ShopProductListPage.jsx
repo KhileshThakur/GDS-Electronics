@@ -1,43 +1,23 @@
-import {
-    useEffect,
-    useMemo,
-    useState
-} from "react";
-import {
-    toast
-} from "react-hot-toast";
-import {
-    Link,
-    useSearchParams,
-} from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
+import { Link, useSearchParams } from "react-router-dom";
+
 import Container from "../../../components/ui/Container";
-import {
-    getProducts
-} from "../services/product.service";
+import { getProducts } from "../services/product.service";
+
 import "./ShopProductListPage.css";
+
 const ShopProductListPage = () => {
 
     const [searchParams] = useSearchParams();
 
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const [products, setProducts] =
-        useState([]);
-
-    const [loading, setLoading] =
-        useState(true);
-
-    const [category, setCategory] =
-        useState("all");
-
-    const [availability, setAvailability] =
-        useState("all");
-
-    const [featured, setFeatured] =
-        useState(false);
-
-    const [sort, setSort] =
-        useState("default");
-
+    const [category, setCategory] = useState("all");
+    const [availability, setAvailability] = useState("all");
+    const [featured, setFeatured] = useState(false);
+    const [sort, setSort] = useState("default");
 
     /*
     --------------------------------
@@ -45,9 +25,60 @@ const ShopProductListPage = () => {
     --------------------------------
     */
 
-    
-    const search = searchParams.get("search") || "";
+    const search =
+        searchParams.get("search")?.trim() || "";
 
+    /*
+    --------------------------------
+    HELPERS
+    --------------------------------
+    */
+
+    const getPrice = (product) => {
+
+        if (product.hasVariants && product.variants?.length) {
+
+            const prices = product.variants
+                .map(variant =>
+                    Number(
+                        variant.discountPrice > 0
+                            ? variant.discountPrice
+                            : variant.price
+                    )
+                )
+                .filter(price => !Number.isNaN(price));
+
+            if (prices.length) {
+                return Math.min(...prices);
+            }
+        }
+
+        return Number(
+            product.discountPrice > 0
+                ? product.discountPrice
+                : product.price
+        );
+    };
+
+    const getOldPrice = (product) => {
+
+        if (product.hasVariants && product.variants?.length) {
+
+            const prices = product.variants
+                .filter(variant =>
+                    Number(variant.discountPrice) > 0
+                )
+                .map(variant =>
+                    Number(variant.price)
+                );
+
+            if (prices.length) {
+                return Math.min(...prices);
+            }
+        }
+
+        return Number(product.price || 0);
+    };
 
     /*
     --------------------------------
@@ -66,24 +97,33 @@ const ShopProductListPage = () => {
             });
 
             setProducts(
-                response.data || []
+                response?.data || []
             );
+
         }
         catch (error) {
+
             toast.error(
                 error.response?.data?.message ||
                 "Failed to load products"
             );
+
+            setProducts([]);
+
         }
         finally {
+
             setLoading(false);
+
         }
+
     };
+
     useEffect(() => {
+
         fetchProducts();
 
     }, [search]);
-
 
     /*
     --------------------------------
@@ -111,12 +151,9 @@ const ShopProductListPage = () => {
 
         });
 
-        return Array.from(
-            map.entries()
-        );
+        return Array.from(map.entries());
 
     }, [products]);
-
 
     /*
     --------------------------------
@@ -134,57 +171,65 @@ const ShopProductListPage = () => {
 
         if (category !== "all") {
 
-            result =
-                result.filter(
-                    product =>
-                        (
-                            product.category?._id ||
-                            product.category
-                        ) === category
-                );
+            result = result.filter(product => {
+
+                const productCategory =
+                    product.category?._id ||
+                    product.category;
+
+                return productCategory === category;
+
+            });
 
         }
-
 
         /*
         Availability
         */
 
-        if (
-            availability ===
-            "in-stock"
-        ) {
+        if (availability === "in-stock") {
 
-            result =
-                result.filter(product =>
-                    product.hasVariants
-                        ? product.variants?.some(
-                            variant =>
-                                variant.stock > 0
-                        )
-                        : product.stock > 0
-                );
+            result = result.filter(product => {
 
-        }
+                if (
+                    product.hasVariants &&
+                    product.variants?.length
+                ) {
 
+                    return product.variants.some(
+                        variant =>
+                            Number(variant.stock) > 0
+                    );
 
-        if (
-            availability ===
-            "out-of-stock"
-        ) {
+                }
 
-            result =
-                result.filter(product =>
-                    product.hasVariants
-                        ? !product.variants?.some(
-                            variant =>
-                                variant.stock > 0
-                        )
-                        : product.stock <= 0
-                );
+                return Number(product.stock) > 0;
+
+            });
 
         }
 
+        if (availability === "out-of-stock") {
+
+            result = result.filter(product => {
+
+                if (
+                    product.hasVariants &&
+                    product.variants?.length
+                ) {
+
+                    return !product.variants.some(
+                        variant =>
+                            Number(variant.stock) > 0
+                    );
+
+                }
+
+                return Number(product.stock) <= 0;
+
+            });
+
+        }
 
         /*
         Featured
@@ -192,14 +237,11 @@ const ShopProductListPage = () => {
 
         if (featured) {
 
-            result =
-                result.filter(
-                    product =>
-                        product.isFeatured
-                );
+            result = result.filter(
+                product => product.isFeatured
+            );
 
         }
-
 
         /*
         Sorting
@@ -209,8 +251,7 @@ const ShopProductListPage = () => {
 
             result.sort(
                 (a, b) =>
-                    getPrice(a) -
-                    getPrice(b)
+                    getPrice(a) - getPrice(b)
             );
 
         }
@@ -219,8 +260,7 @@ const ShopProductListPage = () => {
 
             result.sort(
                 (a, b) =>
-                    getPrice(b) -
-                    getPrice(a)
+                    getPrice(b) - getPrice(a)
             );
 
         }
@@ -229,8 +269,8 @@ const ShopProductListPage = () => {
 
             result.sort(
                 (a, b) =>
-                    a.name.localeCompare(
-                        b.name
+                    (a.name || "").localeCompare(
+                        b.name || ""
                     )
             );
 
@@ -250,13 +290,11 @@ const ShopProductListPage = () => {
 
     }, [
         products,
-        search,
         category,
         availability,
         featured,
         sort
     ]);
-
 
     /*
     --------------------------------
@@ -265,12 +303,21 @@ const ShopProductListPage = () => {
     */
 
     const hasFilters =
-        search ||
+        Boolean(search) ||
         category !== "all" ||
         availability !== "all" ||
         featured ||
         sort !== "default";
 
+    /*
+    --------------------------------
+    CLEAR SHOP FILTERS
+    --------------------------------
+
+    Important:
+    We intentionally DO NOT clear
+    the navbar search here.
+    */
 
     const clearFilters = () => {
 
@@ -281,7 +328,6 @@ const ShopProductListPage = () => {
 
     };
 
-
     /*
     --------------------------------
     LOADING
@@ -289,8 +335,11 @@ const ShopProductListPage = () => {
     */
 
     if (loading) {
+
         return (
+
             <main className="shop-products">
+
                 <Container>
 
                     <div className="shop-products__loading">
@@ -300,26 +349,34 @@ const ShopProductListPage = () => {
                         <p>
                             Loading products...
                         </p>
+
                     </div>
+
                 </Container>
+
             </main>
+
         );
+
     }
 
+    /*
+    --------------------------------
+    PAGE
+    --------------------------------
+    */
 
     return (
+
         <main className="shop-products">
+
             <Container>
 
                 <div className="shop-products__content">
 
-
-                    {/* =========================
-                        TOOLBAR
-                    ========================= */}
+                    {/* TOOLBAR */}
 
                     <section className="products-toolbar">
-
 
                         {/* LEFT */}
 
@@ -332,14 +389,15 @@ const ShopProductListPage = () => {
                                 Our Collection
 
                             </span>
+
                             <h1>
                                 Products
                             </h1>
+
                             <p>
                                 Explore our latest products
                                 and find something you'll love.
                             </p>
-
 
                             <span className="products-count">
 
@@ -355,13 +413,9 @@ const ShopProductListPage = () => {
 
                         </div>
 
-
                         {/* RIGHT */}
 
                         <div className="products-controls">
-
-
-                            {/* SEARCH RESULT */}
 
                             {search && (
 
@@ -379,9 +433,7 @@ const ShopProductListPage = () => {
 
                             )}
 
-
                             <div className="product-filters">
-
 
                                 {/* CATEGORY */}
 
@@ -413,7 +465,6 @@ const ShopProductListPage = () => {
 
                                 </select>
 
-
                                 {/* AVAILABILITY */}
 
                                 <select
@@ -439,7 +490,6 @@ const ShopProductListPage = () => {
 
                                 </select>
 
-
                                 {/* FEATURED */}
 
                                 <label className="featured-filter">
@@ -459,7 +509,6 @@ const ShopProductListPage = () => {
                                     </span>
 
                                 </label>
-
 
                                 {/* SORT */}
 
@@ -494,7 +543,6 @@ const ShopProductListPage = () => {
 
                                 </select>
 
-
                                 {/* CLEAR */}
 
                                 {hasFilters && (
@@ -517,10 +565,7 @@ const ShopProductListPage = () => {
 
                     </section>
 
-
-                    {/* =========================
-                        EMPTY
-                    ========================= */}
+                    {/* EMPTY */}
 
                     {filteredProducts.length === 0 ? (
 
@@ -556,160 +601,175 @@ const ShopProductListPage = () => {
                             )}
 
                         </div>
+
                     ) : (
 
-
-                        /* =========================
-                           PRODUCT GRID
-                        ========================= */
+                        /* PRODUCT GRID */
 
                         <div className="shop-products__grid">
 
-                            {filteredProducts.map(
-                                product => {
-                                    const hasDiscount =
-                                        product.hasVariants
-                                            ? product.variants?.some(
-                                                variant =>
-                                                    variant.discountPrice > 0
-                                            )
-                                            : product.discountPrice > 0;
+                            {filteredProducts.map(product => {
 
+                                const hasDiscount =
+                                    product.hasVariants
+                                        ? product.variants?.some(
+                                            variant =>
+                                                Number(
+                                                    variant.discountPrice
+                                                ) > 0
+                                        )
+                                        : Number(
+                                            product.discountPrice
+                                        ) > 0;
 
-                                    const finalPrice =
-                                        getPrice(product);
+                                const finalPrice =
+                                    getPrice(product);
 
+                                const isOutOfStock =
+                                    product.hasVariants
+                                        ? !product.variants?.some(
+                                            variant =>
+                                                Number(
+                                                    variant.stock
+                                                ) > 0
+                                        )
+                                        : Number(
+                                            product.stock
+                                        ) <= 0;
 
-                                    const isOutOfStock =
-                                        product.hasVariants
-                                            ? !product.variants?.some(
-                                                variant =>
-                                                    variant.stock > 0
-                                            )
-                                            : product.stock <= 0;
+                                return (
 
+                                    <Link
+                                        key={product._id}
+                                        to={`/products/${product.slug}`}
+                                        className="shop-product-card"
+                                    >
 
-                                    return (
-                                        <Link
-                                            key={product._id}
-                                            to={`/products/${product.slug}`}
-                                            className="shop-product-card"
-                                        >
+                                        {/* IMAGE */}
 
+                                        <div className="shop-product-card__image">
 
-                                            {/* IMAGE */}
+                                            {product.images?.[0]?.url ? (
 
-                                            <div className="shop-product-card__image">
+                                                <img
+                                                    src={
+                                                        product.images[0].url
+                                                    }
+                                                    alt={
+                                                        product.name
+                                                    }
+                                                    loading="lazy"
+                                                />
 
-                                                {product.images?.[0]?.url ? (
-                                                    <img
-                                                        src={
-                                                            product.images[0].url
-                                                        }
-                                                        alt={
-                                                            product.name
-                                                        }
-                                                        loading="lazy"
-                                                    />
-                                                ) : (
+                                            ) : (
 
-                                                    <div className="shop-product-card__no-image">
-                                                        No Image
-                                                    </div>
-                                                )}
-                                                {hasDiscount && (
+                                                <div className="shop-product-card__no-image">
+                                                    No Image
+                                                </div>
 
-                                                    <span className="shop-product-card__discount">
-                                                        Sale
+                                            )}
+
+                                            {hasDiscount && (
+
+                                                <span className="shop-product-card__discount">
+                                                    Sale
+                                                </span>
+
+                                            )}
+
+                                            {product.isFeatured && (
+
+                                                <span className="shop-product-card__featured">
+                                                    Featured
+                                                </span>
+
+                                            )}
+
+                                        </div>
+
+                                        {/* CONTENT */}
+
+                                        <div className="shop-product-card__content">
+
+                                            {product.brand && (
+
+                                                <span className="shop-product-card__brand">
+                                                    {product.brand}
+                                                </span>
+
+                                            )}
+
+                                            <h2 className="shop-product-card__name">
+                                                {product.name}
+                                            </h2>
+
+                                            {product.shortDescription && (
+
+                                                <p className="shop-product-card__description">
+                                                    {
+                                                        product.shortDescription
+                                                    }
+                                                </p>
+
+                                            )}
+
+                                            <div className="shop-product-card__footer">
+
+                                                <div className="shop-product-card__prices">
+
+                                                    <span className="shop-product-card__price">
+                                                        ₹{finalPrice}
                                                     </span>
-                                                )}
 
+                                                    {hasDiscount && (
 
-                                                {product.isFeatured && (
-
-                                                    <span className="shop-product-card__featured">
-                                                        Featured
-                                                    </span>
-
-                                                )}
-
-                                            </div>
-
-
-                                            {/* CONTENT */}
-
-                                            <div className="shop-product-card__content">
-
-                                                {product.brand && (
-
-                                                    <span className="shop-product-card__brand">
-                                                        {product.brand}
-                                                    </span>
-                                                )}
-
-
-                                                <h2 className="shop-product-card__name">
-                                                    {product.name}
-                                                </h2>
-                                                {product.shortDescription && (
-
-                                                    <p className="shop-product-card__description">
-                                                        {
-                                                            product.shortDescription
-                                                        }
-                                                    </p>
-                                                )}
-
-
-                                                <div className="shop-product-card__footer">
-
-                                                    <div className="shop-product-card__prices">
-
-                                                        <span className="shop-product-card__price">
-                                                            ₹{finalPrice}
-                                                        </span>
-
-                                                        {hasDiscount && (
-
-                                                            <span className="shop-product-card__old-price">
-                                                                ₹{
-                                                                    getOldPrice(
-                                                                        product
-                                                                    )
-                                                                }
-                                                            </span>
-                                                        )}
-                                                    </div>
-
-
-                                                    {isOutOfStock ? (
-
-                                                        <span className="shop-product-card__stock">
-                                                            Out of stock
-                                                        </span>
-
-                                                    ) : (
-
-                                                        <span className="shop-product-card__arrow">
-                                                            →
+                                                        <span className="shop-product-card__old-price">
+                                                            ₹
+                                                            {getOldPrice(
+                                                                product
+                                                            )}
                                                         </span>
 
                                                     )}
 
                                                 </div>
+
+                                                {isOutOfStock ? (
+
+                                                    <span className="shop-product-card__stock">
+                                                        Out of stock
+                                                    </span>
+
+                                                ) : (
+
+                                                    <span className="shop-product-card__arrow">
+                                                        →
+                                                    </span>
+
+                                                )}
+
                                             </div>
-                                        </Link>
-                                    );
-                                }
-                            )}
+
+                                        </div>
+
+                                    </Link>
+
+                                );
+
+                            })}
+
                         </div>
+
                     )}
+
                 </div>
+
             </Container>
+
         </main>
+
     );
+
 };
 
-
-/*
 export default ShopProductListPage;
