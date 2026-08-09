@@ -6,7 +6,6 @@ import Footer from "../components/common/Footer";
 const CustomerLayout = () => {
 
     return (
-
         <div className="
             min-h-screen
             flex
@@ -15,26 +14,18 @@ const CustomerLayout = () => {
             bg-[var(--background)]
             text-[var(--text)]
         ">
-
             <Navbar />
-
 
             <main className="
                 flex-1
                 w-full
             ">
-
                 <Outlet />
-
             </main>
 
-
             <Footer />
-
         </div>
-
     );
-
 };
 
 export default CustomerLayout;

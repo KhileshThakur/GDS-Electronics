@@ -10,9 +10,7 @@ const AdminLayout = () => {
     const [sidebarOpen, setSidebarOpen] =
         useState(false);
 
-
     return (
-
         <div className="
             min-h-screen
             flex
@@ -31,7 +29,6 @@ const AdminLayout = () => {
                 }
             />
 
-
             {/* =========================
                 Admin Body
             ========================== */}
@@ -41,9 +38,7 @@ const AdminLayout = () => {
                 flex-1
                 min-h-0
             ">
-
                 {/* Sidebar */}
-
                 <Sidebar
                     isOpen={sidebarOpen}
                     onClose={() =>
@@ -51,25 +46,17 @@ const AdminLayout = () => {
                     }
                 />
 
-
                 {/* Main Content */}
-
                 <main className="
                     flex-1
                     min-w-0
                     min-h-0
                 ">
-
                     <Outlet />
-
                 </main>
-
             </div>
-
         </div>
-
     );
-
 };
 
 
