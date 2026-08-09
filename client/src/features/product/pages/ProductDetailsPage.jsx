@@ -1,25 +1,48 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { toast } from "react-hot-toast";
-
-import Container from "../../../components/ui/Container";
-import Card from "../../../components/ui/Card";
+import {
+    useEffect,
+    useState
+} from "react";
 
 import {
-    getProduct,
-    getRelatedProducts
+    useParams
+} from "react-router-dom";
+
+import {
+    toast
+} from "react-hot-toast";
+
+import Container from "../../../components/ui/Container";
+
+import {
+    getProduct
 } from "../services/product.service";
+
+import {
+    addToCart
+} from "../../cart/services/cart.service";
+
+import {
+    addToWishlist
+} from "../../wishlist/services/wishlist.service";
+
+import "./ProductDetailsPage.css";
+
 
 const ProductDetailsPage = () => {
 
     const { slug } = useParams();
 
     const [product, setProduct] = useState(null);
-    const [relatedProducts, setRelatedProducts] = useState([]);
-
     const [loading, setLoading] = useState(true);
-    const [selectedImage, setSelectedImage] = useState(0);
+
+    const [quantity, setQuantity] = useState(1);
     const [selectedVariant, setSelectedVariant] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(0);
+
+
+    /* =========================================
+       Fetch Product
+    ========================================= */
 
     const fetchProduct = async () => {
 
@@ -27,32 +50,24 @@ const ProductDetailsPage = () => {
 
             setLoading(true);
 
-            const response =
-                await getProduct(slug);
+            const response = await getProduct(slug);
+            const data = response.data;
 
-            const productData =
-                response.data;
+            setProduct(data);
 
-            setProduct(productData);
+            setSelectedImage(0);
+            setQuantity(1);
 
-            if (
-                productData?.variants?.length
-            ) {
+            if (data.variants?.length) {
+
                 setSelectedVariant(
-                    productData.variants[0]
+                    data.variants[0]
                 );
+
             }
+            else {
 
-            if (productData?._id) {
-
-                const relatedResponse =
-                    await getRelatedProducts(
-                        productData._id
-                    );
-
-                setRelatedProducts(
-                    relatedResponse.data || []
-                );
+                setSelectedVariant(null);
 
             }
 
@@ -64,6 +79,8 @@ const ProductDetailsPage = () => {
                 "Failed to load product"
             );
 
+            setProduct(null);
+
         }
         finally {
 
@@ -73,505 +90,412 @@ const ProductDetailsPage = () => {
 
     };
 
+
     useEffect(() => {
 
         fetchProduct();
 
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-
     }, [slug]);
 
-    const images = useMemo(() => {
 
-        if (!product?.images?.length) {
-            return [];
-        }
-
-        return product.images.filter(
-            image => image?.url
-        );
-
-    }, [product]);
-
-    const currentPrice =
-        selectedVariant
-            ? selectedVariant.discountPrice ||
-              selectedVariant.price
-            : product?.discountPrice ||
-              product?.price ||
-              0;
-
-    const originalPrice =
-        selectedVariant
-            ? selectedVariant.price
-            : product?.price || 0;
-
-    const hasDiscount =
-        originalPrice > currentPrice;
-
-    const currentStock =
-        selectedVariant
-            ? selectedVariant.stock
-            : product?.stock || 0;
+    /* =========================================
+       Loading
+    ========================================= */
 
     if (loading) {
 
         return (
 
-            <Container>
+            <main className="product-details">
 
-                <div className="
-                    py-20
-                    text-center
-                    text-base
-                    text-[var(--muted)]
-                ">
-                    Loading product...
-                </div>
+                <Container>
 
-            </Container>
+                    <div className="product-details__loading">
+
+                        <div className="product-details__loader" />
+
+                        <p>
+                            Loading product...
+                        </p>
+
+                    </div>
+
+                </Container>
+
+            </main>
 
         );
 
     }
+
+
+    /* =========================================
+       Not Found
+    ========================================= */
 
     if (!product) {
 
         return (
 
-            <Container>
+            <main className="product-details">
 
-                <div className="
-                    py-20
-                    text-center
-                ">
+                <Container>
 
-                    <h1 className="
-                        text-2xl
-                        font-bold
-                    ">
-                        Product not found
-                    </h1>
+                    <div className="product-details__empty">
 
-                    <Link
-                        to="/products"
-                        className="
-                            inline-flex
-                            mt-6
-                            px-5
-                            py-3
-                            rounded-[var(--radius-md)]
-                            bg-[var(--primary)]
-                            text-white
-                            font-semibold
-                        "
-                    >
-                        Back to Products
-                    </Link>
+                        <div className="product-details__empty-icon">
+                            ⚡
+                        </div>
 
-                </div>
+                        <h1>
+                            Product not found
+                        </h1>
 
-            </Container>
+                        <p>
+                            The product you're looking
+                            for is no longer available.
+                        </p>
+
+                    </div>
+
+                </Container>
+
+            </main>
 
         );
 
     }
 
+
+    /* =========================================
+       Current Product Values
+    ========================================= */
+
+    const hasVariants =
+        product.variants?.length > 0;
+
+
+    const price = selectedVariant
+        ? (
+            selectedVariant.discountPrice > 0
+                ? selectedVariant.discountPrice
+                : selectedVariant.price
+        )
+        : (
+            product.discountPrice > 0
+                ? product.discountPrice
+                : product.price
+        );
+
+
+    const originalPrice =
+        selectedVariant
+            ? selectedVariant.price
+            : product.price;
+
+
+    const hasDiscount =
+        price < originalPrice;
+
+
+    /*
+        IMPORTANT:
+        Use availableStock instead of
+        undefined standalone "stock".
+    */
+
+    const availableStock =
+        selectedVariant
+            ? selectedVariant.stock || 0
+            : product.stock || 0;
+
+
+    const images =
+        product.images?.filter(
+            image => image?.url
+        ) || [];
+
+
+    const currentImage =
+        images[selectedImage]?.url ||
+        images[0]?.url;
+
+
+    /* =========================================
+       Variant Selection
+    ========================================= */
+
+    const handleVariantSelect = (
+        variant
+    ) => {
+
+        setSelectedVariant(variant);
+        setQuantity(1);
+
+    };
+
+
+    /* =========================================
+       Quantity
+    ========================================= */
+
+    const decreaseQuantity = () => {
+
+        setQuantity(
+            previous =>
+                Math.max(
+                    1,
+                    previous - 1
+                )
+        );
+
+    };
+
+
+    const increaseQuantity = () => {
+
+        setQuantity(
+            previous =>
+                Math.min(
+                    availableStock,
+                    previous + 1
+                )
+        );
+
+    };
+
+
+    /* =========================================
+       Add To Cart
+    ========================================= */
+
+    const handleAddToCart = async () => {
+
+        if (
+            hasVariants &&
+            !selectedVariant
+        ) {
+
+            toast.error(
+                "Please select a variant"
+            );
+
+            return;
+
+        }
+
+
+        if (availableStock <= 0) {
+
+            toast.error(
+                "Product is out of stock"
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const payload = {
+
+                product: product._id,
+
+                quantity
+
+            };
+
+
+            if (selectedVariant?.sku) {
+
+                payload.variantSku =
+                    selectedVariant.sku;
+
+            }
+
+
+            console.log(
+                "ADD TO CART PAYLOAD:",
+                payload
+            );
+
+
+            const response =
+                await addToCart(payload);
+
+
+            toast.success(
+                response.message ||
+                "Added to cart"
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "ADD TO CART ERROR:",
+                error
+            );
+
+            toast.error(
+                error.response?.data?.message ||
+                "Failed to add to cart"
+            );
+
+        }
+
+    };
+
+
+    /* =========================================
+       Wishlist
+    ========================================= */
+
+    const handleWishlist = async () => {
+
+        try {
+
+            const response =
+                await addToWishlist(
+                    product._id
+                );
+
+
+            toast.success(
+                response.message ||
+                "Added to wishlist"
+            );
+
+        }
+        catch (error) {
+
+            if (
+                error.response?.status === 409
+            ) {
+
+                toast.error(
+                    "Already in wishlist"
+                );
+
+                return;
+
+            }
+
+
+            toast.error(
+                error.response?.data?.message ||
+                "Failed to update wishlist"
+            );
+
+        }
+
+    };
+
+
+    /* =========================================
+       Render
+    ========================================= */
+
     return (
 
-        <Container>
+        <main className="product-details">
 
-            <div className="py-8 sm:py-10">
+            <Container>
 
-                {/* Breadcrumb */}
-
-                <div className="
-                    flex
-                    flex-wrap
-                    items-center
-                    gap-2
-                    mb-6
-                    text-sm
-                    text-[var(--muted)]
-                ">
-
-                    <Link
-                        to="/products"
-                        className="
-                            hover:text-[var(--primary)]
-                            transition
-                        "
-                    >
-                        Products
-                    </Link>
-
-                    <span>/</span>
-
-                    <span className="
-                        text-[var(--text)]
-                    ">
-                        {product.name}
-                    </span>
-
-                </div>
+                <div className="product-details__content">
 
 
-                {/* Main Product */}
+                    {/* =================================
+                        Main Product Section
+                    ================================= */}
 
-                <div className="
-                    grid
-                    grid-cols-1
-                    lg:grid-cols-[1.05fr_0.95fr]
-                    gap-8
-                    lg:gap-10
-                ">
-
-                    {/* Images */}
-
-                    <Card className="
-                        p-4
-                        sm:p-5
-                    ">
-
-                        <div className="
-                            aspect-square
-                            rounded-[var(--radius-lg)]
-                            bg-[var(--surface)]
-                            overflow-hidden
-                            flex
-                            items-center
-                            justify-center
-                        ">
-
-                            {images.length ? (
-
-                                <img
-                                    src={
-                                        images[
-                                            selectedImage
-                                        ]?.url
-                                    }
-                                    alt={product.name}
-                                    className="
-                                        w-full
-                                        h-full
-                                        object-contain
-                                        p-5
-                                        sm:p-8
-                                    "
-                                />
-
-                            ) : (
-
-                                <div className="
-                                    text-[var(--muted)]
-                                    text-sm
-                                ">
-                                    No image available
-                                </div>
-
-                            )}
-
-                        </div>
+                    <div className="product-details__main">
 
 
-                        {images.length > 1 && (
+                        {/* =============================
+                            Product Gallery
+                        ============================== */}
 
-                            <div className="
-                                flex
-                                gap-3
-                                mt-4
-                                overflow-x-auto
-                            ">
+                        <section className="product-details__gallery">
 
-                                {images.map(
-                                    (image, index) => (
 
-                                        <button
-                                            key={index}
-                                            type="button"
-                                            onClick={() =>
-                                                setSelectedImage(
-                                                    index
-                                                )
-                                            }
-                                            className={`
-                                                w-16
-                                                h-16
-                                                sm:w-20
-                                                sm:h-20
-                                                shrink-0
-                                                rounded-[var(--radius-md)]
-                                                overflow-hidden
-                                                border-2
-                                                transition
-                                                ${
-                                                    selectedImage === index
-                                                        ? "border-[var(--primary)]"
-                                                        : "border-transparent"
-                                                }
-                                            `}
-                                        >
+                            {/* Main Image */}
 
-                                            <img
-                                                src={image.url}
-                                                alt=""
-                                                className="
-                                                    w-full
-                                                    h-full
-                                                    object-cover
-                                                "
-                                            />
+                            <div className="product-details__main-image">
 
-                                        </button>
+                                {currentImage ? (
 
-                                    )
+                                    <img
+                                        src={currentImage}
+                                        alt={product.name}
+                                    />
+
+                                ) : (
+
+                                    <div className="product-details__no-image">
+
+                                        <span>
+                                            ⚡
+                                        </span>
+
+                                        <p>
+                                            No image available
+                                        </p>
+
+                                    </div>
+
+                                )}
+
+
+                                {hasDiscount && (
+
+                                    <span className="product-details__sale">
+                                        Sale
+                                    </span>
+
                                 )}
 
                             </div>
 
-                        )}
 
-                    </Card>
+                            {/* Thumbnails */}
 
+                            {images.length > 1 && (
 
-                    {/* Product Information */}
+                                <div className="product-details__thumbnails">
 
-                    <div className="
-                        flex
-                        flex-col
-                    ">
-
-                        {/* Category */}
-
-                        {product.category?.name && (
-
-                            <p className="
-                                text-sm
-                                font-semibold
-                                uppercase
-                                tracking-wide
-                                text-[var(--primary)]
-                                mb-2
-                            ">
-                                {product.category.name}
-                            </p>
-
-                        )}
-
-
-                        <div className="
-                            flex
-                            flex-wrap
-                            items-start
-                            gap-3
-                        ">
-
-                            <h1 className="
-                                text-2xl
-                                sm:text-3xl
-                                lg:text-4xl
-                                font-bold
-                                leading-tight
-                            ">
-                                {product.name}
-                            </h1>
-
-                            {product.isFeatured && (
-
-                                <span className="
-                                    mt-1
-                                    px-3
-                                    py-1
-                                    rounded-full
-                                    text-xs
-                                    font-semibold
-                                    bg-[var(--primary)]
-                                    text-white
-                                ">
-                                    Featured
-                                </span>
-
-                            )}
-
-                        </div>
-
-
-                        {product.brand && (
-
-                            <p className="
-                                mt-3
-                                text-base
-                                text-[var(--muted)]
-                            ">
-                                by{" "}
-                                <span className="
-                                    font-semibold
-                                    text-[var(--text)]
-                                ">
-                                    {product.brand}
-                                </span>
-                            </p>
-
-                        )}
-
-
-                        {/* Description */}
-
-                        <p className="
-                            mt-5
-                            text-base
-                            sm:text-lg
-                            leading-7
-                            text-[var(--muted)]
-                        ">
-                            {product.shortDescription}
-                        </p>
-
-
-                        {/* Price */}
-
-                        <div className="
-                            flex
-                            items-center
-                            flex-wrap
-                            gap-3
-                            mt-6
-                        ">
-
-                            <span className="
-                                text-3xl
-                                sm:text-4xl
-                                font-bold
-                            ">
-                                ₹{currentPrice}
-                            </span>
-
-                            {hasDiscount && (
-
-                                <>
-
-                                    <span className="
-                                        text-lg
-                                        text-[var(--muted)]
-                                        line-through
-                                    ">
-                                        ₹{originalPrice}
-                                    </span>
-
-                                    <span className="
-                                        px-2.5
-                                        py-1
-                                        rounded-full
-                                        bg-green-100
-                                        text-green-700
-                                        text-sm
-                                        font-semibold
-                                    ">
-                                        {Math.round(
-                                            (
-                                                (
-                                                    originalPrice -
-                                                    currentPrice
-                                                ) /
-                                                originalPrice
-                                            ) * 100
-                                        )}% OFF
-                                    </span>
-
-                                </>
-
-                            )}
-
-                        </div>
-
-
-                        {/* Stock */}
-
-                        <div className="
-                            mt-4
-                            text-sm
-                            font-semibold
-                        ">
-
-                            {currentStock > 0 ? (
-
-                                <span className="
-                                    text-green-600
-                                ">
-                                    ✓ In Stock
-                                    {currentStock <= 5 &&
-                                        ` • Only ${currentStock} left`
-                                    }
-                                </span>
-
-                            ) : (
-
-                                <span className="
-                                    text-red-600
-                                ">
-                                    Out of Stock
-                                </span>
-
-                            )}
-
-                        </div>
-
-
-                        {/* Variants */}
-
-                        {product.hasVariants &&
-                            product.variants?.length > 0 && (
-
-                            <div className="
-                                mt-7
-                            ">
-
-                                <h3 className="
-                                    text-base
-                                    font-semibold
-                                    mb-3
-                                ">
-                                    Select Variant
-                                </h3>
-
-                                <div className="
-                                    flex
-                                    flex-wrap
-                                    gap-2
-                                ">
-
-                                    {product.variants.map(
-                                        variant => (
+                                    {images.map(
+                                        (
+                                            image,
+                                            index
+                                        ) => (
 
                                             <button
-                                                key={variant._id}
+                                                key={`image-${index}`}
                                                 type="button"
                                                 onClick={() =>
-                                                    setSelectedVariant(
-                                                        variant
+                                                    setSelectedImage(
+                                                        index
                                                     )
                                                 }
                                                 className={`
-                                                    px-4
-                                                    py-2.5
-                                                    rounded-[var(--radius-md)]
-                                                    border
-                                                    text-sm
-                                                    font-medium
-                                                    transition
-                                                    ${
-                                                        selectedVariant?._id ===
-                                                        variant._id
-                                                            ? "border-[var(--primary)] bg-[var(--primary)] text-white"
-                                                            : "border-[var(--border)] hover:border-[var(--primary)]"
+                                                    product-details__thumbnail
+                                                    ${selectedImage === index
+                                                        ? "is-active"
+                                                        : ""
                                                     }
                                                 `}
                                             >
-                                                {variant.name}
+
+                                                <img
+                                                    src={image.url}
+                                                    alt={`
+                                                        ${product.name}
+                                                        ${index + 1}
+                                                    `}
+                                                />
+
                                             </button>
 
                                         )
@@ -579,219 +503,495 @@ const ProductDetailsPage = () => {
 
                                 </div>
 
+                            )}
 
-                                {/* Variant Attributes */}
+                        </section>
 
-                                {selectedVariant?.attributes?.length >
-                                    0 && (
 
-                                    <div className="
-                                        mt-4
-                                        flex
-                                        flex-wrap
-                                        gap-2
-                                    ">
+                        {/* =============================
+                            Product Information
+                        ============================== */}
 
-                                        {selectedVariant.attributes.map(
-                                            (attribute, index) => (
+                        <section className="product-details__info">
 
-                                                <span
-                                                    key={index}
-                                                    className="
-                                                        px-3
-                                                        py-1.5
-                                                        rounded-full
-                                                        bg-[var(--surface)]
-                                                        border
-                                                        border-[var(--border)]
-                                                        text-sm
-                                                    "
-                                                >
-                                                    <span className="
-                                                        text-[var(--muted)]
-                                                    ">
-                                                        {attribute.key}:
-                                                    </span>{" "}
-                                                    {attribute.value}
-                                                </span>
 
-                                            )
+                            {/* Brand */}
+
+                            {product.brand && (
+
+                                <span className="product-details__brand">
+                                    {product.brand}
+                                </span>
+
+                            )}
+
+
+                            {/* Name */}
+
+                            <h1 className="product-details__title">
+                                {product.name}
+                            </h1>
+
+
+                            {/* Short Description */}
+
+                            {product.shortDescription && (
+
+                                <p className="product-details__short-description">
+
+                                    {product.shortDescription}
+
+                                </p>
+
+                            )}
+
+
+                            {/* Price */}
+
+                            <div className="product-details__price-row">
+
+                                <span className="product-details__price">
+                                    ₹{price}
+                                </span>
+
+
+                                {hasDiscount && (
+
+                                    <span className="product-details__original-price">
+                                        ₹{originalPrice}
+                                    </span>
+
+                                )}
+
+
+                                {hasDiscount && (
+
+                                    <span className="product-details__discount">
+
+                                        Save{" "}
+
+                                        {Math.round(
+                                            (
+                                                (
+                                                    originalPrice -
+                                                    price
+                                                ) /
+                                                originalPrice
+                                            ) * 100
                                         )}
 
-                                    </div>
+                                        %
+
+                                    </span>
 
                                 )}
 
                             </div>
 
-                        )}
+
+                            {/* =========================
+                                Variants
+                            ========================== */}
+
+                            {hasVariants && (
+
+                                <section className="product-details__variants">
+
+                                    <div className="product-details__section-heading">
+
+                                        <div>
+
+                                            <span>
+                                                Options
+                                            </span>
+
+                                            <h2>
+                                                Choose a variant
+                                            </h2>
+
+                                        </div>
+
+                                    </div>
 
 
-                        {/* Actions */}
+                                    <div className="product-details__variant-grid">
 
-                        <div className="
-                            flex
-                            flex-col
-                            sm:flex-row
-                            gap-3
-                            mt-8
-                        ">
+                                        {product.variants.map(
+                                            (
+                                                variant,
+                                                index
+                                            ) => {
 
-                            <button
-                                type="button"
-                                disabled={currentStock <= 0}
-                                className="
-                                    flex-1
-                                    h-12
-                                    px-6
-                                    rounded-[var(--radius-md)]
-                                    bg-[var(--primary)]
-                                    text-white
-                                    font-semibold
-                                    disabled:opacity-50
-                                    disabled:cursor-not-allowed
-                                    hover:bg-[var(--primary-dark)]
-                                    transition
-                                "
+                                                const isSelected =
+                                                    selectedVariant?.sku ===
+                                                    variant.sku;
+
+
+                                                const isOutOfStock =
+                                                    variant.stock <= 0;
+
+
+                                                return (
+
+                                                    <button
+                                                        key={
+                                                            variant._id ||
+                                                            variant.sku ||
+                                                            `${variant.name}-${index}`
+                                                        }
+                                                        type="button"
+                                                        disabled={
+                                                            isOutOfStock
+                                                        }
+                                                        onClick={() =>
+                                                            handleVariantSelect(
+                                                                variant
+                                                            )
+                                                        }
+                                                        className={`
+                                                            product-details__variant
+                                                            ${isSelected
+                                                                ? "is-selected"
+                                                                : ""
+                                                            }
+                                                            ${isOutOfStock
+                                                                ? "is-disabled"
+                                                                : ""
+                                                            }
+                                                        `}
+                                                    >
+
+                                                        <div className="product-details__variant-header">
+
+                                                            <strong>
+                                                                {
+                                                                    variant.name ||
+                                                                    variant.sku ||
+                                                                    "Variant"
+                                                                }
+                                                            </strong>
+
+
+                                                            {isSelected && (
+
+                                                                <span className="product-details__variant-check">
+                                                                    ✓
+                                                                </span>
+
+                                                            )}
+
+                                                        </div>
+
+
+                                                        {/* Variant Attributes */}
+
+                                                        {variant.attributes?.length > 0 && (
+
+                                                            <div className="product-details__variant-attributes">
+
+                                                                {variant.attributes.map(
+                                                                    (
+                                                                        attribute,
+                                                                        attributeIndex
+                                                                    ) => (
+
+                                                                        <div
+                                                                            key={`
+                                                                                ${attribute.key}
+                                                                                -
+                                                                                ${attributeIndex}
+                                                                            `}
+                                                                            className="product-details__variant-attribute"
+                                                                        >
+
+                                                                            <span>
+                                                                                {
+                                                                                    attribute.key
+                                                                                }
+                                                                            </span>
+
+                                                                            <strong>
+                                                                                {
+                                                                                    attribute.value
+                                                                                }
+                                                                            </strong>
+
+                                                                        </div>
+
+                                                                    )
+                                                                )}
+
+                                                            </div>
+
+                                                        )}
+
+
+                                                        <div className="product-details__variant-stock">
+
+                                                            {isOutOfStock
+                                                                ? "Out of stock"
+                                                                : `${variant.stock} available`
+                                                            }
+
+                                                        </div>
+
+                                                    </button>
+
+                                                );
+
+                                            }
+                                        )}
+
+                                    </div>
+
+                                </section>
+
+                            )}
+
+
+                            {/* Stock */}
+
+                            <div
+                                className={`
+                                    product-details__stock
+                                    ${availableStock > 0
+                                        ? "is-available"
+                                        : "is-unavailable"
+                                    }
+                                `}
                             >
-                                Add to Cart
-                            </button>
 
-                            <button
-                                type="button"
-                                className="
-                                    h-12
-                                    px-6
-                                    rounded-[var(--radius-md)]
-                                    border
-                                    border-[var(--border)]
-                                    font-semibold
-                                    hover:border-[var(--primary)]
-                                    hover:text-[var(--primary)]
-                                    transition
-                                "
-                            >
-                                ♡ Wishlist
-                            </button>
+                                <span className="product-details__stock-dot" />
 
-                        </div>
+                                {availableStock > 0
+                                    ? `${availableStock} in stock`
+                                    : "Out of stock"
+                                }
+
+                            </div>
 
 
-                        {/* SKU */}
+                            {/* Quantity */}
 
-                        <div className="
-                            mt-6
-                            pt-5
-                            border-t
-                            border-[var(--border)]
-                            text-sm
-                            text-[var(--muted)]
-                        ">
+                            {availableStock > 0 && (
 
-                            SKU:{" "}
+                                <div className="product-details__purchase">
 
-                            <span className="
-                                font-medium
-                                text-[var(--text)]
-                            ">
-                                {selectedVariant?.sku ||
-                                    product.sku ||
-                                    "N/A"}
-                            </span>
+                                    <div className="product-details__quantity">
 
-                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={
+                                                decreaseQuantity
+                                            }
+                                            disabled={
+                                                quantity <= 1
+                                            }
+                                            aria-label="Decrease quantity"
+                                        >
+                                            −
+                                        </button>
+
+
+                                        <span>
+                                            {quantity}
+                                        </span>
+
+
+                                        <button
+                                            type="button"
+                                            onClick={
+                                                increaseQuantity
+                                            }
+                                            disabled={
+                                                quantity >=
+                                                availableStock
+                                            }
+                                            aria-label="Increase quantity"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+
+
+                                    <span className="product-details__quantity-label">
+                                        Quantity
+                                    </span>
+
+                                </div>
+
+                            )}
+
+
+                            {/* Actions */}
+
+                            <div className="product-details__actions">
+
+                                <button
+                                    type="button"
+                                    disabled={
+                                        availableStock <= 0
+                                    }
+                                    onClick={
+                                        handleAddToCart
+                                    }
+                                    className="product-details__cart"
+                                >
+
+                                    {availableStock > 0
+                                        ? "Add to Cart"
+                                        : "Out of Stock"
+                                    }
+
+                                </button>
+
+
+                                <button
+                                    type="button"
+                                    onClick={
+                                        handleWishlist
+                                    }
+                                    className="product-details__wishlist"
+                                    title="Add to wishlist"
+                                    aria-label="Add to wishlist"
+                                >
+                                    ♡
+                                </button>
+
+                            </div>
+
+
+                            {/* Trust Information */}
+
+                            <div className="product-details__trust">
+
+                                <div>
+                                    <span>
+                                        ✓
+                                    </span>
+
+                                    <p>
+                                        Secure checkout
+                                    </p>
+                                </div>
+
+
+                                <div>
+                                    <span>
+                                        ⚡
+                                    </span>
+
+                                    <p>
+                                        Fast delivery
+                                    </p>
+                                </div>
+
+
+                                <div>
+                                    <span>
+                                        ✓
+                                    </span>
+
+                                    <p>
+                                        Quality products
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </section>
 
                     </div>
 
-                </div>
+
+                    {/* =================================
+                        Description
+                    ================================= */}
+
+                    {product.description && (
+
+                        <section className="product-details__content-card">
+
+                            <div className="product-details__section-heading">
+
+                                <div>
+
+                                    <span>
+                                        Product Details
+                                    </span>
+
+                                    <h2>
+                                        Description
+                                    </h2>
+
+                                </div>
+
+                            </div>
 
 
-                {/* Product Description */}
-
-                {product.description && (
-
-                    <section className="
-                        mt-10
-                    ">
-
-                        <Card>
-
-                            <h2 className="
-                                text-xl
-                                sm:text-2xl
-                                font-bold
-                                mb-4
-                            ">
-                                Product Description
-                            </h2>
-
-                            <p className="
-                                text-base
-                                sm:text-lg
-                                leading-8
-                                text-[var(--muted)]
-                                whitespace-pre-line
-                            ">
+                            <p className="product-details__description">
                                 {product.description}
                             </p>
 
-                        </Card>
+                        </section>
 
-                    </section>
-
-                )}
+                    )}
 
 
-                {/* Specifications */}
+                    {/* =================================
+                        Specifications
+                    ================================= */}
 
-                {product.specifications?.length > 0 && (
+                    {product.specifications?.length > 0 && (
 
-                    <section className="
-                        mt-6
-                    ">
+                        <section className="product-details__content-card">
 
-                        <Card>
+                            <div className="product-details__section-heading">
 
-                            <h2 className="
-                                text-xl
-                                sm:text-2xl
-                                font-bold
-                                mb-5
-                            ">
-                                Specifications
-                            </h2>
+                                <div>
 
-                            <div className="
-                                divide-y
-                                divide-[var(--border)]
-                            ">
+                                    <span>
+                                        Product Information
+                                    </span>
+
+                                    <h2>
+                                        Specifications
+                                    </h2>
+
+                                </div>
+
+                            </div>
+
+
+                            <div className="product-details__specifications">
 
                                 {product.specifications.map(
-                                    (specification, index) => (
+                                    (
+                                        specification,
+                                        index
+                                    ) => (
 
                                         <div
-                                            key={index}
-                                            className="
-                                                grid
-                                                grid-cols-1
-                                                sm:grid-cols-[180px_1fr]
-                                                gap-2
-                                                py-3.5
-                                                text-base
-                                            "
+                                            key={`
+                                                ${specification.key}
+                                                -
+                                                ${index}
+                                            `}
+                                            className="product-details__specification-row"
                                         >
 
-                                            <span className="
-                                                font-semibold
-                                            ">
-                                                {specification.key}
+                                            <span>
+                                                {
+                                                    specification.key
+                                                }
                                             </span>
 
-                                            <span className="
-                                                text-[var(--muted)]
-                                            ">
-                                                {specification.value}
-                                            </span>
+                                            <strong>
+                                                {
+                                                    specification.value
+                                                }
+                                            </strong>
 
                                         </div>
 
@@ -800,193 +1000,19 @@ const ProductDetailsPage = () => {
 
                             </div>
 
-                        </Card>
+                        </section>
 
-                    </section>
+                    )}
 
-                )}
+                </div>
 
+            </Container>
 
-                {/* Related Products */}
-
-                {relatedProducts.length > 0 && (
-
-                    <section className="
-                        mt-10
-                    ">
-
-                        <div className="
-                            flex
-                            items-end
-                            justify-between
-                            gap-4
-                            mb-5
-                        ">
-
-                            <div>
-
-                                <p className="
-                                    text-sm
-                                    font-semibold
-                                    text-[var(--primary)]
-                                    uppercase
-                                    tracking-wide
-                                ">
-                                    You may also like
-                                </p>
-
-                                <h2 className="
-                                    text-2xl
-                                    sm:text-3xl
-                                    font-bold
-                                    mt-1
-                                ">
-                                    Related Products
-                                </h2>
-
-                            </div>
-
-                            <Link
-                                to="/products"
-                                className="
-                                    hidden
-                                    sm:block
-                                    text-sm
-                                    font-semibold
-                                    text-[var(--primary)]
-                                    hover:underline
-                                "
-                            >
-                                View All
-                            </Link>
-
-                        </div>
-
-
-                        <div className="
-                            grid
-                            grid-cols-2
-                            lg:grid-cols-4
-                            gap-4
-                            sm:gap-5
-                        ">
-
-                            {relatedProducts.map(
-                                related => (
-
-                                    <Link
-                                        key={related._id}
-                                        to={`/products/${related.slug}`}
-                                        className="
-                                            group
-                                        "
-                                    >
-
-                                        <Card className="
-                                            h-full
-                                            p-0
-                                            overflow-hidden
-                                            transition
-                                            hover:-translate-y-1
-                                        ">
-
-                                            <div className="
-                                                aspect-square
-                                                bg-[var(--surface)]
-                                                overflow-hidden
-                                            ">
-
-                                                {related.images?.[0]?.url ? (
-
-                                                    <img
-                                                        src={
-                                                            related.images[0].url
-                                                        }
-                                                        alt={
-                                                            related.name
-                                                        }
-                                                        className="
-                                                            w-full
-                                                            h-full
-                                                            object-contain
-                                                            p-4
-                                                            group-hover:scale-105
-                                                            transition
-                                                            duration-300
-                                                        "
-                                                    />
-
-                                                ) : (
-
-                                                    <div className="
-                                                        w-full
-                                                        h-full
-                                                        flex
-                                                        items-center
-                                                        justify-center
-                                                        text-sm
-                                                        text-[var(--muted)]
-                                                    ">
-                                                        No image
-                                                    </div>
-
-                                                )}
-
-                                            </div>
-
-
-                                            <div className="
-                                                p-4
-                                            ">
-
-                                                <p className="
-                                                    text-xs
-                                                    text-[var(--muted)]
-                                                    mb-1
-                                                ">
-                                                    {related.brand}
-                                                </p>
-
-                                                <h3 className="
-                                                    font-semibold
-                                                    text-base
-                                                    line-clamp-2
-                                                ">
-                                                    {related.name}
-                                                </h3>
-
-                                                <p className="
-                                                    mt-2
-                                                    font-bold
-                                                    text-lg
-                                                ">
-                                                    ₹
-                                                    {related.discountPrice ||
-                                                        related.price ||
-                                                        0}
-                                                </p>
-
-                                            </div>
-
-                                        </Card>
-
-                                    </Link>
-
-                                )
-                            )}
-
-                        </div>
-
-                    </section>
-
-                )}
-
-            </div>
-
-        </Container>
+        </main>
 
     );
 
 };
+
 
 export default ProductDetailsPage;

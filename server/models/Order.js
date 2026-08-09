@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
 
+/* =========================================
+   ORDER ITEM
+========================================= */
+
 const orderItemSchema = new mongoose.Schema(
     {
-
         product: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Product",
@@ -54,16 +57,19 @@ const orderItemSchema = new mongoose.Schema(
             type: Number,
             required: true
         }
-
     },
     {
         _id: false
     }
 );
 
+
+/* =========================================
+   SHIPPING ADDRESS
+========================================= */
+
 const shippingAddressSchema = new mongoose.Schema(
     {
-
         fullName: {
             type: String,
             required: true
@@ -108,16 +114,19 @@ const shippingAddressSchema = new mongoose.Schema(
             type: String,
             required: true
         }
-
     },
     {
         _id: false
     }
 );
 
+
+/* =========================================
+   PRICING
+========================================= */
+
 const pricingSchema = new mongoose.Schema(
     {
-
         subtotal: {
             type: Number,
             required: true
@@ -142,16 +151,19 @@ const pricingSchema = new mongoose.Schema(
             type: Number,
             required: true
         }
-
     },
     {
         _id: false
     }
 );
 
+
+/* =========================================
+   PAYMENT
+========================================= */
+
 const paymentSchema = new mongoose.Schema(
     {
-
         method: {
             type: String,
             enum: [
@@ -177,20 +189,33 @@ const paymentSchema = new mongoose.Schema(
             default: ""
         },
 
+        razorpayOrderId: {
+            type: String,
+            default: null
+        },
+
+        razorpayPaymentId: {
+            type: String,
+            default: null
+        },
+
         paidAt: {
             type: Date,
             default: null
         }
-
     },
     {
         _id: false
     }
 );
 
+
+/* =========================================
+   ORDER TIMELINE
+========================================= */
+
 const timelineSchema = new mongoose.Schema(
     {
-
         status: {
             type: String,
             required: true
@@ -205,16 +230,19 @@ const timelineSchema = new mongoose.Schema(
             type: Date,
             default: Date.now
         }
-
     },
     {
         _id: false
     }
 );
 
+
+/* =========================================
+   ORDER
+========================================= */
+
 const orderSchema = new mongoose.Schema(
     {
-
         orderNumber: {
             type: String,
             required: true,
@@ -277,7 +305,6 @@ const orderSchema = new mongoose.Schema(
             type: String,
             default: ""
         }
-
     },
     {
         timestamps: true
