@@ -122,36 +122,36 @@ const UserMenu = () => {
     ===================================== */
     return (
         <button
-            type="button"
-            onClick={handleLogout}
-            title="Logout"
-            className="
-                h-[25px]
-                px-2
-                sm:px-2.5
-                mr-[5px]
-                inline-flex
-                items-center
-                justify-center
-                gap-1
-                rounded-md
-                bg-[var(--sidebar)]
-                text-white
-                text-[10px]
-                font-semibold
-                leading-none
-                whitespace-nowrap
-                hover:bg-[var(--primary-dark)]
-                active:scale-[0.97]
-                transition-all
-                duration-200
-            "
-        >
-            <span>
-                Logout
-            </span>
-            <LogoutIcon />
-        </button>
+                    type="button"
+                    onClick={handleLogout}
+                    className="
+                        h-9
+                        sm:h-10
+                        px-4
+                        sm:px-5
+                        inline-flex
+                        items-center
+                        justify-center
+                        rounded-[var(--radius-md)]
+                        border
+                        border-[var(--primary)]
+                        bg-transparent
+                        text-[var(--primary)]
+                        text-xs
+                        sm:text-sm
+                        font-semibold
+                        whitespace-nowrap
+                        hover:bg-[var(--danger)]
+                        hover:text-white
+                        active:scale-[0.98]
+                        transition-all
+                        duration-200
+                        gap-1
+                    "
+                >
+                    Logout 
+                    <LogoutIcon/>
+                </button>
     );
 };
 export default UserMenu;
