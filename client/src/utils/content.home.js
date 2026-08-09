@@ -18,7 +18,7 @@ export const homeContent = {
             path: "/categories"
         },
 
-        image: null
+        image: "https://scontent.fblr1-6.fna.fbcdn.net/v/t39.30808-6/468515475_10160989120754958_2483165617946921437_n.jpg?stp=dst-jpg_tt6&cstp=mx1688x1125&ctp=s1688x1125&_nc_cat=109&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=J79fUFgXEokQ7kNvwGzUWku&_nc_oc=AdrHhwkjr6Lj7aORHabx-odizMSTy7hfAj4GynJRoxAphucpUM161zEojlcbQw6dHD-pEiJL2Qx8tbWEtqhNg0vs&_nc_zt=23&_nc_ht=scontent.fblr1-6.fna&_nc_gid=vh1gpkBO-MoSuMMpKTFxJQ&_nc_ss=7b289&oh=00_AQGmRlkrpx5saOK_JlMVWr0cOhkimqHXsaMecvpsMlPT5g&oe=6A7DF1F1"
     },
 
 

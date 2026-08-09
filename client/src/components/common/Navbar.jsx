@@ -4,6 +4,7 @@ import {
     useLocation,
     useNavigate
 } from "react-router-dom";
+import { useState } from "react";
 import {
     useSelector
 } from "react-redux";
@@ -122,6 +123,22 @@ const Navbar = ({
 }) => {
     const location = useLocation();
     const navigate = useNavigate();
+    const [search, setSearch] = useState("");
+    const handleSearch = (e) => {
+
+        e.preventDefault();
+
+        const value = search.trim();
+
+        if (!value) return;
+
+        navigate(
+            `/products?search=${encodeURIComponent(value)}`
+        );
+
+    };
+
+
     const {
         user,
         isAuthenticated
@@ -143,6 +160,22 @@ const Navbar = ({
                 : "/"
         );
     };
+
+    const clearSearch = () => {
+
+        setSearch("");
+
+        if (
+            location.pathname === "/products"
+        ) {
+            navigate("/products", {
+                replace: true
+            });
+        }
+
+    };
+
+
     /*
         Customer:
         mobile  -> 2 columns
@@ -317,88 +350,34 @@ grid
                     {/* =================================
                         SEARCH
                     ================================= */}
-                    <div className={`
-                        min-w-0
-                        w-full
-                        row-start-2
-                        col-span-full
-                        flex
-                        items-center
-                        justify-center
-                        lg:row-start-1
-                        lg:col-start-2
-                        lg:col-span-1
-                    `}>
-                        <div className="
-                            h-11
-                            w-full
-                            lg:w-1/2
-                            flex
-                            items-center
-                            overflow-hidden
-                            rounded-full
-                            bg-[var(--background)]
-                            border
-                            border-[var(--border)]
-                            transition-all
-                            duration-200
-                            focus-within:border-[var(--primary)]
-                            focus-within:ring-2
-                            focus-within:ring-[var(--primary)]/10
-                        ">
-                            <input
-                                type="text"
-                                placeholder={
-                                    isAdminView
-                                        ? "Search products, orders..."
-                                        : "Search products..."
-                                }
-                                className="
-                                    flex-1
-                                    min-w-0
-                                    h-full
-                                    bg-transparent
-                                    text-sm
-                                    text-[var(--text)]
-                                    placeholder:text-[var(--text-light)]
-                                    outline-none
-                                    px-[15px]
-                                    py-[5px]
-                                "
-                            />
-                            <button
-                                type="button"
-                                className="
-                                    h-full
-                                    w-12
-                                    sm:w-14
-                                    shrink-0
-                                    inline-flex
-                                    items-center
-                                    justify-center
-                                    bg-[var(--primary)]
-                                    text-white
-                                    hover:bg-[var(--primary-dark)]
-                                    transition-colors
-                                    duration-200
-                                "
+
+                    {/* =================================
+    SEARCH
                             >
                                 <SearchIcon />
                             </button>
                         </div>
-                    </div>
+
+                    </form>
+
+
                 </div>
             </Container>
             {/* =================================
                 CUSTOMER NAVIGATION
             ================================= */}
-            {!isAdminView && (
-                <div className="
+
+            {
+                !isAdminView && (
+
+                    <div className="
                     border-t
                     border-[var(--border)]
                 ">
-                    <Container className="!px-0">
-                        <nav className="
+
+                        <Container className="!px-0">
+
+                            <nav className="
                             h-14
                             flex
                             items-center
@@ -408,21 +387,27 @@ grid
                             md:gap-3
                             overflow-x-auto
                         ">
-                            {customerNavigation.map(
-                                (item) => (
-                                    <NavLink
-                                        key={
-                                            item.path
-                                        }
-                                        to={
-                                            item.path
-                                        }
-                                        end={
-                                            item.path === "/"
-                                        }
-                                        className={({
-                                            isActive
-                                        }) => `
+
+                                {customerNavigation.map(
+                                    (item) => (
+
+                                        <NavLink
+                                            key={
+                                                item.path
+                                            }
+
+                                            to={
+                                                item.path
+                                            }
+
+                                            end={
+                                                item.path === "/"
+                                            }
+
+                                            className={({
+                                                isActive
+                                            }) => `
+
                                             h-14
                                             min-w-[64px]
                                             sm:min-w-[105px]
@@ -442,35 +427,47 @@ grid
                                             transition-all
                                             duration-200
                                             ${isActive
-                                                ? `
+                                                    ? `
                                                         bg-[var(--primary-soft)]
                                                         text-[var(--primary-dark)]
                                                         font-semibold
                                                     `
-                                                : `
+                                                    : `
                                                         text-[var(--text)]
                                                         hover:bg-[var(--surface-hover)]
                                                         hover:text-[var(--primary)]
                                                     `
-                                            }
+                                                }
+
                                         `}
-                                    >
-                                        <NavigationIcon
-                                            type={
-                                                item.icon
-                                            }
-                                        />
-                                        <span>
-                                            {item.label}
-                                        </span>
-                                    </NavLink>
-                                )
-                            )}
-                        </nav>
-                    </Container>
-                </div>
-            )}
-        </header>
+                                        >
+
+                                            <NavigationIcon
+                                                type={
+                                                    item.icon
+                                                }
+                                            />
+
+                                            <span>
+                                                {item.label}
+                                            </span>
+
+                                        </NavLink>
+
+                                    )
+                                )}
+
+                            </nav>
+
+                        </Container>
+
+                    </div>
+
+                )
+            }
+
+        </header >
+
     );
 };
 export default Navbar;

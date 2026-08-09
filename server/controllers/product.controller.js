@@ -187,7 +187,87 @@ export const createProduct = asyncHandler(async (req, res) => {
 
 export const getProducts = asyncHandler(async (req, res) => {
 
-    const products = await Product.find()
+    const {
+        search = ""
+    } = req.query;
+
+    const filter = {};
+
+    const searchText = search.trim();
+
+    if (searchText) {
+
+        const searchWords = searchText
+            .split(/\s+/)
+            .filter(Boolean);
+
+        filter.$and = searchWords.map(word => {
+
+            const escapedWord = word.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&"
+            );
+
+            const searchRegex = new RegExp(
+                escapedWord,
+                "i"
+            );
+
+            return {
+                $or: [
+
+                    {
+                        name: searchRegex
+                    },
+
+                    {
+                        brand: searchRegex
+                    },
+
+                    {
+                        sku: searchRegex
+                    },
+
+                    {
+                        shortDescription: searchRegex
+                    },
+
+                    {
+                        description: searchRegex
+                    },
+
+                    {
+                        "variants.name": searchRegex
+                    },
+
+                    {
+                        "variants.sku": searchRegex
+                    },
+
+                    {
+                        "variants.attributes.key": searchRegex
+                    },
+
+                    {
+                        "variants.attributes.value": searchRegex
+                    },
+
+                    {
+                        "specifications.key": searchRegex
+                    },
+
+                    {
+                        "specifications.value": searchRegex
+                    }
+
+                ]
+            };
+
+        });
+
+    }
+
+    const products = await Product.find(filter)
         .populate(
             "category",
             "name slug"
@@ -203,6 +283,7 @@ export const getProducts = asyncHandler(async (req, res) => {
         "Products fetched successfully",
         products
     );
+
 });
 
 export const getProduct = asyncHandler(async (req, res) => {

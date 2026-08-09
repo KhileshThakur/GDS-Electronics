@@ -3,11 +3,13 @@ import api from "../../../services/api";
 // ======================
 // Get All Products
 // ======================
-
-export const getProducts = async () => {
+export const getProducts = async (params = {}) => {
 
     const response = await api.get(
-        "/products"
+        "/products",
+        {
+            params
+        }
     );
 
     return response.data;
