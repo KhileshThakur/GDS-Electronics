@@ -4,7 +4,7 @@ import {
     useLocation,
     useNavigate
 } from "react-router-dom";
-
+import { useState } from "react";
 import {
     useSelector
 } from "react-redux";
@@ -162,6 +162,21 @@ const Navbar = ({
 
     const location = useLocation();
     const navigate = useNavigate();
+    const [search, setSearch] = useState("");
+    const handleSearch = (e) => {
+
+        e.preventDefault();
+
+        const value = search.trim();
+
+        if (!value) return;
+
+        navigate(
+            `/products?search=${encodeURIComponent(value)}`
+        );
+
+    };
+
 
     const {
         user,
@@ -188,6 +203,20 @@ const Navbar = ({
                 ? "/admin"
                 : "/"
         );
+
+    };
+
+    const clearSearch = () => {
+
+        setSearch("");
+
+        if (
+            location.pathname === "/products"
+        ) {
+            navigate("/products", {
+                replace: true
+            });
+        }
 
     };
 
@@ -437,112 +466,140 @@ grid
                         SEARCH
                     ================================= */}
 
-                    <div className={`
-                        min-w-0
-                        w-full
+                    {/* =================================
+    SEARCH
+================================= */}
 
-                        row-start-2
-
-                        col-span-full
-
-                        flex
-                        items-center
-                        justify-center
-
-                        lg:row-start-1
-                        lg:col-start-2
-                        lg:col-span-1
-                    `}>
+                    <form
+                        onSubmit={handleSearch}
+                        className="min-w-0 w-full col-span-full felx items-center justify-center lg:row-start-1 lg:col-start-2 lg:col-span-1"
+                    >
 
                         <div className="
-                            h-11
-
-                            w-full
-                            lg:w-1/2
-
-                            flex
-                            items-center
-
-                            overflow-hidden
-
-                            rounded-full
-
-                            bg-[var(--background)]
-
-                            border
-                            border-[var(--border)]
-
-                            transition-all
-                            duration-200
-
-                            focus-within:border-[var(--primary)]
-
-                            focus-within:ring-2
-                            focus-within:ring-[var(--primary)]/10
-                        ">
+    relative
+    w-full
+">
 
                             <input
                                 type="text"
-
-                                placeholder={
-                                    isAdminView
-                                        ? "Search products, orders..."
-                                        : "Search products..."
+                                value={search}
+                                onChange={(e) =>
+                                    setSearch(e.target.value)
                                 }
+                                onKeyDown={(e) => {
 
+                                    if (e.key === "Enter") {
+                                        handleSearch();
+                                    }
+
+                                    if (
+                                        e.key === "Escape" &&
+                                        search
+                                    ) {
+                                        clearSearch();
+                                    }
+
+                                }}
+                                placeholder="Search products..."
                                 className="
-                                    flex-1
-                                    min-w-0
+            w-full
+            h-10
 
-                                    h-full
+            pl-4
+            pr-20
 
-                                    bg-transparent
+            rounded-[var(--radius-md)]
 
-                                    text-sm
-                                    text-[var(--text)]
+            border
+            border-[var(--border)]
 
-                                    placeholder:text-[var(--text-light)]
+            bg-[var(--surface)]
+            text-[var(--text)]
 
-                                    outline-none
+            text-sm
 
-                                    px-[15px]
-                                    py-[5px]
-                                "
+            outline-none
+
+            placeholder:text-[var(--text-muted)]
+
+            focus:border-[var(--primary)]
+
+            transition
+        "
                             />
 
+                            {/* Clear */}
+
+                            {search && (
+
+                                <button
+                                    type="button"
+                                    onClick={clearSearch}
+                                    aria-label="Clear search"
+                                    className="
+                absolute
+                right-11
+                top-1/2
+                -translate-y-1/2
+
+                w-7
+                h-7
+
+                flex
+                items-center
+                justify-center
+
+                rounded-full
+
+                text-[var(--text-muted)]
+
+                hover:bg-[var(--background)]
+                hover:text-[var(--text)]
+
+                transition
+            "
+                                >
+                                    ×
+                                </button>
+
+                            )}
+
+                            {/* Search */}
 
                             <button
                                 type="button"
-
+                                onClick={handleSearch}
+                                aria-label="Search"
                                 className="
-                                    h-full
+        absolute
+        right-1
+        top-1/2
+        -translate-y-1/2
 
-                                    w-12
-                                    sm:w-14
+        w-8
+        h-8
 
-                                    shrink-0
+        flex
+        items-center
+        justify-center
 
-                                    inline-flex
-                                    items-center
-                                    justify-center
+        rounded-[var(--radius-sm)]
 
-                                    bg-[var(--primary)]
-                                    text-white
+        bg-[var(--primary)]
+        text-white
 
-                                    hover:bg-[var(--primary-dark)]
+        hover:bg-[var(--primary-dark)]
 
-                                    transition-colors
-                                    duration-200
-                                "
+        transition
+    "
                             >
-
                                 <SearchIcon />
-
                             </button>
 
                         </div>
 
-                    </div>
+                    </form>
+
 
                 </div>
 
@@ -553,16 +610,17 @@ grid
                 CUSTOMER NAVIGATION
             ================================= */}
 
-            {!isAdminView && (
+            {
+                !isAdminView && (
 
-                <div className="
+                    <div className="
                     border-t
                     border-[var(--border)]
                 ">
 
-                    <Container className="!px-0">
+                        <Container className="!px-0">
 
-                        <nav className="
+                            <nav className="
                             h-14
 
                             flex
@@ -576,25 +634,25 @@ grid
                             overflow-x-auto
                         ">
 
-                            {customerNavigation.map(
-                                (item) => (
+                                {customerNavigation.map(
+                                    (item) => (
 
-                                    <NavLink
-                                        key={
-                                            item.path
-                                        }
+                                        <NavLink
+                                            key={
+                                                item.path
+                                            }
 
-                                        to={
-                                            item.path
-                                        }
+                                            to={
+                                                item.path
+                                            }
 
-                                        end={
-                                            item.path === "/"
-                                        }
+                                            end={
+                                                item.path === "/"
+                                            }
 
-                                        className={({
-                                            isActive
-                                        }) => `
+                                            className={({
+                                                isActive
+                                            }) => `
 
                                             h-14
 
@@ -627,45 +685,46 @@ grid
                                             duration-200
 
                                             ${isActive
-                                                ? `
+                                                    ? `
                                                         bg-[var(--primary-soft)]
                                                         text-[var(--primary-dark)]
                                                         font-semibold
                                                     `
-                                                : `
+                                                    : `
                                                         text-[var(--text)]
                                                         hover:bg-[var(--surface-hover)]
                                                         hover:text-[var(--primary)]
                                                     `
-                                            }
+                                                }
 
                                         `}
-                                    >
+                                        >
 
-                                        <NavigationIcon
-                                            type={
-                                                item.icon
-                                            }
-                                        />
+                                            <NavigationIcon
+                                                type={
+                                                    item.icon
+                                                }
+                                            />
 
-                                        <span>
-                                            {item.label}
-                                        </span>
+                                            <span>
+                                                {item.label}
+                                            </span>
 
-                                    </NavLink>
+                                        </NavLink>
 
-                                )
-                            )}
+                                    )
+                                )}
 
-                        </nav>
+                            </nav>
 
-                    </Container>
+                        </Container>
 
-                </div>
+                    </div>
 
-            )}
+                )
+            }
 
-        </header>
+        </header >
 
     );
 

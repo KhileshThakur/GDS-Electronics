@@ -1,5 +1,6 @@
 import {
     useEffect,
+    useMemo,
     useState
 } from "react";
 
@@ -8,7 +9,8 @@ import {
 } from "react-hot-toast";
 
 import {
-    Link
+    Link,
+    useSearchParams,
 } from "react-router-dom";
 
 import Container from "../../../components/ui/Container";
@@ -22,20 +24,43 @@ import "./ShopProductListPage.css";
 
 const ShopProductListPage = () => {
 
-    const [
-        products,
-        setProducts
-    ] = useState([]);
-
-    const [
-        loading,
-        setLoading
-    ] = useState(true);
+    const [searchParams] = useSearchParams();
 
 
-    /* =========================================
-       Fetch Products
-    ========================================= */
+    const [products, setProducts] =
+        useState([]);
+
+    const [loading, setLoading] =
+        useState(true);
+
+    const [category, setCategory] =
+        useState("all");
+
+    const [availability, setAvailability] =
+        useState("all");
+
+    const [featured, setFeatured] =
+        useState(false);
+
+    const [sort, setSort] =
+        useState("default");
+
+
+    /*
+    --------------------------------
+    SEARCH FROM NAVBAR
+    --------------------------------
+    */
+
+    
+    const search = searchParams.get("search") || "";
+
+
+    /*
+    --------------------------------
+    FETCH PRODUCTS
+    --------------------------------
+    */
 
     const fetchProducts = async () => {
 
@@ -43,20 +68,12 @@ const ShopProductListPage = () => {
 
             setLoading(true);
 
-            const response =
-                await getProducts();
-
-
-            const activeProducts =
-                (response.data || [])
-                    .filter(
-                        product =>
-                            product.status === "active"
-                    );
-
+            const response = await getProducts({
+                search
+            });
 
             setProducts(
-                activeProducts
+                response.data || []
             );
 
         }
@@ -81,12 +98,211 @@ const ShopProductListPage = () => {
 
         fetchProducts();
 
-    }, []);
+    }, [search]);
 
 
-    /* =========================================
-       Loading
-    ========================================= */
+    /*
+    --------------------------------
+    CATEGORIES
+    --------------------------------
+    */
+
+    const categories = useMemo(() => {
+
+        const map = new Map();
+
+        products.forEach(product => {
+
+            const id =
+                product.category?._id ||
+                product.category;
+
+            const name =
+                product.category?.name ||
+                "Uncategorized";
+
+            if (id) {
+                map.set(id, name);
+            }
+
+        });
+
+        return Array.from(
+            map.entries()
+        );
+
+    }, [products]);
+
+
+    /*
+    --------------------------------
+    FILTER + SORT
+    --------------------------------
+    */
+
+    const filteredProducts = useMemo(() => {
+
+        let result = [...products];
+
+        /*
+        Category
+        */
+
+        if (category !== "all") {
+
+            result =
+                result.filter(
+                    product =>
+                        (
+                            product.category?._id ||
+                            product.category
+                        ) === category
+                );
+
+        }
+
+
+        /*
+        Availability
+        */
+
+        if (
+            availability ===
+            "in-stock"
+        ) {
+
+            result =
+                result.filter(product =>
+                    product.hasVariants
+                        ? product.variants?.some(
+                            variant =>
+                                variant.stock > 0
+                        )
+                        : product.stock > 0
+                );
+
+        }
+
+
+        if (
+            availability ===
+            "out-of-stock"
+        ) {
+
+            result =
+                result.filter(product =>
+                    product.hasVariants
+                        ? !product.variants?.some(
+                            variant =>
+                                variant.stock > 0
+                        )
+                        : product.stock <= 0
+                );
+
+        }
+
+
+        /*
+        Featured
+        */
+
+        if (featured) {
+
+            result =
+                result.filter(
+                    product =>
+                        product.isFeatured
+                );
+
+        }
+
+
+        /*
+        Sorting
+        */
+
+        if (sort === "price-low") {
+
+            result.sort(
+                (a, b) =>
+                    getPrice(a) -
+                    getPrice(b)
+            );
+
+        }
+
+        if (sort === "price-high") {
+
+            result.sort(
+                (a, b) =>
+                    getPrice(b) -
+                    getPrice(a)
+            );
+
+        }
+
+        if (sort === "name") {
+
+            result.sort(
+                (a, b) =>
+                    a.name.localeCompare(
+                        b.name
+                    )
+            );
+
+        }
+
+        if (sort === "newest") {
+
+            result.sort(
+                (a, b) =>
+                    new Date(b.createdAt) -
+                    new Date(a.createdAt)
+            );
+
+        }
+
+        return result;
+
+    }, [
+        products,
+        search,
+        category,
+        availability,
+        featured,
+        sort
+    ]);
+
+
+    /*
+    --------------------------------
+    ACTIVE FILTERS
+    --------------------------------
+    */
+
+    const hasFilters =
+        search ||
+        category !== "all" ||
+        availability !== "all" ||
+        featured ||
+        sort !== "default";
+
+
+    const clearFilters = () => {
+
+        setCategory("all");
+        setAvailability("all");
+        setFeatured(false);
+        setSort("default");
+
+    };
+
+
+    /*
+    --------------------------------
+    LOADING
+    --------------------------------
+    */
 
     if (loading) {
 
@@ -96,13 +312,9 @@ const ShopProductListPage = () => {
 
                 <Container>
 
-                    <div className="
-                        shop-products__loading
-                    ">
+                    <div className="shop-products__loading">
 
-                        <div className="
-                            shop-products__loader
-                        " />
+                        <div className="shop-products__loader" />
 
                         <p>
                             Loading products...
@@ -119,35 +331,32 @@ const ShopProductListPage = () => {
     }
 
 
-    /* =========================================
-       Render
-    ========================================= */
-
     return (
 
         <main className="shop-products">
 
             <Container>
 
-                <div className="
-                    shop-products__content
-                ">
+                <div className="shop-products__content">
 
 
-                    {/* =================================
-                        Header
-                    ================================= */}
+                    {/* =========================
+                        TOOLBAR
+                    ========================= */}
 
-                    <header className="
-                        shop-products__header
-                    ">
+                    <section className="products-toolbar">
 
-                        <div>
 
-                            <span className="
-                                shop-products__eyebrow
-                            ">
+                        {/* LEFT */}
+
+                        <div className="products-intro">
+
+                            <span className="products-eyebrow">
+
+                                <span />
+
                                 Our Collection
+
                             </span>
 
 
@@ -157,112 +366,279 @@ const ShopProductListPage = () => {
 
 
                             <p>
-                                Explore our latest
-                                products and find
-                                something you'll love.
+                                Explore our latest products
+                                and find something you'll love.
                             </p>
+
+
+                            <span className="products-count">
+
+                                {filteredProducts.length}{" "}
+
+                                {
+                                    filteredProducts.length === 1
+                                        ? "product"
+                                        : "products"
+                                }
+
+                            </span>
 
                         </div>
 
 
-                        {products.length > 0 && (
+                        {/* RIGHT */}
 
-                            <span className="
-                                shop-products__count
-                            ">
-                                {products.length}
-                                {" "}
-                                {products.length === 1
-                                    ? "product"
-                                    : "products"
-                                }
-                            </span>
-
-                        )}
-
-                    </header>
+                        <div className="products-controls">
 
 
-                    {/* =================================
-                        Empty State
-                    ================================= */}
+                            {/* SEARCH RESULT */}
 
-                    {products.length === 0 ? (
+                            {search && (
 
-                        <div className="
-                            shop-products__empty
-                        ">
+                                <div className="products-search-result">
 
-                            <div className="
-                                shop-products__empty-icon
-                            ">
+                                    <span>
+                                        Search:
+                                    </span>
+
+                                    <strong>
+                                        "{search}"
+                                    </strong>
+
+                                </div>
+
+                            )}
+
+
+                            <div className="product-filters">
+
+
+                                {/* CATEGORY */}
+
+                                <select
+                                    value={category}
+                                    onChange={e =>
+                                        setCategory(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    <option value="all">
+                                        All Categories
+                                    </option>
+
+                                    {categories.map(
+                                        ([id, name]) => (
+
+                                            <option
+                                                key={id}
+                                                value={id}
+                                            >
+                                                {name}
+                                            </option>
+
+                                        )
+                                    )}
+
+                                </select>
+
+
+                                {/* AVAILABILITY */}
+
+                                <select
+                                    value={availability}
+                                    onChange={e =>
+                                        setAvailability(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    <option value="all">
+                                        All Products
+                                    </option>
+
+                                    <option value="in-stock">
+                                        In Stock
+                                    </option>
+
+                                    <option value="out-of-stock">
+                                        Out of Stock
+                                    </option>
+
+                                </select>
+
+
+                                {/* FEATURED */}
+
+                                <label className="featured-filter">
+
+                                    <input
+                                        type="checkbox"
+                                        checked={featured}
+                                        onChange={e =>
+                                            setFeatured(
+                                                e.target.checked
+                                            )
+                                        }
+                                    />
+
+                                    <span>
+                                        Featured
+                                    </span>
+
+                                </label>
+
+
+                                {/* SORT */}
+
+                                <select
+                                    value={sort}
+                                    onChange={e =>
+                                        setSort(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    <option value="default">
+                                        Sort: Default
+                                    </option>
+
+                                    <option value="newest">
+                                        Newest
+                                    </option>
+
+                                    <option value="name">
+                                        Name
+                                    </option>
+
+                                    <option value="price-low">
+                                        Price: Low to High
+                                    </option>
+
+                                    <option value="price-high">
+                                        Price: High to Low
+                                    </option>
+
+                                </select>
+
+
+                                {/* CLEAR */}
+
+                                {hasFilters && (
+
+                                    <button
+                                        type="button"
+                                        className="products-clear"
+                                        onClick={
+                                            clearFilters
+                                        }
+                                    >
+                                        Clear
+                                    </button>
+
+                                )}
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    {/* =========================
+                        EMPTY
+                    ========================= */}
+
+                    {filteredProducts.length === 0 ? (
+
+                        <div className="shop-products__empty">
+
+                            <div className="shop-products__empty-icon">
                                 ⚡
                             </div>
 
-
                             <h2>
-                                No products available
+                                No products found
                             </h2>
 
-
                             <p>
-                                Check back later for
-                                new products.
+                                Try changing your search
+                                or filters.
                             </p>
+
+                            {hasFilters && (
+
+                                <button
+                                    type="button"
+                                    onClick={
+                                        clearFilters
+                                    }
+                                    className="
+                                        shop-products__empty-button
+                                    "
+                                >
+                                    Clear Filters
+                                </button>
+
+                            )}
 
                         </div>
 
                     ) : (
 
 
-                        /* =================================
-                           Product Grid
-                        ================================= */
+                        /* =========================
+                           PRODUCT GRID
+                        ========================= */
 
-                        <div className="
-                            shop-products__grid
-                        ">
+                        <div className="shop-products__grid">
 
-                            {products.map(
+                            {filteredProducts.map(
                                 product => {
 
                                     const hasDiscount =
-                                        product.discountPrice > 0;
+                                        product.hasVariants
+                                            ? product.variants?.some(
+                                                variant =>
+                                                    variant.discountPrice > 0
+                                            )
+                                            : product.discountPrice > 0;
+
 
                                     const finalPrice =
-                                        hasDiscount
-                                            ? product.discountPrice
-                                            : product.price;
+                                        getPrice(product);
+
+
+                                    const isOutOfStock =
+                                        product.hasVariants
+                                            ? !product.variants?.some(
+                                                variant =>
+                                                    variant.stock > 0
+                                            )
+                                            : product.stock <= 0;
 
 
                                     return (
 
                                         <Link
-                                            key={
-                                                product._id
-                                            }
+                                            key={product._id}
                                             to={`/products/${product.slug}`}
-                                            className="
-                                                shop-product-card
-                                            "
+                                            className="shop-product-card"
                                         >
 
 
-                                            {/* =========================
-                                                Image
-                                            ========================== */}
+                                            {/* IMAGE */}
 
-                                            <div className="
-                                                shop-product-card__image
-                                            ">
+                                            <div className="shop-product-card__image">
 
                                                 {product.images?.[0]?.url ? (
 
                                                     <img
                                                         src={
-                                                            product
-                                                                .images[0]
-                                                                .url
+                                                            product.images[0].url
                                                         }
                                                         alt={
                                                             product.name
@@ -272,9 +648,7 @@ const ShopProductListPage = () => {
 
                                                 ) : (
 
-                                                    <div className="
-                                                        shop-product-card__no-image
-                                                    ">
+                                                    <div className="shop-product-card__no-image">
                                                         No Image
                                                     </div>
 
@@ -283,10 +657,17 @@ const ShopProductListPage = () => {
 
                                                 {hasDiscount && (
 
-                                                    <span className="
-                                                        shop-product-card__discount
-                                                    ">
+                                                    <span className="shop-product-card__discount">
                                                         Sale
+                                                    </span>
+
+                                                )}
+
+
+                                                {product.isFeatured && (
+
+                                                    <span className="shop-product-card__featured">
+                                                        Featured
                                                     </span>
 
                                                 )}
@@ -294,42 +675,27 @@ const ShopProductListPage = () => {
                                             </div>
 
 
-                                            {/* =========================
-                                                Content
-                                            ========================== */}
+                                            {/* CONTENT */}
 
-                                            <div className="
-                                                shop-product-card__content
-                                            ">
-
+                                            <div className="shop-product-card__content">
 
                                                 {product.brand && (
 
-                                                    <span className="
-                                                        shop-product-card__brand
-                                                    ">
-                                                        {
-                                                            product.brand
-                                                        }
+                                                    <span className="shop-product-card__brand">
+                                                        {product.brand}
                                                     </span>
 
                                                 )}
 
 
-                                                <h2 className="
-                                                    shop-product-card__name
-                                                ">
-                                                    {
-                                                        product.name
-                                                    }
+                                                <h2 className="shop-product-card__name">
+                                                    {product.name}
                                                 </h2>
 
 
                                                 {product.shortDescription && (
 
-                                                    <p className="
-                                                        shop-product-card__description
-                                                    ">
+                                                    <p className="shop-product-card__description">
                                                         {
                                                             product.shortDescription
                                                         }
@@ -338,36 +704,21 @@ const ShopProductListPage = () => {
                                                 )}
 
 
-                                                {/* =====================
-                                                    Price
-                                                ====================== */}
+                                                <div className="shop-product-card__footer">
 
-                                                <div className="
-                                                    shop-product-card__footer
-                                                ">
+                                                    <div className="shop-product-card__prices">
 
-                                                    <div className="
-                                                        shop-product-card__prices
-                                                    ">
-
-                                                        <span className="
-                                                            shop-product-card__price
-                                                        ">
-                                                            ₹
-                                                            {
-                                                                finalPrice
-                                                            }
+                                                        <span className="shop-product-card__price">
+                                                            ₹{finalPrice}
                                                         </span>
-
 
                                                         {hasDiscount && (
 
-                                                            <span className="
-                                                                shop-product-card__old-price
-                                                            ">
-                                                                ₹
-                                                                {
-                                                                    product.price
+                                                            <span className="shop-product-card__old-price">
+                                                                ₹{
+                                                                    getOldPrice(
+                                                                        product
+                                                                    )
                                                                 }
                                                             </span>
 
@@ -376,11 +727,19 @@ const ShopProductListPage = () => {
                                                     </div>
 
 
-                                                    <span className="
-                                                        shop-product-card__arrow
-                                                    ">
-                                                        →
-                                                    </span>
+                                                    {isOutOfStock ? (
+
+                                                        <span className="shop-product-card__stock">
+                                                            Out of stock
+                                                        </span>
+
+                                                    ) : (
+
+                                                        <span className="shop-product-card__arrow">
+                                                            →
+                                                        </span>
+
+                                                    )}
 
                                                 </div>
 
@@ -404,6 +763,82 @@ const ShopProductListPage = () => {
         </main>
 
     );
+
+};
+
+
+/*
+================================
+PRICE HELPERS
+================================
+*/
+
+const getPrice = product => {
+
+    if (
+        product.hasVariants &&
+        product.variants?.length
+    ) {
+
+        const prices =
+            product.variants
+                .map(
+                    variant =>
+                        variant.discountPrice > 0
+                            ? variant.discountPrice
+                            : variant.price
+                )
+                .filter(
+                    price =>
+                        typeof price === "number"
+                );
+
+        if (prices.length) {
+
+            return Math.min(
+                ...prices
+            );
+
+        }
+
+    }
+
+    return product.discountPrice > 0
+        ? product.discountPrice
+        : product.price;
+
+};
+
+
+const getOldPrice = product => {
+
+    if (
+        product.hasVariants &&
+        product.variants?.length
+    ) {
+
+        const prices =
+            product.variants
+                .filter(
+                    variant =>
+                        variant.discountPrice > 0
+                )
+                .map(
+                    variant =>
+                        variant.price
+                );
+
+        if (prices.length) {
+
+            return Math.min(
+                ...prices
+            );
+
+        }
+
+    }
+
+    return product.price;
 
 };
 
