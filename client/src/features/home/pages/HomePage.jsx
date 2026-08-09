@@ -126,7 +126,7 @@ const HomePage = () => {
                 </Container>
             </section>
             {/* =================================
-                FEATURED PRODUCTS
+                URED PRODUCTS
             ================================= */}
             <section className="
                 home-section

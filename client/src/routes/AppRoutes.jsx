@@ -54,9 +54,6 @@ import OrderListPage
 import OrderDetailsPage
     from "../features/order/pages/OrderDetailsPage";
 
-import ChangePasswordPage
-    from "../features/auth/pages/ChangePasswordPage";
-
 
 /* =================================
    Authentication
@@ -183,13 +180,6 @@ const AppRoutes = () => {
                             path="/profile"
                             element={
                                 <ProfilePage />
-                            }
-                        />
-
-                        <Route
-                            path="/change-password"
-                            element={
-                                <ChangePasswordPage />
                             }
                         />
 

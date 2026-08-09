@@ -940,3 +940,52 @@
     }
 
 }
+
+/* =========================================
+   ADDRESS MANAGER
+========================================= */
+
+.address-manager {
+    width: 100%;
+}
+
+
+.address-manager--modal {
+    width: 100%;
+}
+
+
+.address-manager--modal .address-form-card {
+    margin-bottom: 24px;
+}
+
+
+.address-manager--modal .saved-addresses {
+    margin-top: 24px;
+}
+
+
+.address-manager--modal .address-form-card__header {
+    display: none;
+}
+
+
+.address-manager--modal .saved-addresses__header {
+    margin-bottom: 18px;
+}
+
+.address-manager--modal {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+
+.address-manager--modal::-webkit-scrollbar {
+    width: 6px;
+}
+
+
+.address-manager--modal::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+}
