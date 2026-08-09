@@ -487,7 +487,6 @@ const Navbar = ({
                             className="
                                 h-11
                                 w-full
-                                lg:w-1/2
 
                                 flex
                                 items-center

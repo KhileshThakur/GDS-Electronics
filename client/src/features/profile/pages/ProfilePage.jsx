@@ -1,21 +1,22 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+
 import Container from "../../../components/ui/Container";
+
 import "./ProfilePage.css";
+
 const ProfilePage = () => {
+
     const { user } = useSelector(
         state => state.auth
     );
-    const initials = `
-        ${user?.firstName?.[0] || ""}
-        ${user?.lastName?.[0] || ""}
-    `
-        .trim()
-        .toUpperCase();
+
+    const initials =
+        `${user?.firstName?.[0] || ""}${user?.lastName?.[0] || ""}`
+            .toUpperCase();
+
     const joinedDate = user?.createdAt
-        ? new Date(
-            user.createdAt
-        ).toLocaleDateString(
+        ? new Date(user.createdAt).toLocaleDateString(
             "en-IN",
             {
                 month: "long",
@@ -23,228 +24,380 @@ const ProfilePage = () => {
             }
         )
         : "—";
+
+    const accountType =
+        user?.role === "admin"
+            ? "Administrator"
+            : "Customer";
+
+    const phone = user?.phone?.number
+        ? `${user.phone.countryCode || "+91"} ${user.phone.number}`
+        : "Not added";
+
     return (
+
         <Container>
+
             <div className="profile-page">
-                {/* =================================
-                    Header
-                ================================= */}
-                <div className="profile-page-header">
-                    <div>
-                        <span className="profile-label">
-                            ACCOUNT
-                        </span>
-                        <h1>
-                            My Profile
-                        </h1>
-                        <p>
-                            View and manage your account
-                            information.
-                        </p>
-                    </div>
-                </div>
-                {/* =================================
-                    Profile Hero
-                ================================= */}
-                <section className="profile-hero">
-                    <div className="profile-avatar">
-                        {user?.avatar?.url ? (
-                            <img
-                                src={user.avatar.url}
-                                alt={`${user.firstName} ${user.lastName}`}
-                            />
-                        ) : (
-                            <span>
-                                {initials || "U"}
-                            </span>
-                        )}
-                    </div>
-                    <div className="profile-hero-content">
-                        <div className="profile-name-row">
-                            <h2>
-                                {user?.firstName}{" "}
-                                {user?.lastName}
-                            </h2>
-                            {user?.isVerified && (
-                                <span className="profile-badge">
-                                    ✓ Verified
+
+                {/* HEADER */}
+
+                <header className="profile-page-header">
+
+                    <span className="profile-label">
+                        ACCOUNT
+                    </span>
+
+                    <h1>
+                        My Profile
+                    </h1>
+
+                    <p>
+                        View and manage your account information.
+                    </p>
+
+                </header>
+
+
+                {/* OVERVIEW */}
+
+                <section className="profile-overview">
+
+                    {/* USER */}
+
+                    <div className="profile-overview-user">
+
+                        <div className="profile-avatar">
+
+                            {user?.avatar?.url ? (
+
+                                <img
+                                    src={user.avatar.url}
+                                    alt={`${user.firstName} ${user.lastName}`}
+                                />
+
+                            ) : (
+
+                                <span>
+                                    {initials || "U"}
                                 </span>
+
                             )}
+
                         </div>
-                        <p className="profile-email">
-                            {user?.email}
-                        </p>
-                        <div className="profile-hero-meta">
-                            <span>
-                                {user?.role === "admin"
-                                    ? "Administrator"
-                                    : "Customer"
-                                }
-                            </span>
-                            <span className="profile-meta-dot">
-                                •
-                            </span>
-                            <span>
-                                Member since {joinedDate}
-                            </span>
+
+
+                        <div className="profile-user-details">
+
+                            <div className="profile-name-row">
+
+                                <h2>
+                                    {user?.firstName} {user?.lastName}
+                                </h2>
+
+                                {user?.isVerified && (
+                                    <span className="profile-badge">
+                                        ✓ Verified
+                                    </span>
+                                )}
+
+                            </div>
+
+                            <p className="profile-email">
+                                {user?.email}
+                            </p>
+
+                            <div className="profile-user-meta">
+
+                                <span>
+                                    {accountType}
+                                </span>
+
+                                <i>•</i>
+
+                                <span>
+                                    Member since {joinedDate}
+                                </span>
+
+                            </div>
+
                         </div>
+
                     </div>
-                </section>
-                {/* =================================
-                    Personal Information
-                ================================= */}
-                <section className="profile-info-card">
-                    <div className="profile-card-heading">
-                        <div>
+
+
+                    {/* INFORMATION */}
+
+                    <div className="profile-overview-info">
+
+                        <div className="profile-info-heading">
+
                             <span>
-                                PERSONAL
+                                PERSONAL INFORMATION
                             </span>
+
                             <h2>
-                                Personal Information
+                                Account Details
                             </h2>
+
                         </div>
+
+
+                        <div className="profile-mini-grid">
+
+                            <div className="profile-info-item">
+
+                                <span>
+                                    First Name
+                                </span>
+
+                                <strong>
+                                    {user?.firstName || "—"}
+                                </strong>
+
+                            </div>
+
+
+                            <div className="profile-info-item">
+
+                                <span>
+                                    Last Name
+                                </span>
+
+                                <strong>
+                                    {user?.lastName || "—"}
+                                </strong>
+
+                            </div>
+
+
+                            <div className="profile-info-item">
+
+                                <span>
+                                    Email Address
+                                </span>
+
+                                <strong>
+                                    {user?.email || "—"}
+                                </strong>
+
+                            </div>
+
+
+                            <div className="profile-info-item">
+
+                                <span>
+                                    Phone
+                                </span>
+
+                                <strong>
+                                    {phone}
+                                </strong>
+
+                            </div>
+
+
+                            <div className="profile-info-item">
+
+                                <span>
+                                    Account Type
+                                </span>
+
+                                <strong>
+                                    {accountType}
+                                </strong>
+
+                            </div>
+
+
+                            <div className="profile-info-item">
+
+                                <span>
+                                    Account Status
+                                </span>
+
+                                <strong className="profile-status">
+
+                                    <i />
+
+                                    {user?.status || "Active"}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
                     </div>
-                    <div className="profile-info-grid">
-                        <div className="profile-info-item">
-                            <span>
-                                First Name
-                            </span>
-                            <strong>
-                                {user?.firstName || "—"}
-                            </strong>
-                        </div>
-                        <div className="profile-info-item">
-                            <span>
-                                Last Name
-                            </span>
-                            <strong>
-                                {user?.lastName || "—"}
-                            </strong>
-                        </div>
-                        <div className="profile-info-item">
-                            <span>
-                                Email Address
-                            </span>
-                            <strong>
-                                {user?.email || "—"}
-                            </strong>
-                        </div>
-                        <div className="profile-info-item">
-                            <span>
-                                Phone Number
-                            </span>
-                            <strong>
-                                {user?.phone?.number
-                                    ? `${user?.phone?.countryCode || "+91"} ${user.phone.number}`
-                                    : "Not added"
-                                }
-                            </strong>
-                        </div>
-                        <div className="profile-info-item">
-                            <span>
-                                Account Status
-                            </span>
-                            <strong className="profile-status">
-                                <i />
-                                {user?.status || "Active"}
-                            </strong>
-                        </div>
-                        <div className="profile-info-item">
-                            <span>
-                                Account Type
-                            </span>
-                            <strong>
-                                {user?.role === "admin"
-                                    ? "Administrator"
-                                    : "Customer"
-                                }
-                            </strong>
-                        </div>
-                    </div>
+
                 </section>
-                {/* =================================
-                    Account Actions
-                ================================= */}
-                <section className="profile-account-card">
-                    <div className="profile-card-heading">
-                        <div>
-                            <span>
-                                ACCOUNT
-                            </span>
-                            <h2>
-                                Manage Account
-                            </h2>
-                        </div>
+
+
+                {/* SETTINGS */}
+
+                <section className="profile-settings">
+
+                    <div className="profile-section-label">
+                        SETTINGS
                     </div>
-                    <div className="profile-action-list">
-                        {/* Update Profile */}
+
+
+                    <div className="profile-settings-list">
+
                         <Link
                             to="/profile/edit"
-                            className="profile-action"
+                            className="profile-setting"
                         >
-                            <div className="profile-action-icon">
+
+                            <div className="profile-setting-icon">
                                 ✎
                             </div>
-                            <div className="profile-action-content">
+
+                            <div className="profile-setting-content">
+
                                 <h3>
                                     Update Profile
                                 </h3>
+
                                 <p>
-                                    Change your name,
-                                    phone number and
-                                    profile information.
+                                    Update your personal information
                                 </p>
+
                             </div>
-                            <span className="profile-action-arrow">
+
+                            <span className="profile-setting-arrow">
                                 →
                             </span>
+
                         </Link>
-                        {/* Change Password */}
+
+
                         <Link
                             to="/change-password"
-                            className="profile-action"
+                            className="profile-setting"
                         >
-                            <div className="profile-action-icon">
-                                🔐
+
+                            <div className="profile-setting-icon">
+                                🔒
                             </div>
-                            <div className="profile-action-content">
+
+                            <div className="profile-setting-content">
+
                                 <h3>
                                     Change Password
                                 </h3>
+
                                 <p>
-                                    Update your password
-                                    to keep your account secure.
+                                    Keep your account secure
                                 </p>
+
                             </div>
-                            <span className="profile-action-arrow">
+
+                            <span className="profile-setting-arrow">
                                 →
                             </span>
+
                         </Link>
-                        {/* Addresses */}
+
+
                         <Link
                             to="/addresses"
-                            className="profile-action"
+                            className="profile-setting"
                         >
-                            <div className="profile-action-icon">
-                                📍
+
+                            <div className="profile-setting-icon">
+                                ⌖
                             </div>
-                            <div className="profile-action-content">
+
+                            <div className="profile-setting-content">
+
                                 <h3>
                                     Manage Addresses
                                 </h3>
+
                                 <p>
-                                    Add, edit or manage
-                                    your delivery addresses.
+                                    Add or update your delivery addresses
                                 </p>
+
                             </div>
-                            <span className="profile-action-arrow">
+
+                            <span className="profile-setting-arrow">
                                 →
                             </span>
+
                         </Link>
+
+
+                        <button
+                            type="button"
+                            className="profile-setting"
+                        >
+
+                            <div className="profile-setting-icon">
+                                ⏸
+                            </div>
+
+                            <div className="profile-setting-content">
+
+                                <h3>
+                                    Deactivate Account
+                                </h3>
+
+                                <p>
+                                    Temporarily disable your account
+                                </p>
+
+                            </div>
+
+                            <span className="profile-setting-arrow">
+                                →
+                            </span>
+
+                        </button>
+
                     </div>
+
+
+                    {/* DELETE */}
+
+                    <div className="profile-danger">
+
+                        <button
+                            type="button"
+                            className="profile-delete"
+                        >
+
+                            <div className="profile-setting-icon">
+                                ×
+                            </div>
+
+                            <div className="profile-setting-content">
+
+                                <h3>
+                                    Delete Account
+                                </h3>
+
+                                <p>
+                                    Permanently delete your account and data
+                                </p>
+
+                            </div>
+
+                            <span className="profile-setting-arrow">
+                                →
+                            </span>
+
+                        </button>
+
+                    </div>
+
                 </section>
+
             </div>
+
         </Container>
+
     );
 };
+
 export default ProfilePage;
