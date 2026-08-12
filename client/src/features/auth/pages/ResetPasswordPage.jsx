@@ -1,8 +1,7 @@
 import { useState } from "react";
 import {
     Link,
-    useNavigate,
-    useParams
+    useNavigate
 } from "react-router-dom";
 import {
     toast
@@ -15,9 +14,12 @@ import {
     resetPassword
 } from "../services/auth.service";
 const ResetPasswordPage = () => {
-    const {
-        token
-    } = useParams();
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    const email =
+        params.get("email");
     const navigate =
         useNavigate();
     const [
@@ -55,11 +57,10 @@ const ResetPasswordPage = () => {
             }
             try {
                 setLoading(true);
-                const response =
-                    await resetPassword(
-                        token,
-                        formData.password
-                    );
+                const response = await resetPassword({
+                    email,
+                    password: formData.password
+                });
                 toast.success(
                     response.message ||
                     "Password reset successfully"

@@ -1,74 +1,64 @@
 import api from "../../../services/api";
 
+
 export const registerUser = async (data) => {
 
-    const response = await api.post(
-        "/auth/register",
-        data
-    );
+    const response =
+        await api.post(
+            "/auth/register",
+            data
+        );
 
     return response.data;
-
 };
+
+
+export const verifyRegistrationOtp = async (
+    data
+) => {
+
+    const response =
+        await api.post(
+            "/auth/verify-registration",
+            data
+        );
+
+    return response.data;
+};
+
+
+export const resendOtp = async (data) => {
+
+    const response =
+        await api.post(
+            "/auth/resend-otp",
+            data
+        );
+
+    return response.data;
+};
+
 
 export const loginUser = async (data) => {
 
-    const response = await api.post(
-        "/auth/login",
-        data
-    );
+    const response =
+        await api.post(
+            "/auth/login",
+            data
+        );
 
     return response.data;
-
 };
+
 
 export const logoutUser = async () => {
 
-    const response = await api.post(
-        "/auth/logout"
-    );
-
-    return response.data;
-
-};
-
-export const getProfile = async () => {
-
-    const response = await api.get(
-        "/auth/profile"
-    );
-
-    return response.data;
-
-};
-
-export const updateProfile = async (
-    data
-) => {
-
     const response =
-        await api.put(
-            "/auth/profile",
-            data
+        await api.post(
+            "/auth/logout"
         );
 
     return response.data;
-
-};
-
-
-export const changePassword = async (
-    data
-) => {
-
-    const response =
-        await api.put(
-            "/auth/change-password",
-            data
-        );
-
-    return response.data;
-
 };
 
 
@@ -85,23 +75,70 @@ export const forgotPassword = async (
         );
 
     return response.data;
-
 };
 
 
+export const verifyForgotPasswordOtp =
+    async (data) => {
+
+        const response =
+            await api.post(
+                "/auth/verify-forgot-password",
+                data
+            );
+
+        return response.data;
+    };
+
+
 export const resetPassword = async (
-    token,
-    password
+    data
 ) => {
 
     const response =
         await api.post(
-            `/auth/reset-password/${token}`,
-            {
-                password
-            }
+            "/auth/reset-password",
+            data
         );
 
     return response.data;
+};
 
+
+export const getProfile = async () => {
+
+    const response =
+        await api.get(
+            "/auth/profile"
+        );
+
+    return response.data;
+};
+
+
+export const updateProfile = async (
+    data
+) => {
+
+    const response =
+        await api.put(
+            "/auth/profile",
+            data
+        );
+
+    return response.data;
+};
+
+
+export const changePassword = async (
+    data
+) => {
+
+    const response =
+        await api.put(
+            "/auth/change-password",
+            data
+        );
+
+    return response.data;
 };

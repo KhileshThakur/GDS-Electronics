@@ -50,15 +50,18 @@ const RegisterPage = () => {
         }
         try {
             setLoading(true);
-            const response =
-                await registerUser(
-                    formData
-                );
+            const response = await registerUser(formData);
+
             toast.success(
                 response.message ||
-                "Registration successful"
+                "Verification OTP sent"
             );
-            navigate("/login");
+
+            navigate(
+                `/verify-email?email=${encodeURIComponent(
+                    formData.email
+                )}`
+            );
         }
         catch (error) {
             toast.error(

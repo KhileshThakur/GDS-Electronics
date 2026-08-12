@@ -1,6 +1,5 @@
-import crypto from "crypto";
-
 import User from "../models/User.js";
+import Otp from "../models/Otp.js";
 
 import asyncHandler from "../utils/asyncHandler.js";
 import sendResponse from "../utils/response.js";
@@ -20,12 +19,13 @@ import {
 } from "../utils/sanitize.js";
 
 import {
-    ROLES
-} from "../constants/constants.js";
-
-import {
     sendEmail
 } from "../utils/emailSender.js";
+
+import {
+    createAndSendOtp,
+    verifyOtp
+} from "../controllers/otp.controller.js";
 
 export const register = asyncHandler(async (req, res) => {
 
@@ -36,6 +36,7 @@ export const register = asyncHandler(async (req, res) => {
         password
     } = req.body;
 
+
     const error = validateRequiredFields({
         firstName,
         lastName,
@@ -43,46 +44,314 @@ export const register = asyncHandler(async (req, res) => {
         password
     });
 
+
     if (error) {
+
         return sendResponse(
             res,
             400,
             false,
             error
         );
+
     }
 
-    firstName = firstName.trim();
-    lastName = lastName.trim();
-    email = email.toLowerCase().trim();
 
-    const existingUser = await User.findOne({ email });
+    firstName = firstName.trim();
+
+    lastName = lastName.trim();
+
+    email = email
+        .toLowerCase()
+        .trim();
+
+
+    if (password.length < 6) {
+
+        return sendResponse(
+            res,
+            400,
+            false,
+            "Password must be at least 6 characters"
+        );
+
+    }
+
+
+    const existingUser =
+        await User.findOne({
+            email
+        });
+
 
     if (existingUser) {
+
+        /*
+         * If the account exists but has
+         * not been verified, allow the
+         * user to request another OTP.
+         */
+
+        if (!existingUser.isVerified) {
+
+            await createAndSendOtp({
+                email,
+                firstName:
+                    existingUser.firstName,
+                purpose:
+                    "REGISTRATION"
+            });
+
+            return sendResponse(
+                res,
+                200,
+                true,
+                "Verification OTP sent"
+            );
+
+        }
+
+
         return sendResponse(
             res,
             409,
             false,
             "User already exists"
         );
+
     }
 
-    const user = await User.create({
-        firstName,
-        lastName,
-        email,
-        password
+
+    const user =
+        await User.create({
+
+            firstName,
+
+            lastName,
+
+            email,
+
+            password,
+
+            isVerified: false
+
+        });
+
+
+    await createAndSendOtp({
+
+        email: user.email,
+
+        firstName: user.firstName,
+
+        purpose: "REGISTRATION"
+
     });
+
 
     return sendResponse(
         res,
         201,
         true,
-        "Registration successful",
-        sanitizeUser(user)
+        "Registration successful. Verification OTP sent.",
+        {
+            email: user.email
+        }
     );
 
 });
+
+export const verifyRegistrationOtp = async (
+    req,
+    res
+) => {
+
+    try {
+
+        const {
+            email,
+            otp
+        } = req.body;
+
+
+        const result =
+            await verifyOtp({
+
+                email,
+
+                otp,
+
+                purpose:
+                    "REGISTRATION"
+
+            });
+
+
+        if (!result.success) {
+
+            return res.status(400).json({
+
+                message:
+                    result.message
+
+            });
+
+        }
+
+
+        const user =
+            await User.findOne({
+
+                email:
+                    email.toLowerCase().trim()
+
+            });
+
+
+        if (!user) {
+
+            return res.status(404).json({
+
+                message:
+                    "User not found"
+
+            });
+
+        }
+
+
+        user.isVerified = true;
+
+        await user.save();
+
+
+        return res.status(200).json({
+
+            success: true,
+
+            message:
+                "Email verified successfully."
+
+        });
+
+    }
+    catch (error) {
+
+        return res.status(500).json({
+
+            message:
+                "Email verification failed."
+
+        });
+
+    }
+
+};
+
+export const resendOtp =
+    asyncHandler(async (req, res) => {
+
+        const {
+            email,
+            purpose
+        } = req.body;
+
+
+        if (!email || !purpose) {
+
+            return sendResponse(
+                res,
+                400,
+                false,
+                "Email and OTP purpose are required"
+            );
+
+        }
+
+
+        const normalizedEmail =
+            email
+                .toLowerCase()
+                .trim();
+
+
+        const allowedPurposes = [
+            "REGISTRATION",
+            "FORGOT_PASSWORD"
+        ];
+
+
+        if (
+            !allowedPurposes.includes(
+                purpose
+            )
+        ) {
+
+            return sendResponse(
+                res,
+                400,
+                false,
+                "Invalid OTP purpose"
+            );
+
+        }
+
+
+        const user =
+            await User.findOne({
+                email:
+                    normalizedEmail
+            });
+
+
+        if (!user) {
+
+            return sendResponse(
+                res,
+                200,
+                true,
+                "If an account exists, an OTP has been sent"
+            );
+
+        }
+
+
+        if (
+            purpose === "REGISTRATION" &&
+            user.isVerified
+        ) {
+
+            return sendResponse(
+                res,
+                400,
+                false,
+                "Email is already verified"
+            );
+
+        }
+
+
+        await createAndSendOtp({
+
+            email:
+                normalizedEmail,
+
+            firstName:
+                user.firstName,
+
+            purpose
+
+        });
+
+
+        return sendResponse(
+            res,
+            200,
+            true,
+            "OTP sent successfully"
+        );
+
+    });
 
 
 export const login = asyncHandler(async (req, res) => {
@@ -116,6 +385,15 @@ export const login = asyncHandler(async (req, res) => {
             401,
             false,
             "Invalid email or password"
+        );
+    }
+
+    if (!user.isVerified) {
+        return sendResponse(
+            res,
+            403,
+            false,
+            "Please verify your email before logging in"
         );
     }
 
@@ -276,13 +554,14 @@ export const forgotPassword =
 
         const user =
             await User.findOne({
-                email: normalizedEmail
+                email:
+                    normalizedEmail
             });
 
 
         /*
-         * Do not reveal whether
-         * an account exists.
+         * Don't reveal whether the
+         * account exists.
          */
 
         if (!user) {
@@ -291,100 +570,22 @@ export const forgotPassword =
                 res,
                 200,
                 true,
-                "If an account exists, a password reset link has been sent"
+                "If an account exists, an OTP has been sent"
             );
 
         }
 
 
-        const rawToken =
-            crypto.randomBytes(32)
-                .toString("hex");
+        await createAndSendOtp({
 
+            email:
+                user.email,
 
-        const hashedToken =
-            crypto
-                .createHash("sha256")
-                .update(rawToken)
-                .digest("hex");
+            firstName:
+                user.firstName,
 
-
-        user.passwordResetToken =
-            hashedToken;
-
-
-        user.passwordResetExpires =
-            new Date(
-                Date.now() +
-                15 * 60 * 1000
-            );
-
-
-        await user.save();
-
-
-        const resetUrl =
-            `${process.env.CLIENT_URL}/reset-password/${rawToken}`;
-
-
-        await sendEmail({
-
-            to: user.email,
-
-            subject:
-                "Reset your GDS Electronics password",
-
-            html: `
-                <div style="
-                    font-family: Arial, sans-serif;
-                    max-width: 600px;
-                    margin: auto;
-                    padding: 32px;
-                ">
-
-                    <h2>
-                        Reset your password
-                    </h2>
-
-                    <p>
-                        Hi ${user.firstName},
-                    </p>
-
-                    <p>
-                        We received a request to reset
-                        your GDS Electronics password.
-                    </p>
-
-                    <p>
-                        This link will expire in
-                        15 minutes.
-                    </p>
-
-                    <a
-                        href="${resetUrl}"
-                        style="
-                            display:inline-block;
-                            padding:12px 20px;
-                            background:#111;
-                            color:#fff;
-                            text-decoration:none;
-                            border-radius:6px;
-                        "
-                    >
-                        Reset Password
-                    </a>
-
-                    <p style="
-                        margin-top:24px;
-                        color:#777;
-                        font-size:13px;
-                    ">
-                        If you didn't request this,
-                        you can safely ignore this email.
-                    </p>
-
-                </div>
-            `
+            purpose:
+                "FORGOT_PASSWORD"
 
         });
 
@@ -393,7 +594,72 @@ export const forgotPassword =
             res,
             200,
             true,
-            "If an account exists, a password reset link has been sent"
+            "If an account exists, an OTP has been sent"
+        );
+
+    });
+
+export const verifyForgotPasswordOtp =
+    asyncHandler(async (req, res) => {
+
+        const {
+            email,
+            otp
+        } = req.body;
+
+
+        if (!email || !otp) {
+
+            return sendResponse(
+                res,
+                400,
+                false,
+                "Email and OTP are required"
+            );
+
+        }
+
+
+        const normalizedEmail =
+            email
+                .toLowerCase()
+                .trim();
+
+
+        const result =
+            await verifyOtp({
+
+                email:
+                    normalizedEmail,
+
+                otp,
+
+                purpose:
+                    "FORGOT_PASSWORD"
+
+            });
+
+
+        if (!result.success) {
+
+            return sendResponse(
+                res,
+                400,
+                false,
+                result.message
+            );
+
+        }
+
+
+        return sendResponse(
+            res,
+            200,
+            true,
+            "OTP verified successfully",
+            {
+                email: normalizedEmail
+            }
         );
 
     });
@@ -482,14 +748,6 @@ export const changePassword =
         user.password =
             newPassword;
 
-
-        user.passwordResetToken =
-            null;
-
-        user.passwordResetExpires =
-            null;
-
-
         await user.save();
 
 
@@ -506,29 +764,24 @@ export const resetPassword =
     asyncHandler(async (req, res) => {
 
         const {
-            token
-        } = req.params;
-
-        const {
+            email,
             password
         } = req.body;
 
 
-        if (!password) {
+        if (!email || !password) {
 
             return sendResponse(
                 res,
                 400,
                 false,
-                "Password is required"
+                "Email and password are required"
             );
 
         }
 
 
-        if (
-            password.length < 6
-        ) {
+        if (password.length < 6) {
 
             return sendResponse(
                 res,
@@ -540,23 +793,64 @@ export const resetPassword =
         }
 
 
-        const hashedToken =
-            crypto
-                .createHash("sha256")
-                .update(token)
-                .digest("hex");
+        const normalizedEmail =
+            email
+                .toLowerCase()
+                .trim();
+
+
+        const otpRecord =
+            await Otp.findOne({
+
+                email: normalizedEmail,
+
+                purpose:
+                    "FORGOT_PASSWORD",
+
+                verified: true
+
+            });
+
+
+        if (!otpRecord) {
+
+            return sendResponse(
+                res,
+                400,
+                false,
+                "Password reset verification required"
+            );
+
+        }
+
+
+        /*
+         * Make sure the verified OTP
+         * has not expired.
+         */
+
+        if (
+            otpRecord.expiresAt <
+            new Date()
+        ) {
+
+            await Otp.deleteOne({
+                _id: otpRecord._id
+            });
+
+            return sendResponse(
+                res,
+                400,
+                false,
+                "OTP has expired"
+            );
+
+        }
 
 
         const user =
             await User.findOne({
-
-                passwordResetToken:
-                    hashedToken,
-
-                passwordResetExpires: {
-                    $gt: new Date()
-                }
-
+                email: normalizedEmail
             });
 
 
@@ -564,9 +858,9 @@ export const resetPassword =
 
             return sendResponse(
                 res,
-                400,
+                404,
                 false,
-                "Reset link is invalid or expired"
+                "User not found"
             );
 
         }
@@ -576,15 +870,12 @@ export const resetPassword =
             password;
 
 
-        user.passwordResetToken =
-            null;
-
-
-        user.passwordResetExpires =
-            null;
-
-
         await user.save();
+
+
+        await Otp.deleteOne({
+            _id: otpRecord._id
+        });
 
 
         return sendResponse(

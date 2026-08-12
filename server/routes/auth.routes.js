@@ -7,17 +7,21 @@ import {
     profile,
     updateProfile,
     changePassword,
+
     forgotPassword,
-    resetPassword
+    verifyForgotPasswordOtp,
+    resetPassword,
+
+    verifyRegistrationOtp,
+    resendOtp
+
 } from "../controllers/auth.controller.js";
 
 import {
     protect
 } from "../middlewares/auth.js";
 
-
-const router =
-    express.Router();
+const router = express.Router();
 
 
 /* =================================
@@ -27,6 +31,16 @@ const router =
 router.post(
     "/register",
     register
+);
+
+router.post(
+    "/verify-registration",
+    verifyRegistrationOtp
+);
+
+router.post(
+    "/resend-otp",
+    resendOtp
 );
 
 router.post(
@@ -50,7 +64,12 @@ router.post(
 );
 
 router.post(
-    "/reset-password/:token",
+    "/verify-forgot-password",
+    verifyForgotPasswordOtp
+);
+
+router.post(
+    "/reset-password",
     resetPassword
 );
 
@@ -76,6 +95,5 @@ router.put(
     protect,
     changePassword
 );
-
 
 export default router;
