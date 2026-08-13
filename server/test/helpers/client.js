@@ -5,21 +5,14 @@ import { CookieJar } from "tough-cookie";
 const jar = new CookieJar();
 
 const client = wrapper(
-
     axios.create({
-
-        baseURL: "http://localhost:5000/api",
-
+        // Uses an environment variable if provided, otherwise defaults to localhost for local testing
+        baseURL: process.env.API_URL || "http://localhost:5000/api",
         withCredentials: true,
-
         validateStatus: () => true,
-
         jar
-
     })
-
 );
 
 export { jar };
-
 export default client;

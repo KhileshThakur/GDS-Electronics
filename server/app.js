@@ -3,8 +3,14 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import path from "path"; // <-- ADDED THIS
+import { fileURLToPath } from "url"; // <-- ADDED THIS
 
 import routes from "./routes/index.js";
+
+// <-- ADDED THIS: Recreate __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -12,14 +18,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Changed variable name to make more sense
     credentials: true
 }));
 
-app.use(helmet());
+// <-- UPDATED THIS: Helmet's default Content Security Policy will often block React/Vite scripts from loading on Render.
+app.use(helmet({
+    contentSecurityPolicy: false,
+}));
 
 app.use(morgan("dev"));
-
 app.use(cookieParser());
 
 app.use("/api", routes);
