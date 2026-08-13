@@ -24,4 +24,14 @@ app.use(cookieParser());
 
 app.use("/api", routes);
 
+if (process.env.NODE_ENV === "production") {
+    const clientPath = path.join(__dirname, "../client/dist");
+    
+    app.use(express.static(clientPath));
+
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(clientPath, "index.html"));
+    });
+}
+
 export default app;
