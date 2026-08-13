@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-import ProductForm from "../components/ProductForm";
+import ProductForm from "./components/ProductForm";
 
 import {
     getProductById
-} from "../services/product.service";
+} from "./product.service";
 
 const ProductFormPage = () => {
     const { id } = useParams();

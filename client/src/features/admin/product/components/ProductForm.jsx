@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-import Input from "../../../components/ui/Input";
-import Select from "../../../components/ui/Select";
-import Button from "../../../components/ui/Button";
-import Textarea from "../../../components/ui/TextArea";
+import Input from "../../../../components/ui/Input";
+import Select from "../../../../components/ui/Select";
+import Button from "../../../../components/ui/Button";
+import Textarea from "../../../../components/ui/TextArea";
 import {
     FormCard,
     FormSection,
     FormActions
-} from "../../../components/html";
+} from "../../../../components/html";
 
 import {
     getCategories
-} from "../../category/services/category.service";
+} from "../../../category/services/category.service";
 
 import {
     createProduct,
     updateProduct
-} from "../services/product.service";
+} from "../product.service";
 import VariantSection from "./VariantSection";
 import SpecificationSection from "./SpecificationSection";
 import ImageSection from "./ImageSection";

@@ -8,33 +8,29 @@ const Button = ({
     onClick,
     className = ""
 }) => {
-
     const variants = {
         primary: `
             bg-[var(--primary)]
             text-white
             hover:bg-[var(--primary-dark)]
-            shadow-sm
-            hover:shadow-md
         `,
         secondary: `
             bg-[var(--secondary)]
             text-black
             hover:bg-[var(--secondary-dark)]
-            shadow-sm
         `,
         outline: `
-            bg-white
-            text-[var(--primary)]
             border
-            border-[var(--primary)]
-            hover:bg-[var(--primary-soft)]
+            border-[var(--border)]
+            bg-[var(--surface)]
+            text-[var(--text)]
+            hover:border-[var(--primary)]
+            hover:text-[var(--primary)]
         `,
         danger: `
             bg-[var(--danger)]
             text-white
             hover:opacity-90
-            shadow-sm
         `,
         ghost: `
             bg-transparent
@@ -44,50 +40,30 @@ const Button = ({
         `
     };
 
-
     const sizes = {
-        sm: `
-            min-h-9
-            px-3.5
-            text-sm
-            rounded-[var(--radius-sm)]
-        `,
-        md: `
-            min-h-11
-            px-5
-            text-sm
-            rounded-[var(--radius-md)]
-        `,
-        lg: `
-            min-h-12
-            px-6
-            text-base
-            rounded-[var(--radius-md)]
-        `
+        sm: "min-h-9 px-3 text-xs",
+        md: "min-h-10 px-4 text-sm",
+        lg: "min-h-11 px-5 text-sm"
     };
-
 
     return (
         <button
             type={type}
-            disabled={
-                disabled || loading
-            }
+            disabled={disabled || loading}
             onClick={onClick}
             className={`
                 inline-flex
                 items-center
                 justify-center
                 gap-2
+                border
+                border-transparent
                 font-semibold
                 whitespace-nowrap
-                transition-all
-                duration-200
-                ease-out
-                active:scale-[0.98]
+                transition-colors
+                duration-150
                 disabled:cursor-not-allowed
                 disabled:opacity-50
-                disabled:pointer-events-none
                 ${sizes[size]}
                 ${variants[variant]}
                 ${className}
@@ -95,16 +71,16 @@ const Button = ({
         >
             {loading && (
                 <span className="
-                    w-4
-                    h-4
+                    h-3.5
+                    w-3.5
+                    animate-spin
                     rounded-full
                     border-2
                     border-current
                     border-t-transparent
-                    animate-spin
                 " />
-
             )}
+
             {children}
         </button>
     );

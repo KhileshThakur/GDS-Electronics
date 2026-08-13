@@ -38,7 +38,7 @@ import ResetPasswordPage from "../features/auth/pages/ResetPasswordPage";
 import DashboardPage from "../features/admin/pages/DashboardPage";
 import AdminCategoryPage from "../features/category/pages/AdminCategoryPage";
 import ProductListPage from "../features/admin/product/ProductListPage";
-import ProductFormPage from "../features/admin/product/ProductListPage";
+import ProductFormPage from "../features/admin/product/ProductFormPage";
 
 // Other
 import NotFoundPage from "../features/not-found/pages/NotFoundPage";
