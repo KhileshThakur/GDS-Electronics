@@ -1,5 +1,6 @@
 import Button from "../../ui/Button";
 
+
 const FormActions = ({
     loading = false,
     submitText = "Save",
@@ -9,7 +10,7 @@ const FormActions = ({
 
     return (
 
-        <div className="flex justify-end gap-3 pt-6">
+        <div className="flex justify-end gap-3 pt-2 pb-4">
 
             <Button
                 type="button"
@@ -32,5 +33,6 @@ const FormActions = ({
     );
 
 };
+
 
 export default FormActions;

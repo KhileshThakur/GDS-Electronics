@@ -36,7 +36,8 @@ import ResetPasswordPage from "../features/auth/pages/ResetPasswordPage";
 
 // Admin
 import DashboardPage from "../features/admin/pages/DashboardPage";
-import AdminCategoryPage from "../features/category/pages/AdminCategoryPage";
+import CategoryListPage from "../features/category/pages/CategoryListPage";
+import CategoryFormPage from "../features/category/pages/CategoryFormPage";
 import ProductListPage from "../features/admin/product/ProductListPage";
 import ProductFormPage from "../features/admin/product/ProductFormPage";
 
@@ -167,7 +168,12 @@ const AppRoutes = () => {
 
                         <Route
                             path="/admin/categories"
-                            element={<AdminCategoryPage />}
+                            element={<CategoryListPage />}
+                        />
+
+                        <Route
+                            path="/admin/categories/new"
+                            element={<CategoryFormPage />}
                         />
 
                         <Route

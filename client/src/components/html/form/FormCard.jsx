@@ -10,9 +10,7 @@ const FormCard = ({
             {title && (
 
                 <h2 className="text-xl font-semibold mb-5">
-
                     {title}
-
                 </h2>
 
             )}
@@ -24,5 +22,6 @@ const FormCard = ({
     );
 
 };
+
 
 export default FormCard;

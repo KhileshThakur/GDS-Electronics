@@ -45,7 +45,8 @@ const PageHeader = ({
             <div className="min-w-0">
                 {eyebrow && (
                     <p className="
-                        mb-1
+                        mt-0.5
+                        ml-0.5
                         text-[10px]
                         font-bold
                         uppercase
