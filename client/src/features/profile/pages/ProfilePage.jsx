@@ -10,6 +10,13 @@ import ProfileAddressModal from "../components/ProfileAddressModal";
 
 import "./ProfilePage.css";
 import toast from "react-hot-toast";
+import { GoDotFill } from "react-icons/go";
+import { FaCheck } from "react-icons/fa6";
+import { PiLockKeyFill } from "react-icons/pi";
+import { FaCross, FaPencilAlt, FaStop } from "react-icons/fa";
+import { MdLocationPin } from "react-icons/md";
+import { IoMdInformationCircle } from "react-icons/io";
+import { RxCross2 } from "react-icons/rx";
 
 
 const ProfileInfoItem = ({
@@ -158,7 +165,7 @@ const ProfilePage = () => {
                 {user?.isVerified && (
 
                   <span className="profile-badge">
-                    ✓ Verified
+                    <FaCheck/> Verified
                   </span>
 
                 )}
@@ -178,7 +185,7 @@ const ProfilePage = () => {
                 </span>
 
                 <i>
-                  •
+                  <GoDotFill />
                 </i>
 
                 <span>
@@ -268,7 +275,7 @@ const ProfilePage = () => {
           <div className="profile-settings-list">
 
             <ProfileAction
-              icon="✎"
+              icon=<FaPencilAlt />
               title="Update Profile"
               description="Change your name, phone number and profile information."
               onClick={() => setEditOpen(true)}
@@ -276,7 +283,7 @@ const ProfilePage = () => {
 
 
             <ProfileAction
-              icon="🔐"
+              icon=<PiLockKeyFill />
               title="Change Password"
               description="Update your password to keep your account secure."
               onClick={() => setPasswordOpen(true)}
@@ -284,7 +291,7 @@ const ProfilePage = () => {
 
 
             <ProfileAction
-              icon="📍"
+              icon=<MdLocationPin />
               title="Manage Addresses"
               description="Add, edit or manage your delivery addresses."
               onClick={() => setAddressOpen(true)}
@@ -292,12 +299,12 @@ const ProfilePage = () => {
 
 
             <ProfileAction
-              icon="⏸"
+              icon=<FaStop />
               title="Deactivate Account"
               description="Temporarily disable your account."
               onClick={() => {
                 toast("This feature is not implemented yet.", {
-                  icon: "ℹ️"
+                  icon: <IoMdInformationCircle />
                 });
               }}
             />
@@ -310,13 +317,13 @@ const ProfilePage = () => {
           <div className="profile-danger">
 
             <ProfileAction
-              icon="×"
+              icon=<RxCross2 />
               title="Delete Account"
               description="Permanently delete your account and data."
               danger
               onClick={() => {
                 toast("This feature is not implemented yet.", {
-                  icon: "ℹ️"
+                  icon: <IoMdInformationCircle />
                 });
               }}
             />

@@ -13,6 +13,8 @@ import {
     getOrders
 } from "../services/order.service";
 import "./OrderCustomer.css";
+import { FaPlus } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa6";
 const OrderListPage = () => {
     const [
         orders,
@@ -102,7 +104,7 @@ const OrderListPage = () => {
                 {orders.length === 0 ? (
                     <div className="order-empty">
                         <div className="order-empty__icon">
-                            +
+                            <FaPlus />
                         </div>
                         <h2>
                             No orders yet
@@ -228,7 +230,7 @@ const OrderListPage = () => {
                                         >
                                             View Order
                                             <span>
-                                                →
+                                                <FaArrowRight />
                                             </span>
                                         </Link>
                                     </div>

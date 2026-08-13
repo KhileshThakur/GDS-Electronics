@@ -10,6 +10,13 @@ import {
     clearCart
 } from "../services/cart.service";
 import "./CartPage.css";
+import { FaCartShopping } from "react-icons/fa6";
+import { FaMinus } from "react-icons/fa6";
+import { BiRupee } from "react-icons/bi";
+import { FaArrowRight } from "react-icons/fa6";
+import { FaArrowLeft } from "react-icons/fa6";
+import { RxCross2 } from "react-icons/rx";
+
 const CartPage = () => {
     const [cart, setCart] = useState({
         items: []
@@ -234,7 +241,7 @@ const CartPage = () => {
                             <div className="
                                 cart-empty-icon
                             ">
-                                🛒
+                                <FaCartShopping />
                             </div>
                             <h2>
                                 Your cart is empty
@@ -371,7 +378,7 @@ const CartPage = () => {
                                                                     )
                                                                 }
                                                             >
-                                                                −
+                                                                <FaMinus />
                                                             </button>
                                                             <span>
                                                                 {item.quantity}
@@ -391,7 +398,7 @@ const CartPage = () => {
                                                         <span className="
                                                             cart-item-total
                                                         ">
-                                                            ₹
+                                                            <BiRupee />
                                                             {itemTotal.toLocaleString(
                                                                 "en-IN"
                                                             )}
@@ -411,7 +418,7 @@ const CartPage = () => {
                                                     "
                                                     title="Remove item"
                                                 >
-                                                    ×
+                                                    <RxCross2 />
                                                 </button>
                                             </div>
                                         </Card>
@@ -500,7 +507,7 @@ const CartPage = () => {
                                 >
                                     Proceed to Checkout
                                     <span>
-                                        →
+                                        <FaArrowRight />
                                     </span>
                                 </Link>
                                 <Link
@@ -509,7 +516,8 @@ const CartPage = () => {
                                         cart-shopping-link
                                     "
                                 >
-                                    ← Continue Shopping
+                                    <FaArrowLeft />
+                                    Continue Shopping
                                 </Link>
                             </div>
                         </Card>
