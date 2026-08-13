@@ -1,26 +1,23 @@
 import { useState } from "react";
-
 import {
     Link,
     useNavigate,
     useSearchParams
 } from "react-router-dom";
-
 import {
     toast
 } from "react-hot-toast";
 
-import Container from "../../../components/ui/Container";
 import Card from "../../../components/ui/Card";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 
 import {
-    verifyRegistrationOtp,
+    verifyForgotPasswordOtp,
     resendOtp
 } from "../services/auth.service";
 
-const VerifyRegistrationOtpPage = () => {
+const VerifyForgotPasswordOtpPage = () => {
 
     const navigate = useNavigate();
 
@@ -46,247 +43,271 @@ const VerifyRegistrationOtpPage = () => {
         setResendLoading
     ] = useState(false);
 
-    const handleSubmit =
-        async (event) => {
+    const handleSubmit = async (event) => {
 
-            event.preventDefault();
+        event.preventDefault();
 
-            if (loading) {
-                return;
-            }
+        if (loading) {
+            return;
+        }
 
-            if (!email) {
-                toast.error(
-                    "Email is missing"
-                );
-                return;
-            }
+        if (!email) {
+            toast.error("Email is missing");
+            return;
+        }
 
-            if (
-                !/^\d{6}$/.test(
-                    otp.trim()
-                )
-            ) {
-                toast.error(
-                    "Enter a valid 6-digit OTP"
-                );
-                return;
-            }
+        if (
+            !/^\d{6}$/.test(
+                otp.trim()
+            )
+        ) {
+            toast.error(
+                "Enter a valid 6-digit OTP"
+            );
+            return;
+        }
 
-            try {
+        try {
 
-                setLoading(true);
+            setLoading(true);
 
-                const response =
-                    await verifyRegistrationOtp({
-                        email,
-                        otp: otp.trim()
-                    });
+            const response =
+                await verifyForgotPasswordOtp({
+                    email,
+                    otp: otp.trim()
+                });
 
-                toast.success(
-                    response.message ||
-                    "Email verified successfully"
-                );
+            toast.success(
+                response.message ||
+                "OTP verified successfully"
+            );
 
-                navigate("/login");
+            navigate(
+                `/reset-password?email=${encodeURIComponent(
+                    email
+                )}`
+            );
 
-            }
-            catch (error) {
+        }
+        catch (error) {
 
-                toast.error(
-                    error.response?.data?.message ||
-                    "Invalid or expired OTP"
-                );
+            toast.error(
+                error.response?.data?.message ||
+                "Invalid or expired OTP"
+            );
 
-            }
-            finally {
+        }
+        finally {
 
-                setLoading(false);
+            setLoading(false);
 
-            }
+        }
 
-        };
+    };
 
-    const handleResend =
-        async () => {
+    const handleResend = async () => {
 
-            if (resendLoading) {
-                return;
-            }
+        if (resendLoading) {
+            return;
+        }
 
-            if (!email) {
-                toast.error(
-                    "Email is missing"
-                );
-                return;
-            }
+        if (!email) {
+            toast.error("Email is missing");
+            return;
+        }
 
-            try {
+        try {
 
-                setResendLoading(true);
+            setResendLoading(true);
 
-                const response =
-                    await resendOtp({
-                        email,
-                        purpose: "REGISTRATION"
-                    });
+            const response =
+                await resendOtp({
+                    email,
+                    purpose: "FORGOT_PASSWORD"
+                });
 
-                toast.success(
-                    response.message ||
-                    "OTP sent successfully"
-                );
+            toast.success(
+                response.message ||
+                "OTP sent successfully"
+            );
 
-            }
-            catch (error) {
+        }
+        catch (error) {
 
-                toast.error(
-                    error.response?.data?.message ||
-                    "Unable to resend OTP"
-                );
+            toast.error(
+                error.response?.data?.message ||
+                "Unable to resend OTP"
+            );
 
-            }
-            finally {
+        }
+        finally {
 
-                setResendLoading(false);
+            setResendLoading(false);
 
-            }
+        }
 
-        };
+    };
 
     return (
 
-        <Container>
+        <Card className="
+            w-full
+            max-w-xl
+            min-h-[560px]
+            flex
+            flex-col
+            justify-center
+        ">
 
             <div className="
-                max-w-lg
+                max-w-md
                 mx-auto
-                py-10
-                sm:py-14
+                w-full
+                text-center
             ">
 
-                <Card>
+                <div className="
+                    mx-auto
+                    mb-7
+                    h-16
+                    w-16
+                    rounded-full
+                    border-4
+                    border-[var(--primary-soft)]
+                    flex
+                    items-center
+                    justify-center
+                    text-[var(--primary)]
+                    font-bold
+                ">
+                    OTP
+                </div>
 
-                    <p className="
-                        text-xs
-                        font-semibold
-                        uppercase
-                        tracking-[0.12em]
-                        text-[var(--primary)]
+                <p className="
+                    text-xs
+                    font-bold
+                    uppercase
+                    tracking-[0.16em]
+                    text-[var(--primary)]
+                ">
+                    Password Recovery
+                </p>
+
+                <h1 className="
+                    mt-3
+                    text-3xl
+                    sm:text-4xl
+                    font-bold
+                ">
+                    Verify your code
+                </h1>
+
+                <p className="
+                    mt-3
+                    text-sm
+                    leading-6
+                    text-[var(--text-light)]
+                ">
+                    Enter the 6-digit OTP sent to
+                    <strong className="
+                        ml-1
+                        text-[var(--text)]
                     ">
-                        Email Verification
-                    </p>
+                        {email}
+                    </strong>
+                </p>
 
-                    <h1 className="
-                        mt-2
-                        text-2xl
-                        sm:text-3xl
-                        font-bold
-                    ">
-                        Verify your email
-                    </h1>
+                <form
+                    onSubmit={handleSubmit}
+                    className="
+                        mt-9
+                        space-y-5
+                    "
+                >
 
-                    <p className="
-                        mt-2
-                        text-sm
-                        leading-6
+                    <Input
+                        label="6-Digit OTP"
+                        name="otp"
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        value={otp}
+                        onChange={(event) =>
+                            setOtp(
+                                event.target.value
+                                    .replace(/\D/g, "")
+                            )
+                        }
+                        autoComplete="one-time-code"
+                        required
+                    />
+
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full"
+                    >
+                        {loading
+                            ? "Verifying..."
+                            : "Verify OTP"
+                        }
+                    </Button>
+
+                </form>
+
+                <div className="
+                    mt-7
+                    flex
+                    justify-center
+                    gap-2
+                    text-sm
+                ">
+
+                    <span className="
                         text-[var(--text-light)]
                     ">
-                        Enter the 6-digit OTP sent to
-                        <strong className="
-                            text-[var(--text)]
-                        ">
-                            {" "}{email}
-                        </strong>.
-                    </p>
+                        Didn't receive it?
+                    </span>
 
-                    <form
-                        onSubmit={handleSubmit}
+                    <button
+                        type="button"
+                        onClick={handleResend}
+                        disabled={resendLoading}
                         className="
-                            mt-7
-                            space-y-5
+                            font-bold
+                            text-[var(--primary)]
                         "
                     >
+                        {resendLoading
+                            ? "Sending..."
+                            : "Resend OTP"
+                        }
+                    </button>
 
-                        <Input
-                            label="Verification OTP"
-                            name="otp"
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={6}
-                            value={otp}
-                            onChange={
-                                event =>
-                                    setOtp(
-                                        event.target.value
-                                            .replace(/\D/g, "")
-                                    )
-                            }
-                            autoComplete="one-time-code"
-                            required
-                        />
+                </div>
 
-                        <Button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full"
-                        >
-                            {loading
-                                ? "Verifying..."
-                                : "Verify Email"
-                            }
-                        </Button>
+                <div className="mt-5">
 
-                    </form>
+                    <Link
+                        to="/login"
+                        className="
+                            text-sm
+                            font-medium
+                            text-[var(--text-light)]
+                            hover:text-[var(--primary)]
+                        "
+                    >
+                        Cancel and return to Login
+                    </Link>
 
-                    <div className="
-                        mt-5
-                        text-center
-                    ">
-
-                        <button
-                            type="button"
-                            onClick={handleResend}
-                            disabled={resendLoading}
-                            className="
-                                text-sm
-                                font-medium
-                                text-[var(--primary)]
-                            "
-                        >
-                            {resendLoading
-                                ? "Sending..."
-                                : "Resend OTP"
-                            }
-                        </button>
-
-                    </div>
-
-                    <div className="
-                        mt-4
-                        text-center
-                    ">
-
-                        <Link
-                            to="/login"
-                            className="
-                                text-sm
-                                font-medium
-                                text-[var(--text-light)]
-                            "
-                        >
-                            Back to Login
-                        </Link>
-
-                    </div>
-
-                </Card>
+                </div>
 
             </div>
 
-        </Container>
+        </Card>
 
     );
 
 };
 
-export default VerifyRegistrationOtpPage;
+export default VerifyForgotPasswordOtpPage;

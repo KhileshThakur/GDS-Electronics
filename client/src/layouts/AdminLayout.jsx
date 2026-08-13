@@ -4,41 +4,59 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
 import Sidebar from "../components/common/Sidebar";
 
-
 const AdminLayout = () => {
 
-    const [sidebarOpen, setSidebarOpen] =
-        useState(false);
+    const [
+        sidebarOpen,
+        setSidebarOpen
+    ] = useState(false);
 
     return (
+
         <div className="
-            min-h-screen
+            h-screen
+            w-full
+            overflow-hidden
             flex
             flex-col
-
             bg-[var(--background)]
+            text-[var(--text)]
         ">
 
-            {/* =========================
+            {/* =================================
                 Navbar
-            ========================== */}
+            ================================= */}
 
-            <Navbar
-                onMenuClick={() =>
-                    setSidebarOpen(true)
-                }
-            />
+            <div className="
+                shrink-0
+                w-full
+            ">
 
-            {/* =========================
+                <Navbar
+                    onMenuClick={() =>
+                        setSidebarOpen(true)
+                    }
+                />
+
+            </div>
+
+
+            {/* =================================
                 Admin Body
-            ========================== */}
+            ================================= */}
 
             <div className="
                 flex
                 flex-1
                 min-h-0
+                w-full
+                overflow-hidden
             ">
-                {/* Sidebar */}
+
+                {/* =================================
+                    Sidebar
+                ================================= */}
+
                 <Sidebar
                     isOpen={sidebarOpen}
                     onClose={() =>
@@ -46,18 +64,28 @@ const AdminLayout = () => {
                     }
                 />
 
-                {/* Main Content */}
+
+                {/* =================================
+                    Main Content
+                ================================= */}
+
                 <main className="
                     flex-1
                     min-w-0
                     min-h-0
+                    overflow-y-auto
+                    overflow-x-hidden
+                    bg-[var(--background)]
                 ">
+
                     <Outlet />
+
                 </main>
+
             </div>
+
         </div>
     );
 };
-
 
 export default AdminLayout;

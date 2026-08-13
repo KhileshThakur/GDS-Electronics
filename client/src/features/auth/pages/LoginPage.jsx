@@ -9,22 +9,29 @@ import {
 import {
     toast
 } from "react-hot-toast";
+
 import Card from "../../../components/ui/Card";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
+
 import {
     loginUser
 } from "../services/auth.service";
+
 import {
     ROLES
 } from "../../../constants/constants";
+
 import {
     setLoading,
     setUser
 } from "../../../redux/slices/authSlice";
+
 const LoginPage = () => {
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
     const [
         formData,
         setFormData
@@ -32,48 +39,53 @@ const LoginPage = () => {
         email: "",
         password: ""
     });
+
     const [
         loading,
         setLoadingState
     ] = useState(false);
-    /* =========================================
-       Change Handler
-    ========================================= */
+
     const handleChange = (event) => {
+
         const {
             name,
             value
         } = event.target;
+
         setFormData(previous => ({
             ...previous,
             [name]: value
         }));
+
     };
-    /* =========================================
-       Submit
-    ========================================= */
+
     const handleSubmit = async (event) => {
+
         event.preventDefault();
+
         if (loading) {
             return;
         }
+
         try {
+
             setLoadingState(true);
+
             dispatch(
                 setLoading(true)
             );
+
             const response =
-                await loginUser(
-                    formData
-                );
+                await loginUser(formData);
+
             dispatch(
-                setUser(
-                    response.data
-                )
+                setUser(response.data)
             );
+
             toast.success(
                 "Login successful"
             );
+
             if (
                 response.data.role ===
                 ROLES.ADMIN
@@ -83,161 +95,201 @@ const LoginPage = () => {
             else {
                 navigate("/");
             }
+
         }
         catch (error) {
-            console.error(
-                error
-            );
+
+            console.error(error);
+
             toast.error(
                 error.response?.data?.message ||
                 "Login failed"
             );
+
         }
         finally {
+
             setLoadingState(false);
+
             dispatch(
                 setLoading(false)
             );
+
         }
+
     };
+
     return (
+
         <Card className="
             w-full
+            max-w-xl
+            min-h-[560px]
+            flex
+            flex-col
+            justify-between
+            overflow-hidden
         ">
-            {/* =================================
-                Header
-            ================================= */}
-            <div className="
-                mb-7
-            ">
-                <p className="
-                    mb-2
-                    text-xs
-                    sm:text-sm
-                    font-semibold
-                    uppercase
-                    tracking-[0.1em]
-                    text-[var(--primary)]
-                ">
-                    Welcome Back
-                </p>
-                <h1 className="
-                    text-2xl
-                    sm:text-3xl
-                    font-bold
-                    leading-tight
-                    text-[var(--text)]
-                ">
-                    Sign in to your account
-                </h1>
-                <p className="
-                    mt-2
-                    text-sm
-                    sm:text-[15px]
-                    leading-6
-                    text-[var(--text-light)]
-                ">
-                    Access your account and continue
-                    shopping with GDS Electronics.
-                </p>
-            </div>
-            {/* =================================
-                Form
-            ================================= */}
-            <form
-                onSubmit={handleSubmit}
-                className="
-                    space-y-5
-                "
-            >
-                <Input
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={
-                        formData.email
-                    }
-                    onChange={
-                        handleChange
-                    }
-                    autoComplete="email"
-                    required
-                />
-                <Input
-                    label="Password"
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    autoComplete="current-password"
-                    required
-                />
-                {/* =================================
-                    Forgot Password
-                ================================= */}
+
+            <div>
+
+                {/* Brand Accent */}
+
                 <div className="
-                    -mt-2
-                    flex
-                    justify-end
-                ">
-                    <Link
-                        to="/forgot-password"
-                        className="
-                            text-sm
-                            font-medium
-                            text-[var(--primary)]
-                            hover:text-[var(--primary-dark)]
-                            transition-colors
-                            duration-200
-                        "
-                    >
-                        Forgot password?
-                    </Link>
+                    mb-8
+                    h-1
+                    w-14
+                    rounded-full
+                    bg-[var(--primary)]
+                " />
+
+                {/* Header */}
+
+                <div>
+
+                    <p className="
+                        text-xs
+                        font-bold
+                        uppercase
+                        tracking-[0.16em]
+                        text-[var(--primary)]
+                    ">
+                        GDS Electronics
+                    </p>
+
+                    <h1 className="
+                        mt-3
+                        text-3xl
+                        sm:text-4xl
+                        font-bold
+                        leading-tight
+                        text-[var(--text)]
+                    ">
+                        Welcome back.
+                    </h1>
+
+                    <p className="
+                        mt-3
+                        max-w-md
+                        text-sm
+                        leading-6
+                        text-[var(--text-light)]
+                    ">
+                        Sign in to manage your account,
+                        orders and shopping experience.
+                    </p>
+
                 </div>
-                <Button
-                    type="submit"
-                    disabled={loading}
+
+                {/* Form */}
+
+                <form
+                    onSubmit={handleSubmit}
                     className="
-                        w-full
+                        mt-9
+                        space-y-5
                     "
                 >
-                    {loading
-                        ? "Signing In..."
-                        : "Sign In"
-                    }
-                </Button>
-            </form>
-            {/* =================================
-                Register Link
-            ================================= */}
+
+                    <Input
+                        label="Email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        autoComplete="email"
+                        required
+                    />
+
+                    <Input
+                        label="Password"
+                        name="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        autoComplete="current-password"
+                        required
+                    />
+
+                    <div className="
+                        flex
+                        justify-end
+                        -mt-2
+                    ">
+
+                        <Link
+                            to="/forgot-password"
+                            className="
+                                text-sm
+                                font-semibold
+                                text-[var(--primary)]
+                                hover:text-[var(--primary-dark)]
+                                transition-colors
+                            "
+                        >
+                            Forgot password?
+                        </Link>
+
+                    </div>
+
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="
+                            w-full
+                            mt-2
+                        "
+                    >
+                        {loading
+                            ? "Signing In..."
+                            : "Sign In"
+                        }
+                    </Button>
+
+                </form>
+
+            </div>
+
+            {/* Footer */}
+
             <div className="
-                mt-6
-                pt-5
+                mt-10
+                pt-6
                 border-t
                 border-[var(--border)]
-                text-center
+                flex
+                flex-col
+                gap-3
+                sm:flex-row
+                sm:items-center
+                sm:justify-between
             ">
+
                 <p className="
                     text-sm
                     text-[var(--text-light)]
                 ">
-                    Don't have an account?
-                    <Link
-                        to="/register"
-                        className="
-                            ml-1.5
-                            font-semibold
-                            text-[var(--primary)]
-                            hover:text-[var(--primary-dark)]
-                            transition-colors
-                            duration-200
-                        "
-                    >
-                        Create Account
-                    </Link>
+                    New to GDS Electronics?
                 </p>
+
+                <Link
+                    to="/register"
+                    className="
+                        text-sm
+                        font-bold
+                        text-[var(--primary)]
+                        hover:text-[var(--primary-dark)]
+                    "
+                >
+                    Create an account →
+                </Link>
+
             </div>
+
         </Card>
+
     );
+
 };
+
 export default LoginPage;

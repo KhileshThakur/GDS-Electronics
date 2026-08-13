@@ -1,21 +1,36 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import {
+    Link,
+    useNavigate
+} from "react-router-dom";
+import {
+    toast
+} from "react-hot-toast";
 
-import Container from "../../../components/ui/Container";
 import Card from "../../../components/ui/Card";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 
-import { forgotPassword } from "../services/auth.service";
+import {
+    forgotPassword
+} from "../services/auth.service";
 
 const ForgotPasswordPage = () => {
+
     const navigate = useNavigate();
 
-    const [email, setEmail] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [
+        email,
+        setEmail
+    ] = useState("");
+
+    const [
+        loading,
+        setLoading
+    ] = useState(false);
 
     const handleSubmit = async (event) => {
+
         event.preventDefault();
 
         if (loading) {
@@ -23,9 +38,11 @@ const ForgotPasswordPage = () => {
         }
 
         try {
+
             setLoading(true);
 
-            const response = await forgotPassword(email);
+            const response =
+                await forgotPassword(email);
 
             toast.success(
                 response.message ||
@@ -37,106 +54,156 @@ const ForgotPasswordPage = () => {
                     email
                 )}`
             );
-        } catch (error) {
+
+        }
+        catch (error) {
+
             toast.error(
                 error.response?.data?.message ||
                 "Unable to process request"
             );
-        } finally {
-            setLoading(false);
+
         }
+        finally {
+
+            setLoading(false);
+
+        }
+
     };
 
     return (
-        <Container>
+
+        <Card className="
+            w-full
+            max-w-xl
+            min-h-[560px]
+            flex
+            flex-col
+            justify-center
+        ">
+
             <div className="
-                max-w-lg
+                max-w-md
                 mx-auto
-                py-10
-                sm:py-14
+                w-full
             ">
-                <Card>
+
+                {/* Recovery Badge */}
+
+                <div className="
+                    mx-auto
+                    mb-7
+                    flex
+                    h-14
+                    w-14
+                    items-center
+                    justify-center
+                    rounded-2xl
+                    bg-[var(--primary-soft)]
+                    text-[var(--primary)]
+                    text-xl
+                    font-bold
+                ">
+                    ?
+                </div>
+
+                <div className="
+                    text-center
+                ">
+
                     <p className="
                         text-xs
-                        font-semibold
+                        font-bold
                         uppercase
-                        tracking-[0.12em]
+                        tracking-[0.16em]
                         text-[var(--primary)]
                     ">
                         Account Recovery
                     </p>
 
                     <h1 className="
-                        mt-2
-                        text-2xl
-                        sm:text-3xl
+                        mt-3
+                        text-3xl
+                        sm:text-4xl
                         font-bold
                     ">
-                        Forgot Password?
+                        Forgot your password?
                     </h1>
 
                     <p className="
-                        mt-2
+                        mt-3
                         text-sm
                         leading-6
                         text-[var(--text-light)]
                     ">
-                        Enter your email and we'll
-                        send you a verification OTP
-                        to reset your password.
+                        Enter your registered email
+                        and we'll send you a secure
+                        verification OTP.
                     </p>
 
-                    <form
-                        onSubmit={handleSubmit}
+                </div>
+
+                <form
+                    onSubmit={handleSubmit}
+                    className="
+                        mt-9
+                        space-y-5
+                    "
+                >
+
+                    <Input
+                        label="Email Address"
+                        name="email"
+                        type="email"
+                        value={email}
+                        onChange={(event) =>
+                            setEmail(
+                                event.target.value
+                            )
+                        }
+                        autoComplete="email"
+                        required
+                    />
+
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full"
+                    >
+                        {loading
+                            ? "Sending..."
+                            : "Send Verification OTP"
+                        }
+                    </Button>
+
+                </form>
+
+                <div className="
+                    mt-7
+                    text-center
+                ">
+
+                    <Link
+                        to="/login"
                         className="
-                            mt-6
-                            space-y-5
+                            text-sm
+                            font-semibold
+                            text-[var(--text-light)]
+                            hover:text-[var(--primary)]
                         "
                     >
-                        <Input
-                            label="Email"
-                            name="email"
-                            type="email"
-                            value={email}
-                            onChange={(event) =>
-                                setEmail(
-                                    event.target.value
-                                )
-                            }
-                            autoComplete="email"
-                            required
-                        />
+                        ← Back to Login
+                    </Link>
 
-                        <Button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full"
-                        >
-                            {loading
-                                ? "Sending..."
-                                : "Send OTP"
-                            }
-                        </Button>
+                </div>
 
-                        <div className="
-                            text-center
-                        ">
-                            <Link
-                                to="/login"
-                                className="
-                                    text-sm
-                                    font-medium
-                                    text-[var(--primary)]
-                                "
-                            >
-                                Back to Login
-                            </Link>
-                        </div>
-                    </form>
-                </Card>
             </div>
-        </Container>
+
+        </Card>
+
     );
+
 };
 
 export default ForgotPasswordPage;

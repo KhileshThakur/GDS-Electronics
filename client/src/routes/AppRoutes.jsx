@@ -35,10 +35,10 @@ import VerifyForgotPasswordOtpPage from "../features/auth/pages/VerifyForgotPass
 import ResetPasswordPage from "../features/auth/pages/ResetPasswordPage";
 
 // Admin
-import DashboardPage from "../features/admin/dashboard/pages/DashboardPage";
+import DashboardPage from "../features/admin/pages/DashboardPage";
 import AdminCategoryPage from "../features/category/pages/AdminCategoryPage";
-import ProductListPage from "../features/product/pages/ProductListPage";
-import ProductFormPage from "../features/product/pages/ProductFormPage";
+import ProductListPage from "../features/admin/product/ProductListPage";
+import ProductFormPage from "../features/admin/product/ProductListPage";
 
 // Other
 import NotFoundPage from "../features/not-found/pages/NotFoundPage";

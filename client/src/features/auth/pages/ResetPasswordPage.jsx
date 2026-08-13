@@ -6,22 +6,28 @@ import {
 import {
     toast
 } from "react-hot-toast";
-import Container from "../../../components/ui/Container";
+
 import Card from "../../../components/ui/Card";
 import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
+
 import {
     resetPassword
 } from "../services/auth.service";
+
 const ResetPasswordPage = () => {
-    const params = new URLSearchParams(
-        window.location.search
-    );
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
 
     const email =
         params.get("email");
+
     const navigate =
         useNavigate();
+
     const [
         formData,
         setFormData
@@ -29,150 +35,201 @@ const ResetPasswordPage = () => {
         password: "",
         confirmPassword: ""
     });
+
     const [
         loading,
         setLoading
     ] = useState(false);
-    const handleChange =
-        (event) => {
-            setFormData(
-                previous => ({
-                    ...previous,
-                    [event.target.name]:
-                        event.target.value
-                })
+
+    const handleChange = (event) => {
+
+        setFormData(previous => ({
+            ...previous,
+            [event.target.name]:
+                event.target.value
+        }));
+
+    };
+
+    const handleSubmit = async (event) => {
+
+        event.preventDefault();
+
+        if (
+            formData.password !==
+            formData.confirmPassword
+        ) {
+            toast.error(
+                "Passwords do not match"
             );
-        };
-    const handleSubmit =
-        async (event) => {
-            event.preventDefault();
-            if (
-                formData.password !==
-                formData.confirmPassword
-            ) {
-                toast.error(
-                    "Passwords do not match"
-                );
-                return;
-            }
-            try {
-                setLoading(true);
-                const response = await resetPassword({
+            return;
+        }
+
+        try {
+
+            setLoading(true);
+
+            const response =
+                await resetPassword({
                     email,
-                    password: formData.password
+                    password:
+                        formData.password
                 });
-                toast.success(
-                    response.message ||
-                    "Password reset successfully"
-                );
-                navigate("/login");
-            }
-            catch (error) {
-                toast.error(
-                    error.response?.data?.message ||
-                    "Reset link is invalid or expired"
-                );
-            }
-            finally {
-                setLoading(false);
-            }
-        };
+
+            toast.success(
+                response.message ||
+                "Password reset successfully"
+            );
+
+            navigate("/login");
+
+        }
+        catch (error) {
+
+            toast.error(
+                error.response?.data?.message ||
+                "Unable to reset password"
+            );
+
+        }
+        finally {
+
+            setLoading(false);
+
+        }
+
+    };
+
     return (
-        <Container>
+
+        <Card className="
+            w-full
+            max-w-xl
+            min-h-[560px]
+            flex
+            flex-col
+            justify-center
+        ">
+
             <div className="
-                max-w-lg
+                max-w-md
                 mx-auto
-                py-10
-                sm:py-14
+                w-full
             ">
-                <Card>
-                    <p className="
+
+                <div className="
+                    mb-8
+                ">
+
+                    <div className="
+                        inline-flex
+                        rounded-lg
+                        bg-[var(--secondary)]
+                        px-3
+                        py-1
                         text-xs
-                        font-semibold
+                        font-bold
                         uppercase
-                        tracking-[0.12em]
-                        text-[var(--primary)]
+                        tracking-wide
+                        text-[var(--sidebar)]
                     ">
-                        Account Recovery
-                    </p>
+                        Security
+                    </div>
+
                     <h1 className="
-                        mt-2
-                        text-2xl
-                        sm:text-3xl
+                        mt-4
+                        text-3xl
+                        sm:text-4xl
                         font-bold
                     ">
-                        Create New Password
+                        Create a new password
                     </h1>
+
                     <p className="
-                        mt-2
+                        mt-3
                         text-sm
+                        leading-6
                         text-[var(--text-light)]
                     ">
-                        Choose a new password for your
+                        Choose a strong password to
+                        protect your GDS Electronics
                         account.
                     </p>
-                    <form
-                        onSubmit={handleSubmit}
+
+                </div>
+
+                <form
+                    onSubmit={handleSubmit}
+                    className="
+                        space-y-5
+                    "
+                >
+
+                    <Input
+                        label="New Password"
+                        name="password"
+                        type="password"
+                        value={
+                            formData.password
+                        }
+                        onChange={handleChange}
+                        autoComplete="new-password"
+                        required
+                    />
+
+                    <Input
+                        label="Confirm Password"
+                        name="confirmPassword"
+                        type="password"
+                        value={
+                            formData.confirmPassword
+                        }
+                        onChange={handleChange}
+                        autoComplete="new-password"
+                        required
+                    />
+
+                    <Button
+                        type="submit"
+                        disabled={loading}
                         className="
-                            mt-7
-                            space-y-5
+                            w-full
+                            mt-2
                         "
                     >
-                        <Input
-                            label="New Password"
-                            name="password"
-                            type="password"
-                            value={
-                                formData.password
-                            }
-                            onChange={
-                                handleChange
-                            }
-                            autoComplete="new-password"
-                            required
-                        />
-                        <Input
-                            label="Confirm Password"
-                            name="confirmPassword"
-                            type="password"
-                            value={
-                                formData.confirmPassword
-                            }
-                            onChange={
-                                handleChange
-                            }
-                            autoComplete="new-password"
-                            required
-                        />
-                        <Button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full"
-                        >
-                            {loading
-                                ? "Resetting..."
-                                : "Reset Password"
-                            }
-                        </Button>
-                    </form>
-                    <div className="
-                        mt-5
-                        text-center
-                    ">
-                        <Link
-                            to="/login"
-                            className="
-                                text-sm
-                                font-medium
-                                text-[var(--primary)]
-                            "
-                        >
-                            Back to Login
-                        </Link>
-                    </div>
-                </Card>
+                        {loading
+                            ? "Updating Password..."
+                            : "Set New Password"
+                        }
+                    </Button>
+
+                </form>
+
+                <div className="
+                    mt-7
+                    text-center
+                ">
+
+                    <Link
+                        to="/login"
+                        className="
+                            text-sm
+                            font-semibold
+                            text-[var(--text-light)]
+                            hover:text-[var(--primary)]
+                        "
+                    >
+                        ← Back to Login
+                    </Link>
+
+                </div>
+
             </div>
-        </Container>
+
+        </Card>
+
     );
+
 };
+
 export default ResetPasswordPage;

@@ -434,7 +434,78 @@ const CategoriesIcon = () => (
     </svg>
 
 );
+/* =========================================
+Users / Customers
+========================================= */
 
+const CustomersIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" className="w-[18px] h-[18px]" stroke="currentColor" strokeWidth="1.8">
+        <circle cx="9" cy="8" r="3" />
+        <path d="M3.5 19c.7-3.2 2.5-5 5.5-5s4.8 1.8 5.5 5" strokeLinecap="round" />
+        <path d="M15 6.5a3 3 0 0 1 0 5.8" strokeLinecap="round" />
+        <path d="M17 14.5c1.9.7 3 2.2 3.5 4.5" strokeLinecap="round" />
+    </svg>
+);
+
+/* =========================================
+Inventory
+========================================= */
+
+const InventoryIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" className="w-[18px] h-[18px]" stroke="currentColor" strokeWidth="1.8">
+        <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z" strokeLinejoin="round" />
+        <path d="M4 7.5 12 12l8-4.5" strokeLinejoin="round" />
+        <path d="M12 12v9" strokeLinecap="round" />
+    </svg>
+);
+
+/* =========================================
+Analytics
+========================================= */
+
+const AnalyticsIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" className="w-[18px] h-[18px]" stroke="currentColor" strokeWidth="1.8">
+        <path d="M4 19V5" strokeLinecap="round" />
+        <path d="M4 19h16" strokeLinecap="round" />
+        <path d="m7 15 4-4 3 2 5-6" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="7" cy="15" r="1" />
+        <circle cx="11" cy="11" r="1" />
+        <circle cx="14" cy="13" r="1" />
+        <circle cx="19" cy="7" r="1" />
+    </svg>
+);
+
+/* =========================================
+Coupons
+========================================= */
+
+const CouponsIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" className="w-[18px] h-[18px]" stroke="currentColor" strokeWidth="1.8">
+        <path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4z" strokeLinejoin="round" />
+        <path d="M9 9h.01M15 15h.01M9 15l6-6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
+
+/* =========================================
+Reviews
+========================================= */
+
+const ReviewsIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" className="w-[18px] h-[18px]" stroke="currentColor" strokeWidth="1.8">
+        <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9z" strokeLinejoin="round" />
+    </svg>
+);
+
+/* =========================================
+Settings
+========================================= */
+
+const SettingsIcon = () => (
+    <svg viewBox="0 0 24 24" fill="none" className="w-[18px] h-[18px]" stroke="currentColor" strokeWidth="1.8">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.1h-2.6v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1A1.7 1.7 0 0 0 8 15a1.7 1.7 0 0 0-1.5-1H6.4v-2.6h.1A1.7 1.7 0 0 0 8 10a1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V5h2.6v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.5 1h.1v2.6h-.1a1.7 1.7 0 0 0-1.5 1.4Z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+);
 
 /* =========================================
    Navigation Icon Resolver
@@ -445,24 +516,21 @@ const NavigationIcon = ({
 }) => {
 
     const icons = {
-
         home: HomeIcon,
-
         products: ProductsIcon,
-
         orders: OrdersIcon,
-
         wishlist: HeartIcon,
-
         cart: CartIcon,
-
         dashboard: DashboardIcon,
-
         categories: CategoriesIcon,
-
         logout: LogoutIcon,
-
-        profile: ProfileIcon
+        profile: ProfileIcon,
+        customers: CustomersIcon,
+        inventory: InventoryIcon,
+        analytics: AnalyticsIcon,
+        coupons: CouponsIcon,
+        reviews: ReviewsIcon,
+        settings: SettingsIcon
     };
 
 
@@ -486,14 +554,20 @@ const NavigationIcon = ({
 export {
     HomeIcon,
     ProductsIcon,
-    SearchIcon,
-    HeartIcon,
     OrdersIcon,
+    MenuIcon,
+    HeartIcon,
     CartIcon,
     DashboardIcon,
-    ProfileIcon,
-    LogoutIcon,
-    MenuIcon,
     CategoriesIcon,
-    NavigationIcon
+    LogoutIcon,
+    ProfileIcon,
+    CustomersIcon,
+    InventoryIcon,
+    AnalyticsIcon,
+    CouponsIcon,
+    ReviewsIcon,
+    SettingsIcon,
+    NavigationIcon,
+    SearchIcon
 };

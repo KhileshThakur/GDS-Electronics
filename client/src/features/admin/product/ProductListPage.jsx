@@ -14,7 +14,7 @@ import {
 import {
     getProducts,
     deleteProduct
-} from "../services/product.service";
+} from "./product.service";
 
 import {
     PageHeader,
