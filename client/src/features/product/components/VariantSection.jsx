@@ -4,7 +4,7 @@ import Button from "../../../components/ui/Button";
 import {
     FormCard,
     FormSection
-} from "../../../components/admin";
+} from "../../../components/html";
 
 const VariantSection = ({
     variants,

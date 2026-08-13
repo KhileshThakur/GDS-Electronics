@@ -1,4 +1,9 @@
 export const homeContent = {
+
+    navbar:{
+        announcement: "FREEEEEEE SHIPPPPPPPPPPIIIIINNNNNGGGGG. ********** FREEEEEEEEEEE ITEMMMMMMMMMMMMMMMMMMSSSSSSSSSSSSSSSS over 5000 of shoppiiiiiiiinnnnnnnnnnnggggggggg"
+    },
+
     hero: {
         eyebrow: "GDS Electronics",
 

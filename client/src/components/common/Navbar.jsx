@@ -23,6 +23,8 @@ import {
     MenuIcon
 } from "../../assets/icons/Icons";
 
+import { homeContent } from "../../utils/content.home";
+
 
 /* =========================================
    View Toggle
@@ -156,6 +158,10 @@ const Navbar = ({
     onMenuClick
 }) => {
 
+    const {
+        navbar
+    } = homeContent;
+
     const [search, setSearch] =
         useState("");
 
@@ -280,21 +286,13 @@ const Navbar = ({
 
                         gap-4
                     ">
-
-                        <span className="
-                            min-w-0
-
-                            text-[11px]
-                            sm:text-xs
-
-                            font-medium
-
-                            text-white/90
-
-                            truncate
-                        ">
-                            ⚡ Free shipping above ₹999
-                        </span>
+                        <marquee
+                            className="block w-full min-w-0 text-[11px] sm:text-xs font-medium text-white/90 whitespace-nowrap"
+                            scrollamount="5" /* Controls the speed (higher is faster) */
+                            loop="infinite"
+                        >
+                            {navbar.announcement}
+                        </marquee>
 
 
                         {isAuthenticated &&

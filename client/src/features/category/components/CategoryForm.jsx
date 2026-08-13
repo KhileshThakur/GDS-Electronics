@@ -9,7 +9,7 @@ import {
     FormCard,
     FormSection,
     FormActions
-} from "../../../components/admin/form";
+} from "../../../components/html/form";
 
 const CategoryForm = ({ onSuccess, selectedCategory, clearSelection }) => {
 

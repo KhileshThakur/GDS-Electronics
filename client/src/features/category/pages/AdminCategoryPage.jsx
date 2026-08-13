@@ -12,7 +12,7 @@ import {
     DataTable,
     StatusBadge,
     ActionButtons
-} from "../../../components/admin";
+} from "../../../components/html";
 
 const AdminCategoryPage = () => {
 

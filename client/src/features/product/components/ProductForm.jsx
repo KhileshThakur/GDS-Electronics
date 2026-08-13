@@ -9,7 +9,7 @@ import {
     FormCard,
     FormSection,
     FormActions
-} from "../../../components/admin";
+} from "../../../components/html";
 
 import {
     getCategories

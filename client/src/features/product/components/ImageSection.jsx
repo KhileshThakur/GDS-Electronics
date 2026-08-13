@@ -3,7 +3,7 @@ import Button from "../../../components/ui/Button";
 
 import {
     FormCard
-} from "../../../components/admin";
+} from "../../../components/html";
 
 const ImageSection = ({
     images,
