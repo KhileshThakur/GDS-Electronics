@@ -8,6 +8,10 @@ import {
     homeContent
 } from "../../../utils/content.home";
 import "./HomePage.css";
+
+import { SiGooglegemini } from "react-icons/si";
+import { FaPlus, FaCheck } from "react-icons/fa6";
+
 const HomePage = () => {
     const {
         hero,
@@ -175,7 +179,7 @@ const HomePage = () => {
                         <div className="
                             home-empty__icon
                         ">
-                            ✦
+                            <SiGooglegemini />
                         </div>
                         <h3>
                             {
@@ -306,7 +310,7 @@ const HomePage = () => {
                         <div className="
                             home-empty__icon
                         ">
-                            +
+                            <FaPlus />
                         </div>
                         <h3>
                             {
@@ -373,7 +377,7 @@ const HomePage = () => {
                                         "
                                     >
                                         <span>
-                                            ✓
+                                            <FaCheck />
                                         </span>
                                         <p>
                                             {point}

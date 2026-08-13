@@ -26,6 +26,11 @@ import {
 } from "../../wishlist/services/wishlist.service";
 
 import "./ProductDetailsPage.css";
+import { BiRupee } from "react-icons/bi";
+import { MdCheck } from "react-icons/md";
+import { FaCheck, FaMinus, FaPlus } from "react-icons/fa";
+import { CiHeart } from "react-icons/ci";
+import { MdElectricBolt, MdOutlinePercent } from "react-icons/md";
 
 
 const ProductDetailsPage = () => {
@@ -436,7 +441,7 @@ const ProductDetailsPage = () => {
                                     <div className="product-details__no-image">
 
                                         <span>
-                                            ⚡
+                                            <MdElectricBolt />
                                         </span>
 
                                         <p>
@@ -551,14 +556,14 @@ const ProductDetailsPage = () => {
                             <div className="product-details__price-row">
 
                                 <span className="product-details__price">
-                                    ₹{price}
+                                    <BiRupee />{price}
                                 </span>
 
 
                                 {hasDiscount && (
 
                                     <span className="product-details__original-price">
-                                        ₹{originalPrice}
+                                        <BiRupee />{originalPrice}
                                     </span>
 
                                 )}
@@ -580,7 +585,7 @@ const ProductDetailsPage = () => {
                                             ) * 100
                                         )}
 
-                                        %
+                                        <MdOutlinePercent />
 
                                     </span>
 
@@ -675,7 +680,7 @@ const ProductDetailsPage = () => {
                                                             {isSelected && (
 
                                                                 <span className="product-details__variant-check">
-                                                                    ✓
+                                                                    <FaCheck />
                                                                 </span>
 
                                                             )}
@@ -789,7 +794,7 @@ const ProductDetailsPage = () => {
                                             }
                                             aria-label="Decrease quantity"
                                         >
-                                            −
+                                            <FaMinus />
                                         </button>
 
 
@@ -809,7 +814,7 @@ const ProductDetailsPage = () => {
                                             }
                                             aria-label="Increase quantity"
                                         >
-                                            +
+                                            <FaPlus />
                                         </button>
 
                                     </div>
@@ -856,7 +861,7 @@ const ProductDetailsPage = () => {
                                     title="Add to wishlist"
                                     aria-label="Add to wishlist"
                                 >
-                                    ♡
+                                    <CiHeart />
                                 </button>
 
                             </div>
@@ -868,7 +873,7 @@ const ProductDetailsPage = () => {
 
                                 <div>
                                     <span>
-                                        ✓
+                                        <FaCheck />
                                     </span>
 
                                     <p>
@@ -879,7 +884,7 @@ const ProductDetailsPage = () => {
 
                                 <div>
                                     <span>
-                                        ⚡
+                                        <MdElectricBolt />
                                     </span>
 
                                     <p>
@@ -890,7 +895,7 @@ const ProductDetailsPage = () => {
 
                                 <div>
                                     <span>
-                                        ✓
+                                        <FaCheck />
                                     </span>
 
                                     <p>
