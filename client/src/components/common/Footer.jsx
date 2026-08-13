@@ -1,5 +1,8 @@
 import Container from "../ui/Container";
 import contact from "../../utils/contact";
+import { CiAt } from "react-icons/ci";
+import { BsFillTelephoneFill } from "react-icons/bs";
+import { GoDotFill } from "react-icons/go";
 
 const Footer = () => {
     return (
@@ -116,7 +119,7 @@ const Footer = () => {
                                         bg-white/5
                                         text-[var(--secondary)]"
                                     >
-                                        @
+                                        <CiAt />
                                     </span>
                                     <span className="
                                         break-all
@@ -154,7 +157,7 @@ const Footer = () => {
                                         bg-white/5
                                         text-[var(--secondary)]
                                     ">
-                                        ☎
+                                        <BsFillTelephoneFill />
                                     </span>
                                     <span>
                                         {
@@ -201,7 +204,7 @@ const Footer = () => {
                                     bg-white/5
                                     text-[var(--secondary)]
                                 ">
-                                    ●
+                                    <GoDotFill />
                                 </span>
                                 <div className="
                                     text-sm

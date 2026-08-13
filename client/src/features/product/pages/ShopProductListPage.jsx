@@ -4,6 +4,10 @@ import { Link, useSearchParams } from "react-router-dom";
 
 import Container from "../../../components/ui/Container";
 import { getProducts } from "../services/product.service";
+import { GoDotFill } from "react-icons/go";
+import { MdElectricBolt } from "react-icons/md";
+import { FaArrowRight } from "react-icons/fa";
+import { BiRupee } from "react-icons/bi";
 
 import "./ShopProductListPage.css";
 
@@ -384,7 +388,7 @@ const ShopProductListPage = () => {
 
                             <span className="products-eyebrow">
 
-                                <span />
+                                <GoDotFill />
 
                                 Our Collection
 
@@ -572,7 +576,7 @@ const ShopProductListPage = () => {
                         <div className="shop-products__empty">
 
                             <div className="shop-products__empty-icon">
-                                ⚡
+                                <MdElectricBolt />
                             </div>
 
                             <h2>
@@ -718,13 +722,13 @@ const ShopProductListPage = () => {
                                                 <div className="shop-product-card__prices">
 
                                                     <span className="shop-product-card__price">
-                                                        ₹{finalPrice}
+                                                    <span><BiRupee /></span>{finalPrice}
                                                     </span>
 
                                                     {hasDiscount && (
 
                                                         <span className="shop-product-card__old-price">
-                                                            ₹
+                                                            <span><BiRupee /></span>            
                                                             {getOldPrice(
                                                                 product
                                                             )}
@@ -743,7 +747,7 @@ const ShopProductListPage = () => {
                                                 ) : (
 
                                                     <span className="shop-product-card__arrow">
-                                                        →
+                                                        <FaArrowRight />
                                                     </span>
 
                                                 )}
