@@ -12,6 +12,7 @@ import {
 } from "../services/wishlist.service";
 
 import "./WishlistPage.css";
+import { FaArrowRight } from "react-icons/fa";
 
 
 /* =========================================
@@ -350,7 +351,7 @@ const WishlistPage = () => {
                             >
                                 Browse Products
                                 <span>
-                                    →
+                                    <FaArrowRight />
                                 </span>
                             </Link>
 

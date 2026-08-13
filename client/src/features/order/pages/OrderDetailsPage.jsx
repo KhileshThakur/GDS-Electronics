@@ -15,6 +15,7 @@ import {
     cancelOrder
 } from "../services/order.service";
 import "./OrderCustomer.css";
+import { FaCheck } from "react-icons/fa";
 const OrderDetailsPage = () => {
     const {
         id
@@ -242,7 +243,7 @@ const OrderDetailsPage = () => {
                         <div className="
                             order-delivery-banner__icon
                         ">
-                            ✓
+                            < FaCheck/>
                         </div>
                         <div>
                             <span>
