@@ -40,6 +40,11 @@ import CategoryListPage from "../features/category/pages/CategoryListPage";
 import CategoryFormPage from "../features/category/pages/CategoryFormPage";
 import ProductListPage from "../features/admin/product/ProductListPage";
 import ProductFormPage from "../features/admin/product/ProductFormPage";
+import AdminOrderListPage from "../features/order/pages/AdminOrderListPage";
+import AdminOrderDetailPage from "../features/order/pages/AdminOrderDetailPage";
+import AdminCustomerListPage from "../features/admin/customer/AdminCustomerListPage";
+import AdminCustomerDetailPage from "../features/admin/customer/AdminCustomerDetailPage";
+
 
 // Other
 import NotFoundPage from "../features/not-found/pages/NotFoundPage";
@@ -129,31 +134,26 @@ const AppRoutes = () => {
                                 <VerifyRegistrationOtpPage />
                             }
                         />
+
+                        <Route
+                            path="/forgot-password"
+                            element={<ForgotPasswordPage />}
+                        />
+
+                        <Route
+                            path="/verify-forgot-password"
+                            element={
+                                <VerifyForgotPasswordOtpPage />
+                            }
+                        />
+
+                        <Route
+                            path="/reset-password"
+                            element={<ResetPasswordPage />}
+                        />
                     </Route>
                 </Route>
 
-                {/* ================================
-                    Password Recovery
-                ================================= */}
-
-                <Route element={<AuthLayout />}>
-                    <Route
-                        path="/forgot-password"
-                        element={<ForgotPasswordPage />}
-                    />
-
-                    <Route
-                        path="/verify-forgot-password"
-                        element={
-                            <VerifyForgotPasswordOtpPage />
-                        }
-                    />
-
-                    <Route
-                        path="/reset-password"
-                        element={<ResetPasswordPage />}
-                    />
-                </Route>
 
                 {/* ================================
                     Admin
@@ -189,6 +189,26 @@ const AppRoutes = () => {
                         <Route
                             path="/admin/products/:id/edit"
                             element={<ProductFormPage />}
+                        />
+
+                        <Route
+                            path="/admin/orders"
+                            element={<AdminOrderListPage />}
+                        />
+
+                        <Route
+                            path="/admin/orders/:id"
+                            element={<AdminOrderDetailPage />}
+                        />
+
+                        <Route
+                            path="/admin/customers"
+                            element={<AdminCustomerListPage />}
+                        />
+
+                        <Route
+                            path="/admin/customers/:id"
+                            element={<AdminCustomerDetailPage />}
                         />
                     </Route>
                 </Route>
