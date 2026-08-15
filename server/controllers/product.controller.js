@@ -622,3 +622,153 @@ export const getProductById = asyncHandler(async (req, res) => {
     );
 
 });
+
+export const updateProductStock = asyncHandler(async (req, res) => {
+
+    const { id } = req.params;
+
+    const {
+        stock,
+        variants
+    } = req.body;
+
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+
+        return sendResponse(
+            res,
+            404,
+            false,
+            "Product not found"
+        );
+
+    }
+
+
+    /* =================================
+       VARIANT PRODUCT
+    ================================= */
+
+    if (product.hasVariants) {
+
+        if (!Array.isArray(variants)) {
+
+            return sendResponse(
+                res,
+                400,
+                false,
+                "Variants are required for this product"
+            );
+
+        }
+
+
+        for (const variant of variants) {
+
+            if (!variant.sku) {
+
+                return sendResponse(
+                    res,
+                    400,
+                    false,
+                    "Variant SKU is required"
+                );
+
+            }
+
+
+            const stockValue =
+                Number(variant.stock);
+
+
+            if (
+                !Number.isFinite(stockValue) ||
+                stockValue < 0
+            ) {
+
+                return sendResponse(
+                    res,
+                    400,
+                    false,
+                    `Invalid stock for variant ${variant.sku}`
+                );
+
+            }
+
+        }
+
+
+        for (const variant of variants) {
+
+            const existingVariant =
+                product.variants.find(
+                    item =>
+                        item.sku === variant.sku
+                );
+
+
+            if (!existingVariant) {
+
+                return sendResponse(
+                    res,
+                    404,
+                    false,
+                    `Variant ${variant.sku} not found`
+                );
+
+            }
+
+
+            existingVariant.stock =
+                Number(variant.stock);
+
+        }
+
+    }
+
+
+    /* =================================
+       NORMAL PRODUCT
+    ================================= */
+
+    else {
+
+        const stockValue =
+            Number(stock);
+
+
+        if (
+            !Number.isFinite(stockValue) ||
+            stockValue < 0
+        ) {
+
+            return sendResponse(
+                res,
+                400,
+                false,
+                "Valid stock is required"
+            );
+
+        }
+
+
+        product.stock =
+            stockValue;
+
+    }
+
+
+    await product.save();
+
+
+    return sendResponse(
+        res,
+        200,
+        true,
+        "Product stock updated successfully",
+        product
+    );
+
+});

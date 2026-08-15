@@ -8,6 +8,7 @@ import wishlistRoutes from "./wishlist.routes.js";
 import addressRoutes from "./address.routes.js";
 import orderRoutes from "./order.routes.js";
 import adminRoutes from "./admin.routes.js";
+import inventoryRoutes from "./inventory.routes.js";
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.use("/wishlist", wishlistRoutes);
 router.use("/addresses", addressRoutes);
 router.use("/orders", orderRoutes);
 router.use("/admin", adminRoutes);
-
+router.use("/inventory", inventoryRoutes);
 
 router.get("/", (req, res) => {
     res.json({

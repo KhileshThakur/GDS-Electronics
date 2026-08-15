@@ -1,657 +1,2269 @@
-import { useEffect, useMemo, useState } from "react";
-import { getAdminDashboard } from "../services/admin.service";
+import {
+    useEffect,
+    useMemo,
+    useState
+} from "react";
+
+import {
+    useNavigate
+} from "react-router-dom";
+
+import {
+    getAdminDashboard
+} from "../services/admin.service";
+
+import {
+    PageHeader,
+    StatusBadge,
+    StatCard
+} from "../../../components/html";
+
+
+// =====================================================
+// Constants
+// =====================================================
 
 const PERIODS = [
-    { value: "today", label: "Today" },
-    { value: "yesterday", label: "Yesterday" },
-    { value: "7days", label: "7 Days" },
-    { value: "1month", label: "1 Month" },
-    { value: "3month", label: "3 Months" },
-    { value: "9month", label: "9 Months" },
-    { value: "1year", label: "1 Year" }
+    {
+        value: "today",
+        label: "Today"
+    },
+    {
+        value: "yesterday",
+        label: "Yesterday"
+    },
+    {
+        value: "7days",
+        label: "7 Days"
+    },
+    {
+        value: "1month",
+        label: "1 Month"
+    },
+    {
+        value: "3month",
+        label: "3 Months"
+    },
+    {
+        value: "9month",
+        label: "9 Months"
+    },
+    {
+        value: "1year",
+        label: "1 Year"
+    }
 ];
 
-const formatCurrency = (value = 0) =>
-    new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: 0
-    }).format(value);
 
-const formatNumber = (value = 0) =>
-    new Intl.NumberFormat("en-IN").format(value);
+// =====================================================
+// Helpers
+// =====================================================
 
-const StatusBadge = ({ status }) => {
-    const styles = {
-        Critical: "bg-red-500/10 text-red-500 border-red-500/20",
-        Low: "bg-amber-500/10 text-amber-500 border-amber-500/20"
-    };
+const formatCurrency = (
+    value = 0
+) =>
+    new Intl.NumberFormat(
+        "en-IN",
+        {
+            style: "currency",
+            currency: "INR",
+            maximumFractionDigits: 0
+        }
+    ).format(value);
 
-    return (
-        <span className={`inline-flex border px-2 py-1 text-[11px] font-semibold ${styles[status] || "bg-white/5 text-[var(--text-muted)] border-[var(--border)]"}`}>
-            {status}
-        </span>
-    );
+
+const formatNumber = (
+    value = 0
+) =>
+    new Intl.NumberFormat(
+        "en-IN"
+    ).format(value);
+
+
+const getOrderStatus = (
+    status
+) => {
+
+    if (!status) {
+        return "Unknown";
+    }
+
+    return status;
+
 };
 
-const StatCard = ({ label, value, accent }) => (
-    <div className={`relative overflow-hidden border border-[var(--border)] bg-[var(--surface)] px-5 py-4 ${accent}`}>
-        <div className="absolute left-0 top-0 h-full w-[3px] bg-current" />
-        <p className="text-xs font-medium text-[var(--text-muted)]">{label}</p>
-        <p className="mt-2 text-2xl font-bold tracking-tight text-[var(--text)]">{value}</p>
+
+// =====================================================
+// Mini Section Header
+// =====================================================
+
+const SectionHeader = ({
+    title,
+    description,
+    action,
+    onAction
+}) => (
+
+    <div className="
+        flex
+        items-center
+        justify-between
+        gap-4
+        border-b
+        border-[var(--border)]
+        px-4
+        py-3
+        sm:px-5
+    ">
+
+        <div className="
+            min-w-0
+        ">
+
+            <h2 className="
+                text-sm
+                font-semibold
+                text-[var(--text)]
+            ">
+
+                {title}
+
+            </h2>
+
+            {description && (
+
+                <p className="
+                    mt-0.5
+                    text-[11px]
+                    text-[var(--text-muted)]
+                ">
+
+                    {description}
+
+                </p>
+
+            )}
+
+        </div>
+
+        {action && (
+
+            <button
+                type="button"
+                onClick={onAction}
+                className="
+                    shrink-0
+                    text-xs
+                    font-semibold
+                    text-[var(--primary)]
+                    hover:underline
+                "
+            >
+
+                {action}
+
+            </button>
+
+        )}
+
     </div>
+
 );
 
-const BarChart = ({ categories }) => {
-    const maxStock = Math.max(...categories.map(item => item.stock), 1);
 
-    return (
-        <div className="flex h-[280px] w-full items-end gap-3 border-b border-[var(--border)] px-2 pb-0 pt-8 sm:gap-5">
-            {categories.map((item) => {
-                const height = Math.max((item.stock / maxStock) * 100, 5);
+// =====================================================
+// Sales Chart
+// =====================================================
 
-                return (
-                    <div key={item.name} className="group flex h-full flex-1 flex-col justify-end">
-                        <div className="relative flex h-full items-end justify-center">
-                            <div
-                                className="relative w-full max-w-14 bg-[var(--primary)] transition-all duration-300 group-hover:bg-[var(--secondary)]"
-                                style={{ height: `${height}%` }}
-                            >
-                                <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-semibold text-[var(--text)]">
-                                    {formatNumber(item.stock)}
-                                </span>
-                            </div>
-                        </div>
+const SalesChart = ({
+    sales
+}) => {
 
-                        <div className="mt-3 h-8 text-center">
-                            <p className="truncate text-[10px] font-medium text-[var(--text-muted)] sm:text-xs">
-                                {item.name}
-                            </p>
-                        </div>
-                    </div>
-                );
-            })}
-        </div>
-    );
-};
+    const values =
+        sales?.values || [];
 
-const InventoryDashboard = ({ data, period }) => {
-    const summary = data?.summary || {};
-    const distribution = data?.stockDistribution || {};
-    const categories = data?.categories || [];
-    const lowStockProducts = data?.lowStockProducts || [];
+    const labels =
+        sales?.labels || [];
 
-    const totalStock =
-        (distribution.healthy || 0) +
-        (distribution.low || 0) +
-        (distribution.outOfStock || 0);
+    const maxSale =
+        Math.max(
+            ...values,
+            1
+        );
 
-    const healthPercentage = totalStock
-        ? Math.round((distribution.healthy / totalStock) * 100)
-        : 0;
 
-    return (
-        <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-                <StatCard
-                    label="Total Products"
-                    value={formatNumber(summary.totalProducts)}
-                    accent="text-[var(--primary)]"
-                />
-                <StatCard
-                    label="Healthy Stock"
-                    value={formatNumber(summary.healthyStock)}
-                    accent="text-emerald-500"
-                />
-                <StatCard
-                    label="Low Stock"
-                    value={formatNumber(summary.lowStock)}
-                    accent="text-amber-500"
-                />
-                <StatCard
-                    label="Out of Stock"
-                    value={formatNumber(summary.outOfStock)}
-                    accent="text-red-500"
-                />
+    if (!values.length) {
+
+        return (
+
+            <div className="
+                flex
+                h-[230px]
+                items-center
+                justify-center
+                text-xs
+                text-[var(--text-muted)]
+            ">
+
+                No sales data available
+
             </div>
 
-            <div className="grid gap-5 xl:grid-cols-[1.6fr_0.8fr]">
-                <section className="border border-[var(--border)] bg-[var(--surface)] p-5">
-                    <div className="flex items-start justify-between gap-4">
-                        <div>
-                            <h2 className="text-base font-semibold text-[var(--text)]">
-                                Stock by Category
-                            </h2>
-                            <p className="mt-1 text-xs text-[var(--text-muted)]">
-                                Current inventory distribution
-                            </p>
-                        </div>
+        );
 
-                        <div className="text-right">
-                            <p className="text-xs text-[var(--text-muted)]">Stock Value</p>
-                            <p className="mt-1 text-lg font-bold text-[var(--text)]">
-                                {formatCurrency(summary.stockValue)}
-                            </p>
-                        </div>
-                    </div>
+    }
 
-                    {categories.length ? (
-                        <BarChart categories={categories} />
-                    ) : (
-                        <div className="flex h-[280px] items-center justify-center text-sm text-[var(--text-muted)]">
-                            No category data available
-                        </div>
-                    )}
-                </section>
 
-                <section className="border border-[var(--border)] bg-[var(--surface)] p-5">
-                    <div>
-                        <h2 className="text-base font-semibold text-[var(--text)]">
-                            Stock Health
-                        </h2>
-                        <p className="mt-1 text-xs text-[var(--text-muted)]">
-                            Overall inventory condition
-                        </p>
-                    </div>
+    return (
 
-                    <div className="mt-7 flex items-center gap-6">
+        <div className="
+            flex
+            h-[230px]
+            items-end
+            gap-2
+            border-b
+            border-[var(--border)]
+            px-2
+            pt-6
+            sm:gap-4
+        ">
+
+            {values.map(
+                (
+                    value,
+                    index
+                ) => {
+
+                    const height =
+                        Math.max(
+                            (
+                                value /
+                                maxSale
+                            ) * 100,
+                            5
+                        );
+
+
+                    return (
+
                         <div
-                            className="relative grid h-32 w-32 shrink-0 place-items-center rounded-full"
-                            style={{
-                                background: `conic-gradient(
-                                    #22c55e ${healthPercentage}%,
-                                    #f59e0b ${healthPercentage}% ${healthPercentage + ((distribution.low || 0) / Math.max(totalStock, 1)) * 100}%,
-                                    #ef4444 0
-                                )`
-                            }}
+                            key={
+                                `${labels[index]}-${index}`
+                            }
+                            className="
+                                group
+                                flex
+                                h-full
+                                min-w-0
+                                flex-1
+                                flex-col
+                                justify-end
+                            "
                         >
-                            <div className="grid h-24 w-24 place-items-center rounded-full bg-[var(--surface)]">
-                                <div className="text-center">
-                                    <p className="text-2xl font-bold text-[var(--text)]">
-                                        {healthPercentage}%
-                                    </p>
-                                    <p className="text-[10px] text-[var(--text-muted)]">
-                                        Healthy
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div className="space-y-4">
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <span className="h-2 w-2 bg-emerald-500" />
-                                    <span className="text-xs text-[var(--text-muted)]">
-                                        Healthy
-                                    </span>
-                                </div>
-                                <p className="mt-1 text-sm font-semibold text-[var(--text)]">
-                                    {formatNumber(distribution.healthy)}
-                                </p>
-                            </div>
+                            <div className="
+                                relative
+                                flex
+                                h-full
+                                items-end
+                                justify-center
+                            ">
 
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <span className="h-2 w-2 bg-amber-500" />
-                                    <span className="text-xs text-[var(--text-muted)]">
-                                        Low Stock
-                                    </span>
-                                </div>
-                                <p className="mt-1 text-sm font-semibold text-[var(--text)]">
-                                    {formatNumber(distribution.low)}
-                                </p>
-                            </div>
-
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <span className="h-2 w-2 bg-red-500" />
-                                    <span className="text-xs text-[var(--text-muted)]">
-                                        Out of Stock
-                                    </span>
-                                </div>
-                                <p className="mt-1 text-sm font-semibold text-[var(--text)]">
-                                    {formatNumber(distribution.outOfStock)}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mt-7 border-t border-[var(--border)] pt-5">
-                        <p className="text-xs text-[var(--text-muted)]">Total Stock Units</p>
-                        <p className="mt-1 text-xl font-bold text-[var(--text)]">
-                            {formatNumber(totalStock)}
-                        </p>
-                    </div>
-                </section>
-            </div>
-
-            <section className="border border-[var(--border)] bg-[var(--surface)]">
-                <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
-                    <div>
-                        <h2 className="text-base font-semibold text-[var(--text)]">
-                            Low Stock Products
-                        </h2>
-                        <p className="mt-1 text-xs text-[var(--text-muted)]">
-                            Products that need inventory attention
-                        </p>
-                    </div>
-
-                    <span className="border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-500">
-                        {lowStockProducts.length} Alerts
-                    </span>
-                </div>
-
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[650px] text-left">
-                        <thead>
-                            <tr className="border-b border-[var(--border)] text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                                <th className="px-5 py-3 font-semibold">Product</th>
-                                <th className="px-5 py-3 font-semibold">SKU</th>
-                                <th className="px-5 py-3 font-semibold">Stock</th>
-                                <th className="px-5 py-3 font-semibold">Threshold</th>
-                                <th className="px-5 py-3 font-semibold">Status</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {lowStockProducts.map((product) => (
-                                <tr
-                                    key={product.sku}
-                                    className="border-b border-[var(--border)] last:border-0 hover:bg-[var(--background)]"
+                                <div
+                                    className="
+                                        w-full
+                                        max-w-12
+                                        bg-[var(--primary)]
+                                        transition
+                                        group-hover:bg-[var(--secondary)]
+                                    "
+                                    style={{
+                                        height:
+                                            `${height}%`
+                                    }}
                                 >
-                                    <td className="px-5 py-4">
-                                        <p className="text-sm font-medium text-[var(--text)]">
-                                            {product.name}
-                                        </p>
-                                    </td>
 
-                                    <td className="px-5 py-4 text-xs text-[var(--text-muted)]">
-                                        {product.sku}
-                                    </td>
+                                    <span className="
+                                        absolute
+                                        -top-5
+                                        left-1/2
+                                        hidden
+                                        -translate-x-1/2
+                                        whitespace-nowrap
+                                        text-[10px]
+                                        font-semibold
+                                        text-[var(--text)]
+                                        group-hover:block
+                                    ">
 
-                                    <td className="px-5 py-4 text-sm font-bold text-[var(--text)]">
-                                        {product.stock}
-                                    </td>
+                                        {formatCurrency(
+                                            value
+                                        )}
 
-                                    <td className="px-5 py-4 text-xs text-[var(--text-muted)]">
-                                        {product.threshold}
-                                    </td>
+                                    </span>
 
-                                    <td className="px-5 py-4">
-                                        <StatusBadge status={product.status} />
-                                    </td>
-                                </tr>
-                            ))}
+                                </div>
 
-                            {!lowStockProducts.length && (
-                                <tr>
-                                    <td
-                                        colSpan="5"
-                                        className="px-5 py-10 text-center text-sm text-[var(--text-muted)]"
-                                    >
-                                        No low stock products
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                            </div>
+
+                            <p className="
+                                mt-2
+                                truncate
+                                text-center
+                                text-[10px]
+                                text-[var(--text-muted)]
+                            ">
+
+                                {labels[index]}
+
+                            </p>
+
+                        </div>
+
+                    );
+
+                }
+            )}
+
         </div>
+
     );
+
 };
 
-const EcommerceDashboard = ({ data }) => {
-    const summary = data?.summary || {};
-    const sales = data?.sales || {};
-    const orders = data?.orders || {};
-    const topProducts = data?.topProducts || [];
-    const recentOrders = data?.recentOrders || [];
 
-    const maxSale = Math.max(...(sales.values || []), 1);
+// =====================================================
+// Order Summary
+// =====================================================
+
+const OrderSummary = ({
+    orders
+}) => {
+
+    const total =
+        Number(
+            orders?.total || 0
+        );
+
+
+    const statuses = [
+
+        {
+            label: "Delivered",
+            value:
+                orders?.statuses?.delivered || 0,
+            className:
+                "bg-emerald-500"
+        },
+
+        {
+            label: "Processing",
+            value:
+                orders?.statuses?.processing || 0,
+            className:
+                "bg-amber-500"
+        },
+
+        {
+            label: "Shipped",
+            value:
+                orders?.statuses?.shipped || 0,
+            className:
+                "bg-[var(--primary)]"
+        },
+
+        {
+            label: "Cancelled",
+            value:
+                orders?.statuses?.cancelled || 0,
+            className:
+                "bg-red-500"
+        }
+
+    ];
+
 
     return (
-        <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+
+        <div className="
+            space-y-4
+            p-4
+            sm:p-5
+        ">
+
+            {statuses.map(
+                status => {
+
+                    const percentage =
+                        total
+                            ? Math.round(
+                                (
+                                    status.value /
+                                    total
+                                ) * 100
+                            )
+                            : 0;
+
+
+                    return (
+
+                        <div
+                            key={
+                                status.label
+                            }
+                        >
+
+                            <div className="
+                                mb-1.5
+                                flex
+                                items-center
+                                justify-between
+                            ">
+
+                                <span className="
+                                    text-[11px]
+                                    text-[var(--text-muted)]
+                                ">
+
+                                    {status.label}
+
+                                </span>
+
+                                <span className="
+                                    text-xs
+                                    font-semibold
+                                    text-[var(--text)]
+                                ">
+
+                                    {formatNumber(
+                                        status.value
+                                    )}
+
+                                </span>
+
+                            </div>
+
+
+                            <div className="
+                                h-1.5
+                                overflow-hidden
+                                bg-[var(--background)]
+                            ">
+
+                                <div
+                                    className={`
+                                        h-full
+                                        ${status.className}
+                                    `}
+                                    style={{
+                                        width:
+                                            `${percentage}%`
+                                    }}
+                                />
+
+                            </div>
+
+                        </div>
+
+                    );
+
+                }
+            )}
+
+        </div>
+
+    );
+
+};
+
+
+// =====================================================
+// E-commerce Dashboard
+// =====================================================
+
+const EcommerceDashboard = ({
+    data
+}) => {
+
+    const navigate =
+        useNavigate();
+
+
+    const summary =
+        data?.summary || {};
+
+    const sales =
+        data?.sales || {};
+
+    const orders =
+        data?.orders || {};
+
+    const topProducts =
+        data?.topProducts || [];
+
+    const recentOrders =
+        data?.recentOrders || [];
+
+
+    return (
+
+        <div className="
+            space-y-3
+        ">
+
+
+            {/* =========================================
+                SUMMARY
+            ========================================= */}
+
+            <div className="
+                grid
+                grid-cols-2
+                gap-3
+                xl:grid-cols-4
+            ">
+
                 <StatCard
                     label="Revenue"
-                    value={formatCurrency(summary.revenue)}
-                    accent="text-[var(--primary)]"
+                    value={
+                        formatCurrency(
+                            summary.revenue
+                        )
+                    }
+                    accent="blue"
                 />
+
                 <StatCard
                     label="Orders"
-                    value={formatNumber(summary.orders)}
-                    accent="text-[var(--secondary)]"
+                    value={
+                        formatNumber(
+                            summary.orders
+                        )
+                    }
+                    accent="purple"
                 />
+
                 <StatCard
                     label="Customers"
-                    value={formatNumber(summary.customers)}
-                    accent="text-emerald-500"
+                    value={
+                        formatNumber(
+                            summary.customers
+                        )
+                    }
+                    accent="green"
                 />
+
                 <StatCard
-                    label="Average Order Value"
-                    value={formatCurrency(summary.averageOrderValue)}
-                    accent="text-violet-500"
+                    label="Average Order"
+                    value={
+                        formatCurrency(
+                            summary.averageOrderValue
+                        )
+                    }
+                    accent="amber"
                 />
+
             </div>
 
-            <div className="grid gap-5 xl:grid-cols-[1.6fr_0.8fr]">
-                <section className="border border-[var(--border)] bg-[var(--surface)] p-5">
-                    <div className="flex items-start justify-between">
-                        <div>
-                            <h2 className="text-base font-semibold text-[var(--text)]">
-                                Sales Overview
-                            </h2>
-                            <p className="mt-1 text-xs text-[var(--text-muted)]">
-                                Revenue performance
-                            </p>
+
+            {/* =========================================
+                SALES + ORDER SUMMARY
+            ========================================= */}
+
+            <div className="
+                grid
+                gap-3
+                xl:grid-cols-[1.65fr_0.8fr]
+            ">
+
+
+                {/* SALES */}
+
+                <section className="
+                    overflow-hidden
+                    border
+                    border-[var(--border)]
+                    bg-[var(--surface)]
+                ">
+
+                    <SectionHeader
+                        title="Sales Overview"
+                        description="Revenue performance for the selected period."
+                    />
+
+                    <div className="
+                        px-4
+                        pt-4
+                        sm:px-5
+                    ">
+
+                        <div className="
+                            flex
+                            items-end
+                            justify-between
+                            gap-4
+                        ">
+
+                            <div>
+
+                                <p className="
+                                    text-[10px]
+                                    text-[var(--text-muted)]
+                                ">
+
+                                    Total Revenue
+
+                                </p>
+
+                                <p className="
+                                    mt-1
+                                    text-xl
+                                    font-bold
+                                    tracking-tight
+                                    text-[var(--text)]
+                                ">
+
+                                    {formatCurrency(
+                                        summary.revenue
+                                    )}
+
+                                </p>
+
+                            </div>
+
                         </div>
 
-                        <p className="text-lg font-bold text-[var(--text)]">
-                            {formatCurrency(summary.revenue)}
-                        </p>
+                        <SalesChart
+                            sales={sales}
+                        />
+
                     </div>
 
-                    <div className="mt-8 flex h-[250px] items-end gap-3 border-b border-[var(--border)] px-2 sm:gap-5">
-                        {(sales.values || []).map((value, index) => {
-                            const height = Math.max((value / maxSale) * 100, 5);
-
-                            return (
-                                <div key={sales.labels?.[index]} className="group flex h-full flex-1 flex-col justify-end">
-                                    <div className="flex h-full items-end justify-center">
-                                        <div
-                                            className="w-full max-w-14 bg-[var(--primary)] transition-all group-hover:bg-[var(--secondary)]"
-                                            style={{ height: `${height}%` }}
-                                        />
-                                    </div>
-
-                                    <p className="mt-3 text-center text-[10px] text-[var(--text-muted)]">
-                                        {sales.labels?.[index]}
-                                    </p>
-                                </div>
-                            );
-                        })}
-                    </div>
                 </section>
 
-                <section className="border border-[var(--border)] bg-[var(--surface)] p-5">
-                    <h2 className="text-base font-semibold text-[var(--text)]">
-                        Order Summary
-                    </h2>
-                    <p className="mt-1 text-xs text-[var(--text-muted)]">
-                        {formatNumber(orders.total)} total orders
-                    </p>
 
-                    <div className="mt-6 space-y-5">
-                        {[
-                            ["Delivered", orders.statuses?.delivered, "bg-emerald-500"],
-                            ["Processing", orders.statuses?.processing, "bg-amber-500"],
-                            ["Shipped", orders.statuses?.shipped, "bg-[var(--primary)]"],
-                            ["Cancelled", orders.statuses?.cancelled, "bg-red-500"]
-                        ].map(([label, value, color]) => {
-                            const percentage = orders.total
-                                ? Math.round((value / orders.total) * 100)
-                                : 0;
+                {/* ORDERS */}
 
-                            return (
-                                <div key={label}>
-                                    <div className="mb-2 flex justify-between text-xs">
-                                        <span className="text-[var(--text-muted)]">{label}</span>
-                                        <span className="font-semibold text-[var(--text)]">
-                                            {value || 0}
-                                        </span>
-                                    </div>
+                <section className="
+                    overflow-hidden
+                    border
+                    border-[var(--border)]
+                    bg-[var(--surface)]
+                ">
 
-                                    <div className="h-1.5 bg-[var(--background)]">
-                                        <div
-                                            className={`h-full ${color}`}
-                                            style={{ width: `${percentage}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                    <SectionHeader
+                        title="Order Summary"
+                        description={
+                            `${formatNumber(
+                                orders.total
+                            )} total orders`
+                        }
+                    />
+
+                    <OrderSummary
+                        orders={orders}
+                    />
+
                 </section>
+
             </div>
 
-            <div className="grid gap-5 xl:grid-cols-2">
-                <section className="border border-[var(--border)] bg-[var(--surface)]">
-                    <div className="border-b border-[var(--border)] px-5 py-4">
-                        <h2 className="text-base font-semibold text-[var(--text)]">
-                            Top Products
-                        </h2>
-                    </div>
 
-                    <div>
-                        {topProducts.map((product, index) => (
-                            <div
-                                key={product.name}
-                                className="flex items-center gap-4 border-b border-[var(--border)] px-5 py-4 last:border-0"
-                            >
-                                <span className="w-6 text-sm font-bold text-[var(--text-muted)]">
-                                    #{index + 1}
-                                </span>
+            {/* =========================================
+                TOP PRODUCTS + RECENT ORDERS
+            ========================================= */}
 
-                                <div className="min-w-0 flex-1">
-                                    <p className="truncate text-sm font-medium text-[var(--text)]">
-                                        {product.name}
-                                    </p>
-                                    <p className="mt-1 text-[11px] text-[var(--text-muted)]">
-                                        {product.units} units
-                                    </p>
-                                </div>
+            <div className="
+                grid
+                gap-3
+                xl:grid-cols-2
+            ">
 
-                                <p className="text-sm font-semibold text-[var(--text)]">
-                                    {formatCurrency(product.revenue)}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+
+                {/* TOP PRODUCTS */}
+
+                <section className="
+                    overflow-hidden
+                    border
+                    border-[var(--border)]
+                    bg-[var(--surface)]
+                ">
+
+                    <SectionHeader
+                        title="Top Products"
+                        description="Best performing products by revenue."
+                        action="View Products"
+                        onAction={() =>
+                            navigate(
+                                "/admin/products"
+                            )
+                        }
+                    />
+
+
+                    {topProducts.length ? (
+
+                        <div>
+
+                            {topProducts
+                                .slice(0, 5)
+                                .map(
+                                    (
+                                        product,
+                                        index
+                                    ) => (
+
+                                        <div
+                                            key={
+                                                product.name ||
+                                                index
+                                            }
+                                            className="
+                                                flex
+                                                items-center
+                                                gap-3
+                                                border-b
+                                                border-[var(--border)]
+                                                px-4
+                                                py-3
+                                                last:border-0
+                                                sm:px-5
+                                            "
+                                        >
+
+                                            <span className="
+                                                w-6
+                                                shrink-0
+                                                text-xs
+                                                font-bold
+                                                text-[var(--text-muted)]
+                                            ">
+
+                                                #{index + 1}
+
+                                            </span>
+
+
+                                            <div className="
+                                                min-w-0
+                                                flex-1
+                                            ">
+
+                                                <p className="
+                                                    truncate
+                                                    text-xs
+                                                    font-semibold
+                                                    text-[var(--text)]
+                                                ">
+
+                                                    {
+                                                        product.name
+                                                    }
+
+                                                </p>
+
+                                                <p className="
+                                                    mt-0.5
+                                                    text-[10px]
+                                                    text-[var(--text-muted)]
+                                                ">
+
+                                                    {
+                                                        formatNumber(
+                                                            product.units
+                                                        )
+                                                    }{" "}
+                                                    units sold
+
+                                                </p>
+
+                                            </div>
+
+
+                                            <p className="
+                                                shrink-0
+                                                text-xs
+                                                font-semibold
+                                                text-[var(--text)]
+                                            ">
+
+                                                {formatCurrency(
+                                                    product.revenue
+                                                )}
+
+                                            </p>
+
+                                        </div>
+
+                                    )
+                                )}
+
+                        </div>
+
+                    ) : (
+
+                        <div className="
+                            px-5
+                            py-10
+                            text-center
+                            text-xs
+                            text-[var(--text-muted)]
+                        ">
+
+                            No product data available
+
+                        </div>
+
+                    )}
+
                 </section>
 
-                <section className="border border-[var(--border)] bg-[var(--surface)]">
-                    <div className="border-b border-[var(--border)] px-5 py-4">
-                        <h2 className="text-base font-semibold text-[var(--text)]">
-                            Recent Orders
-                        </h2>
-                    </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full min-w-[500px] text-left">
-                            <thead>
-                                <tr className="border-b border-[var(--border)] text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                                    <th className="px-5 py-3">Order</th>
-                                    <th className="px-5 py-3">Customer</th>
-                                    <th className="px-5 py-3">Amount</th>
-                                    <th className="px-5 py-3">Status</th>
-                                </tr>
-                            </thead>
+                {/* RECENT ORDERS */}
 
-                            <tbody>
-                                {recentOrders.map(order => (
-                                    <tr key={order.id} className="border-b border-[var(--border)] last:border-0">
-                                        <td className="px-5 py-4 text-xs font-semibold text-[var(--text)]">
-                                            {order.id}
-                                        </td>
-                                        <td className="px-5 py-4 text-xs text-[var(--text-muted)]">
-                                            {order.customer}
-                                        </td>
-                                        <td className="px-5 py-4 text-xs font-semibold text-[var(--text)]">
-                                            {formatCurrency(order.amount)}
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            <StatusBadge status={order.status === "Cancelled" ? "Critical" : order.status} />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                <section className="
+                    overflow-hidden
+                    border
+                    border-[var(--border)]
+                    bg-[var(--surface)]
+                ">
+
+                    <SectionHeader
+                        title="Recent Orders"
+                        description="Latest customer orders."
+                        action="View Orders"
+                        onAction={() =>
+                            navigate(
+                                "/admin/orders"
+                            )
+                        }
+                    />
+
+
+                    {recentOrders.length ? (
+
+                        <div className="
+                            divide-y
+                            divide-[var(--border)]
+                        ">
+
+                            {recentOrders
+                                .slice(0, 5)
+                                .map(
+                                    order => (
+
+                                        <button
+                                            key={
+                                                order.id
+                                            }
+                                            type="button"
+                                            onClick={() =>
+                                                order.id &&
+                                                navigate(
+                                                    `/admin/orders/${order.id}`
+                                                )
+                                            }
+                                            className="
+                                                flex
+                                                w-full
+                                                items-center
+                                                gap-3
+                                                px-4
+                                                py-3
+                                                text-left
+                                                transition
+                                                hover:bg-[var(--background)]
+                                                sm:px-5
+                                            "
+                                        >
+
+                                            <div className="
+                                                min-w-0
+                                                flex-1
+                                            ">
+
+                                                <p className="
+                                                    truncate
+                                                    text-xs
+                                                    font-semibold
+                                                    text-[var(--text)]
+                                                ">
+
+                                                    {order.id}
+
+                                                </p>
+
+                                                <p className="
+                                                    mt-0.5
+                                                    truncate
+                                                    text-[10px]
+                                                    text-[var(--text-muted)]
+                                                ">
+
+                                                    {order.customer}
+
+                                                </p>
+
+                                            </div>
+
+
+                                            <p className="
+                                                shrink-0
+                                                text-xs
+                                                font-semibold
+                                                text-[var(--text)]
+                                            ">
+
+                                                {formatCurrency(
+                                                    order.amount
+                                                )}
+
+                                            </p>
+
+
+                                            <StatusBadge
+                                                status={
+                                                    getOrderStatus(
+                                                        order.status
+                                                    )
+                                                }
+                                            />
+
+                                        </button>
+
+                                    )
+                                )}
+
+                        </div>
+
+                    ) : (
+
+                        <div className="
+                            px-5
+                            py-10
+                            text-center
+                            text-xs
+                            text-[var(--text-muted)]
+                        ">
+
+                            No recent orders
+
+                        </div>
+
+                    )}
+
                 </section>
+
             </div>
+
         </div>
+
     );
+
 };
 
+
+// =====================================================
+// Inventory Dashboard
+// =====================================================
+
+const InventoryDashboard = ({
+    data
+}) => {
+
+    const navigate =
+        useNavigate();
+
+
+    const summary =
+        data?.summary || {};
+
+    const distribution =
+        data?.stockDistribution || {};
+
+    const categories =
+        data?.categories || [];
+
+    const lowStockProducts =
+        data?.lowStockProducts || [];
+
+
+    const totalStock =
+        (
+            distribution.healthy || 0
+        ) +
+        (
+            distribution.low || 0
+        ) +
+        (
+            distribution.outOfStock || 0
+        );
+
+
+    const healthPercentage =
+        totalStock
+            ? Math.round(
+                (
+                    distribution.healthy /
+                    totalStock
+                ) * 100
+            )
+            : 0;
+
+
+    const maxStock =
+        Math.max(
+            ...categories.map(
+                item =>
+                    Number(
+                        item.stock || 0
+                    )
+            ),
+            1
+        );
+
+
+    return (
+
+        <div className="
+            space-y-3
+        ">
+
+
+            {/* SUMMARY */}
+
+            <div className="
+                grid
+                grid-cols-2
+                gap-3
+                xl:grid-cols-4
+            ">
+
+                <StatCard
+                    label="Total Products"
+                    value={
+                        formatNumber(
+                            summary.totalProducts
+                        )
+                    }
+                    accent="blue"
+                />
+
+                <StatCard
+                    label="Healthy Stock"
+                    value={
+                        formatNumber(
+                            summary.healthyStock
+                        )
+                    }
+                    accent="green"
+                />
+
+                <StatCard
+                    label="Low Stock"
+                    value={
+                        formatNumber(
+                            summary.lowStock
+                        )
+                    }
+                    accent="amber"
+                />
+
+                <StatCard
+                    label="Out of Stock"
+                    value={
+                        formatNumber(
+                            summary.outOfStock
+                        )
+                    }
+                    accent="red"
+                />
+
+            </div>
+
+
+            {/* CATEGORY + HEALTH */}
+
+            <div className="
+                grid
+                gap-3
+                xl:grid-cols-[1.65fr_0.8fr]
+            ">
+
+
+                {/* CATEGORY STOCK */}
+
+                <section className="
+                    overflow-hidden
+                    border
+                    border-[var(--border)]
+                    bg-[var(--surface)]
+                ">
+
+                    <SectionHeader
+                        title="Stock by Category"
+                        description="Current inventory distribution."
+                        action="Manage Inventory"
+                        onAction={() =>
+                            navigate(
+                                "/admin/inventory"
+                            )
+                        }
+                    />
+
+
+                    <div className="
+                        px-4
+                        pt-5
+                        sm:px-5
+                    ">
+
+                        <div className="
+                            flex
+                            items-end
+                            justify-between
+                        ">
+
+                            <div>
+
+                                <p className="
+                                    text-[10px]
+                                    text-[var(--text-muted)]
+                                ">
+
+                                    Stock Value
+
+                                </p>
+
+                                <p className="
+                                    mt-1
+                                    text-xl
+                                    font-bold
+                                    text-[var(--text)]
+                                ">
+
+                                    {formatCurrency(
+                                        summary.stockValue
+                                    )}
+
+                                </p>
+
+                            </div>
+
+                            <p className="
+                                text-xs
+                                text-[var(--text-muted)]
+                            ">
+
+                                {formatNumber(
+                                    totalStock
+                                )} units
+
+                            </p>
+
+                        </div>
+
+
+                        {categories.length ? (
+
+                            <div className="
+                                mt-5
+                                flex
+                                h-[220px]
+                                items-end
+                                gap-2
+                                border-b
+                                border-[var(--border)]
+                                px-1
+                                sm:gap-4
+                            ">
+
+                                {categories.map(
+                                    (
+                                        item,
+                                        index
+                                    ) => {
+
+                                        const stock =
+                                            Number(
+                                                item.stock || 0
+                                            );
+
+                                        const height =
+                                            Math.max(
+                                                (
+                                                    stock /
+                                                    maxStock
+                                                ) * 100,
+                                                5
+                                            );
+
+
+                                        return (
+
+                                            <div
+                                                key={
+                                                    item.name ||
+                                                    index
+                                                }
+                                                className="
+                                                    group
+                                                    flex
+                                                    h-full
+                                                    min-w-0
+                                                    flex-1
+                                                    flex-col
+                                                    justify-end
+                                                "
+                                            >
+
+                                                <div className="
+                                                    relative
+                                                    flex
+                                                    h-full
+                                                    items-end
+                                                    justify-center
+                                                ">
+
+                                                    <div
+                                                        className="
+                                                            w-full
+                                                            max-w-12
+                                                            bg-[var(--primary)]
+                                                            transition
+                                                            group-hover:bg-[var(--secondary)]
+                                                        "
+                                                        style={{
+                                                            height:
+                                                                `${height}%`
+                                                        }}
+                                                    >
+
+                                                        <span className="
+                                                            absolute
+                                                            -top-5
+                                                            left-1/2
+                                                            hidden
+                                                            -translate-x-1/2
+                                                            whitespace-nowrap
+                                                            text-[10px]
+                                                            font-semibold
+                                                            text-[var(--text)]
+                                                            group-hover:block
+                                                        ">
+
+                                                            {formatNumber(
+                                                                stock
+                                                            )}
+
+                                                        </span>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <p className="
+                                                    mt-2
+                                                    truncate
+                                                    text-center
+                                                    text-[10px]
+                                                    text-[var(--text-muted)]
+                                                ">
+
+                                                    {
+                                                        item.name
+                                                    }
+
+                                                </p>
+
+                                            </div>
+
+                                        );
+
+                                    }
+                                )}
+
+                            </div>
+
+                        ) : (
+
+                            <div className="
+                                flex
+                                h-[220px]
+                                items-center
+                                justify-center
+                                text-xs
+                                text-[var(--text-muted)]
+                            ">
+
+                                No category data available
+
+                            </div>
+
+                        )}
+
+                    </div>
+
+                </section>
+
+
+                {/* STOCK HEALTH */}
+
+                <section className="
+                    overflow-hidden
+                    border
+                    border-[var(--border)]
+                    bg-[var(--surface)]
+                ">
+
+                    <SectionHeader
+                        title="Stock Health"
+                        description="Overall inventory condition."
+                    />
+
+
+                    <div className="
+                        flex
+                        items-center
+                        gap-6
+                        p-4
+                        sm:p-5
+                    ">
+
+                        <div
+                            className="
+                                relative
+                                grid
+                                h-28
+                                w-28
+                                shrink-0
+                                place-items-center
+                                rounded-full
+                            "
+                            style={{
+                                background:
+                                    `conic-gradient(
+                                        #22c55e ${healthPercentage}%,
+                                        #f59e0b ${healthPercentage}% ${
+                                            healthPercentage +
+                                            (
+                                                (
+                                                    distribution.low ||
+                                                    0
+                                                ) /
+                                                Math.max(
+                                                    totalStock,
+                                                    1
+                                                )
+                                            ) * 100
+                                        }%,
+                                        #ef4444 0
+                                    )`
+                            }}
+                        >
+
+                            <div className="
+                                grid
+                                h-20
+                                w-20
+                                place-items-center
+                                rounded-full
+                                bg-[var(--surface)]
+                            ">
+
+                                <div className="
+                                    text-center
+                                ">
+
+                                    <p className="
+                                        text-xl
+                                        font-bold
+                                        text-[var(--text)]
+                                    ">
+
+                                        {healthPercentage}%
+
+                                    </p>
+
+                                    <p className="
+                                        text-[9px]
+                                        text-[var(--text-muted)]
+                                    ">
+
+                                        Healthy
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div className="
+                            min-w-0
+                            space-y-3
+                        ">
+
+                            <div>
+
+                                <p className="
+                                    text-[10px]
+                                    text-[var(--text-muted)]
+                                ">
+
+                                    Healthy
+
+                                </p>
+
+                                <p className="
+                                    text-sm
+                                    font-semibold
+                                    text-[var(--text)]
+                                ">
+
+                                    {formatNumber(
+                                        distribution.healthy
+                                    )}
+
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <p className="
+                                    text-[10px]
+                                    text-[var(--text-muted)]
+                                ">
+
+                                    Low Stock
+
+                                </p>
+
+                                <p className="
+                                    text-sm
+                                    font-semibold
+                                    text-[var(--text)]
+                                ">
+
+                                    {formatNumber(
+                                        distribution.low
+                                    )}
+
+                                </p>
+
+                            </div>
+
+
+                            <div>
+
+                                <p className="
+                                    text-[10px]
+                                    text-[var(--text-muted)]
+                                ">
+
+                                    Out of Stock
+
+                                </p>
+
+                                <p className="
+                                    text-sm
+                                    font-semibold
+                                    text-[var(--text)]
+                                ">
+
+                                    {formatNumber(
+                                        distribution.outOfStock
+                                    )}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div className="
+                        border-t
+                        border-[var(--border)]
+                        px-4
+                        py-4
+                        sm:px-5
+                    ">
+
+                        <p className="
+                            text-[10px]
+                            text-[var(--text-muted)]
+                        ">
+
+                            Total Stock Units
+
+                        </p>
+
+                        <p className="
+                            mt-1
+                            text-lg
+                            font-bold
+                            text-[var(--text)]
+                        ">
+
+                            {formatNumber(
+                                totalStock
+                            )}
+
+                        </p>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            {/* LOW STOCK */}
+
+            <section className="
+                overflow-hidden
+                border
+                border-[var(--border)]
+                bg-[var(--surface)]
+            ">
+
+                <SectionHeader
+                    title="Low Stock Alerts"
+                    description="Products requiring inventory attention."
+                    action="View Inventory"
+                    onAction={() =>
+                        navigate(
+                            "/admin/inventory"
+                        )
+                    }
+                />
+
+
+                {lowStockProducts.length ? (
+
+                    <div className="
+                        overflow-x-auto
+                    ">
+
+                        <table className="
+                            w-full
+                            min-w-[600px]
+                            text-left
+                        ">
+
+                            <thead>
+
+                                <tr className="
+                                    border-b
+                                    border-[var(--border)]
+                                    text-[10px]
+                                    uppercase
+                                    tracking-wider
+                                    text-[var(--text-muted)]
+                                ">
+
+                                    <th className="
+                                        px-4
+                                        py-2.5
+                                        font-semibold
+                                        sm:px-5
+                                    ">
+
+                                        Product
+
+                                    </th>
+
+                                    <th className="
+                                        px-4
+                                        py-2.5
+                                        font-semibold
+                                        sm:px-5
+                                    ">
+
+                                        SKU
+
+                                    </th>
+
+                                    <th className="
+                                        px-4
+                                        py-2.5
+                                        font-semibold
+                                        sm:px-5
+                                    ">
+
+                                        Stock
+
+                                    </th>
+
+                                    <th className="
+                                        px-4
+                                        py-2.5
+                                        font-semibold
+                                        sm:px-5
+                                    ">
+
+                                        Threshold
+
+                                    </th>
+
+                                    <th className="
+                                        px-4
+                                        py-2.5
+                                        font-semibold
+                                        sm:px-5
+                                    ">
+
+                                        Status
+
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {lowStockProducts
+                                    .slice(0, 8)
+                                    .map(
+                                        (
+                                            product,
+                                            index
+                                        ) => (
+
+                                            <tr
+                                                key={
+                                                    product.sku ||
+                                                    product._id ||
+                                                    index
+                                                }
+                                                className="
+                                                    border-b
+                                                    border-[var(--border)]
+                                                    last:border-0
+                                                    hover:bg-[var(--background)]
+                                                "
+                                            >
+
+                                                <td className="
+                                                    px-4
+                                                    py-3
+                                                    sm:px-5
+                                                ">
+
+                                                    <p className="
+                                                        max-w-[260px]
+                                                        truncate
+                                                        text-xs
+                                                        font-semibold
+                                                        text-[var(--text)]
+                                                    ">
+
+                                                        {
+                                                            product.name
+                                                        }
+
+                                                    </p>
+
+                                                </td>
+
+
+                                                <td className="
+                                                    px-4
+                                                    py-3
+                                                    font-mono
+                                                    text-[10px]
+                                                    text-[var(--text-muted)]
+                                                    sm:px-5
+                                                ">
+
+                                                    {
+                                                        product.sku ||
+                                                        "—"
+                                                    }
+
+                                                </td>
+
+
+                                                <td className="
+                                                    px-4
+                                                    py-3
+                                                    text-xs
+                                                    font-bold
+                                                    text-[var(--text)]
+                                                    sm:px-5
+                                                ">
+
+                                                    {
+                                                        product.stock ??
+                                                        0
+                                                    }
+
+                                                </td>
+
+
+                                                <td className="
+                                                    px-4
+                                                    py-3
+                                                    text-[10px]
+                                                    text-[var(--text-muted)]
+                                                    sm:px-5
+                                                ">
+
+                                                    {
+                                                        product.threshold ??
+                                                        0
+                                                    }
+
+                                                </td>
+
+
+                                                <td className="
+                                                    px-4
+                                                    py-3
+                                                    sm:px-5
+                                                ">
+
+                                                    <StatusBadge
+                                                        status={
+                                                            product.status
+                                                        }
+                                                    />
+
+                                                </td>
+
+                                            </tr>
+
+                                        )
+                                    )}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                ) : (
+
+                    <div className="
+                        px-5
+                        py-10
+                        text-center
+                        text-xs
+                        text-[var(--text-muted)]
+                    ">
+
+                        No low stock products
+
+                    </div>
+
+                )}
+
+            </section>
+
+        </div>
+
+    );
+
+};
+
+
+// =====================================================
+// Dashboard
+// =====================================================
+
 const Dashboard = () => {
-    const [mode, setMode] = useState("ecommerce");
-    const [period, setPeriod] = useState("7days");
-    const [dashboard, setDashboard] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
 
-    useEffect(() => {
-        let mounted = true;
+    const [
+        mode,
+        setMode
+    ] = useState(
+        "ecommerce"
+    );
 
-        const fetchDashboard = async () => {
+
+    const [
+        period,
+        setPeriod
+    ] = useState(
+        "7days"
+    );
+
+
+    const [
+        dashboard,
+        setDashboard
+    ] = useState(null);
+
+
+    const [
+        loading,
+        setLoading
+    ] = useState(true);
+
+
+    const [
+        error,
+        setError
+    ] = useState("");
+
+
+    const fetchDashboard =
+        async () => {
+
             try {
+
                 setLoading(true);
                 setError("");
 
-                const response = await getAdminDashboard(mode, period);
-
-                if (mounted) {
-                    setDashboard(response?.data || null);
-                }
-            } catch (err) {
-                if (mounted) {
-                    setError(
-                        err?.response?.data?.message ||
-                        "Unable to load dashboard data."
+                const response =
+                    await getAdminDashboard(
+                        mode,
+                        period
                     );
-                }
-            } finally {
-                if (mounted) setLoading(false);
+
+
+                setDashboard(
+                    response?.data ||
+                    null
+                );
+
             }
+            catch (err) {
+
+                setError(
+                    err?.response?.data?.message ||
+                    "Unable to load dashboard data."
+                );
+
+            }
+            finally {
+
+                setLoading(false);
+
+            }
+
         };
 
-        fetchDashboard();
+
+    useEffect(() => {
+
+        let mounted =
+            true;
+
+
+        const load =
+            async () => {
+
+                try {
+
+                    setLoading(true);
+                    setError("");
+
+                    const response =
+                        await getAdminDashboard(
+                            mode,
+                            period
+                        );
+
+
+                    if (mounted) {
+
+                        setDashboard(
+                            response?.data ||
+                            null
+                        );
+
+                    }
+
+                }
+                catch (err) {
+
+                    if (mounted) {
+
+                        setError(
+                            err?.response?.data?.message ||
+                            "Unable to load dashboard data."
+                        );
+
+                    }
+
+                }
+                finally {
+
+                    if (mounted) {
+
+                        setLoading(false);
+
+                    }
+
+                }
+
+            };
+
+
+        load();
+
 
         return () => {
-            mounted = false;
-        };
-    }, [mode, period]);
 
-    const periodLabel = useMemo(
-        () => PERIODS.find(item => item.value === period)?.label || "7 Days",
-        [period]
-    );
+            mounted = false;
+
+        };
+
+    }, [
+        mode,
+        period
+    ]);
+
+
+    const periodLabel =
+        useMemo(
+            () =>
+                PERIODS.find(
+                    item =>
+                        item.value ===
+                        period
+                )?.label ||
+                "7 Days",
+            [period]
+        );
+
 
     return (
-        <div className="min-h-full bg-[var(--background)] px-4 py-5 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-[1600px]">
-                <header className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                    <div>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--secondary)]">
-                            Admin
-                        </p>
 
-                        <h1 className="mt-1 text-2xl font-bold tracking-tight text-[var(--text)]">
-                            Dashboard
-                        </h1>
+        <section className="
+            w-full
+            space-y-3
+            px-1
+            sm:px-2
+        ">
 
-                        <p className="mt-1 text-xs text-[var(--text-muted)]">
-                            {mode === "ecommerce"
-                                ? "Monitor your e-commerce performance."
-                                : "Monitor your inventory and stock health."}
-                        </p>
-                    </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
-                        <div className="flex border border-[var(--border)] bg-[var(--surface)] p-1">
-                            <button
-                                type="button"
-                                onClick={() => setMode("ecommerce")}
-                                className={`px-3 py-2 text-xs font-semibold transition ${
-                                    mode === "ecommerce"
-                                        ? "bg-[var(--primary)] text-white"
-                                        : "text-[var(--text-muted)] hover:text-[var(--text)]"
-                                }`}
-                            >
-                                E-commerce
-                            </button>
+            {/* =========================================
+                PAGE HEADER
+            ========================================= */}
 
-                            <button
-                                type="button"
-                                onClick={() => setMode("inventory")}
-                                className={`px-3 py-2 text-xs font-semibold transition ${
-                                    mode === "inventory"
-                                        ? "bg-[var(--primary)] text-white"
-                                        : "text-[var(--text-muted)] hover:text-[var(--text)]"
-                                }`}
-                            >
-                                Inventory
-                            </button>
-                        </div>
+            <PageHeader
+                eyebrow="ADMIN"
+                title="Dashboard"
+                subtitle={
+                    mode === "ecommerce"
+                        ? "Monitor sales, orders and customer activity."
+                        : "Monitor product stock and inventory health."
+                }
+            >
 
-                        <select
-                            value={period}
-                            onChange={e => setPeriod(e.target.value)}
-                            className="border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs font-medium text-[var(--text)] outline-none"
-                        >
-                            {PERIODS.map(item => (
-                                <option key={item.value} value={item.value}>
-                                    {item.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </header>
+                <div className="
+                    flex
+                    flex-wrap
+                    items-center
+                    justify-end
+                    gap-2
+                ">
 
-                <div className="mb-5 flex items-center justify-between border-l-2 border-[var(--primary)] bg-[var(--surface)] px-4 py-3">
-                    <div>
-                        <p className="text-xs font-semibold text-[var(--text)]">
-                            {mode === "ecommerce" ? "E-commerce Overview" : "Inventory Overview"}
-                        </p>
-                        <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
-                            Data for {periodLabel.toLowerCase()}
-                        </p>
-                    </div>
 
-                    {loading && (
-                        <span className="text-[10px] font-medium text-[var(--secondary)]">
-                            Updating...
-                        </span>
-                    )}
-                </div>
+                    {/* MODE */}
 
-                {error ? (
-                    <div className="border border-red-500/20 bg-red-500/5 px-5 py-8 text-center">
-                        <p className="text-sm font-semibold text-red-500">
-                            {error}
-                        </p>
+                    <div className="
+                        flex
+                        border
+                        border-[var(--border)]
+                        bg-[var(--surface)]
+                        p-0.5
+                    ">
 
                         <button
                             type="button"
-                            onClick={() => setPeriod(current => current)}
-                            className="mt-3 text-xs font-semibold text-[var(--primary)] hover:underline"
+                            onClick={() =>
+                                setMode(
+                                    "ecommerce"
+                                )
+                            }
+                            className={`
+                                px-3
+                                py-1.5
+                                text-xs
+                                font-semibold
+                                transition
+                                ${
+                                    mode ===
+                                    "ecommerce"
+                                        ? "bg-[var(--primary)] text-white"
+                                        : "text-[var(--text-muted)] hover:text-[var(--text)]"
+                                }
+                            `}
                         >
-                            Try again
+
+                            E-commerce
+
                         </button>
+
+
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setMode(
+                                    "inventory"
+                                )
+                            }
+                            className={`
+                                px-3
+                                py-1.5
+                                text-xs
+                                font-semibold
+                                transition
+                                ${
+                                    mode ===
+                                    "inventory"
+                                        ? "bg-[var(--primary)] text-white"
+                                        : "text-[var(--text-muted)] hover:text-[var(--text)]"
+                                }
+                            `}
+                        >
+
+                            Inventory
+
+                        </button>
+
                     </div>
-                ) : loading && !dashboard ? (
-                    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-                        {[1, 2, 3, 4].map(item => (
-                            <div
-                                key={item}
-                                className="h-28 animate-pulse border border-[var(--border)] bg-[var(--surface)]"
-                            />
-                        ))}
+
+
+                    {/* PERIOD */}
+
+                    <select
+                        value={
+                            period
+                        }
+                        onChange={
+                            event =>
+                                setPeriod(
+                                    event.target.value
+                                )
+                        }
+                        className="
+                            h-8
+                            border
+                            border-[var(--border)]
+                            bg-[var(--surface)]
+                            px-2.5
+                            text-xs
+                            font-medium
+                            text-[var(--text)]
+                            outline-none
+                            focus:border-[var(--primary)]
+                        "
+                    >
+
+                        {PERIODS.map(
+                            item => (
+
+                                <option
+                                    key={
+                                        item.value
+                                    }
+                                    value={
+                                        item.value
+                                    }
+                                >
+
+                                    {item.label}
+
+                                </option>
+
+                            )
+                        )}
+
+                    </select>
+
+                </div>
+
+            </PageHeader>
+
+
+            {/* =========================================
+                DATA CONTEXT
+            ========================================= */}
+
+            <div className="
+                flex
+                min-h-10
+                items-center
+                justify-between
+                gap-4
+                border-l-2
+                border-[var(--primary)]
+                bg-[var(--surface)]
+                px-3
+                py-2
+            ">
+
+                <div>
+
+                    <p className="
+                        text-xs
+                        font-semibold
+                        text-[var(--text)]
+                    ">
+
+                        {mode === "ecommerce"
+                            ? "E-commerce Overview"
+                            : "Inventory Overview"}
+
+                    </p>
+
+                    <p className="
+                        mt-0.5
+                        text-[10px]
+                        text-[var(--text-muted)]
+                    ">
+
+                        Data for {
+                            periodLabel.toLowerCase()
+                        }
+
+                    </p>
+
+                </div>
+
+
+                {loading && (
+
+                    <div className="
+                        flex
+                        items-center
+                        gap-2
+                        text-[10px]
+                        font-medium
+                        text-[var(--secondary)]
+                    ">
+
+                        <span className="
+                            h-3
+                            w-3
+                            animate-spin
+                            rounded-full
+                            border
+                            border-[var(--border)]
+                            border-t-[var(--primary)]"
+                        />
+
+                        Updating...
+
                     </div>
-                ) : mode === "inventory" ? (
-                    <InventoryDashboard
-                        data={dashboard}
-                        period={period}
-                    />
-                ) : (
-                    <EcommerceDashboard
-                        data={dashboard}
-                    />
+
                 )}
+
             </div>
-        </div>
+
+
+            {/* =========================================
+                ERROR
+            ========================================= */}
+
+            {error ? (
+
+                <div className="
+                    border
+                    border-red-500/20
+                    bg-red-500/5
+                    px-5
+                    py-10
+                    text-center
+                ">
+
+                    <p className="
+                        text-sm
+                        font-semibold
+                        text-red-500
+                    ">
+
+                        {error}
+
+                    </p>
+
+
+                    <button
+                        type="button"
+                        onClick={
+                            fetchDashboard
+                        }
+                        className="
+                            mt-3
+                            text-xs
+                            font-semibold
+                            text-[var(--primary)]
+                            hover:underline
+                        "
+                    >
+
+                        Try Again
+
+                    </button>
+
+                </div>
+
+            ) : loading && !dashboard ? (
+
+                <div className="
+                    grid
+                    grid-cols-2
+                    gap-3
+                    xl:grid-cols-4
+                ">
+
+                    {[1, 2, 3, 4].map(
+                        item => (
+
+                            <div
+                                key={
+                                    item
+                                }
+                                className="
+                                    h-24
+                                    animate-pulse
+                                    border
+                                    border-[var(--border)]
+                                    bg-[var(--surface)]
+                                "
+                            />
+
+                        )
+                    )}
+
+                </div>
+
+            ) : mode === "inventory" ? (
+
+                <InventoryDashboard
+                    data={
+                        dashboard
+                    }
+                />
+
+            ) : (
+
+                <EcommerceDashboard
+                    data={
+                        dashboard
+                    }
+                />
+
+            )}
+
+        </section>
+
     );
+
 };
+
 
 export default Dashboard;

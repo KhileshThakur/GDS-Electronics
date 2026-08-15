@@ -7,7 +7,8 @@ import {
     updateProduct,
     deleteProduct,
     getRelatedProducts,
-    getProductById
+    getProductById,
+    updateProductStock
 } from "../controllers/product.controller.js";
 
 import {
@@ -42,6 +43,13 @@ router.post(
     protect,
     adminOnly,
     createProduct
+);
+
+router.patch(
+    "/:id/stock",
+    protect,
+    adminOnly,
+    updateProductStock
 );
 
 router.put(

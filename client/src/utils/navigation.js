@@ -38,7 +38,7 @@ export const adminNavigation = [
     { label: "Orders", path: "/admin/orders", icon: "orders" },
     { label: "Customers", path: "/admin/customers", icon: "customers" },
     { label: "Inventory", path: "/admin/inventory", icon: "inventory" },
-    { label: "Analytics", path: "/admin/analytics", icon: "analytics" },
-    { label: "Coupons", path: "/admin/coupons", icon: "coupons" },
+    // { label: "Analytics", path: "/admin/analytics", icon: "analytics" },
+    // { label: "Coupons", path: "/admin/coupons", icon: "coupons" },
     { label: "Settings", path: "/admin/settings", icon: "settings" }
 ];

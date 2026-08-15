@@ -44,7 +44,9 @@ import AdminOrderListPage from "../features/order/pages/AdminOrderListPage";
 import AdminOrderDetailPage from "../features/order/pages/AdminOrderDetailPage";
 import AdminCustomerListPage from "../features/admin/customer/AdminCustomerListPage";
 import AdminCustomerDetailPage from "../features/admin/customer/AdminCustomerDetailPage";
-
+import AdminInventoryListPage from "../features/admin/inventory/AdminInventoryListPage";
+import AdminInventoryManagePage from "../features/admin/inventory/AdminInventoryManagePage";
+import AdminSettingsPage from "../features/admin/pages/AdminSettingsPage";
 
 // Other
 import NotFoundPage from "../features/not-found/pages/NotFoundPage";
@@ -209,6 +211,27 @@ const AppRoutes = () => {
                         <Route
                             path="/admin/customers/:id"
                             element={<AdminCustomerDetailPage />}
+                        />
+
+                        <Route
+                            path="/admin/inventory"
+                            element={
+                                <AdminInventoryListPage />
+                            }
+                        />
+
+                        <Route
+                            path="/admin/inventory/:id"
+                            element={
+                                <AdminInventoryManagePage />
+                            }
+                        />
+
+                        <Route
+                            path="/admin/settings"
+                            element={
+                                <AdminSettingsPage/>
+                            }
                         />
                     </Route>
                 </Route>
