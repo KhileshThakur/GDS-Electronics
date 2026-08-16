@@ -50,10 +50,12 @@ import AdminSettingsPage from "../features/admin/pages/AdminSettingsPage";
 
 // Other
 import NotFoundPage from "../features/not-found/pages/NotFoundPage";
+import ScrollToTop from "../components/common/ScrollToTop";
 
 const AppRoutes = () => {
     return (
         <BrowserRouter>
+            <ScrollToTop />
             <Routes>
 
                 {/* ================================
@@ -230,7 +232,7 @@ const AppRoutes = () => {
                         <Route
                             path="/admin/settings"
                             element={
-                                <AdminSettingsPage/>
+                                <AdminSettingsPage />
                             }
                         />
                     </Route>
@@ -246,6 +248,7 @@ const AppRoutes = () => {
                 />
 
             </Routes>
+
         </BrowserRouter>
     );
 };

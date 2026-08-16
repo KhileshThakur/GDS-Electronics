@@ -1,12 +1,10 @@
 import {
     NavLink,
     Link,
-    useLocation,
     useNavigate
 } from "react-router-dom";
 
 import { useState } from "react";
-import { useSelector } from "react-redux";
 
 import Logo from "./Logo";
 import UserMenu from "./UserMenu";
@@ -19,186 +17,25 @@ import Container from "../ui/Container";
 
 import {
     SearchIcon,
-    NavigationIcon,
-    MenuIcon
+    NavigationIcon
 } from "../../assets/icons/Icons";
 
-import { homeContent } from "../../utils/content.home";
 
-
-/* =========================================
-   View Toggle
-========================================= */
-
-const ViewToggle = ({
-    isAdminView,
-    onChange
-}) => (
-
-    <div className="
-        inline-flex
-        items-center
-        p-0.5
-        sm:p-1
-
-        rounded-full
-
-        bg-white/10
-        border
-        border-white/20
-
-        shrink-0
-    ">
-
-        <button
-            type="button"
-            onClick={() =>
-                onChange("customer")
-            }
-            className={`
-                h-6
-                sm:h-8
-
-                min-w-[68px]
-                sm:min-w-[96px]
-
-                px-2
-                sm:px-5
-
-                inline-flex
-                items-center
-                justify-center
-
-                rounded-full
-
-                text-[9px]
-                sm:text-xs
-
-                font-semibold
-                whitespace-nowrap
-
-                transition-all
-                duration-300
-
-                ${!isAdminView
-                    ? `
-                            bg-white
-                            text-[var(--sidebar)]
-                            shadow-sm
-                        `
-                    : `
-                            text-white/65
-                            hover:text-white
-                            hover:bg-white/10
-                        `
-                }
-            `}
-        >
-            Customer
-        </button>
-
-
-        <button
-            type="button"
-            onClick={() =>
-                onChange("admin")
-            }
-            className={`
-                h-6
-                sm:h-8
-
-                min-w-[68px]
-                sm:min-w-[96px]
-
-                px-2
-                sm:px-5
-
-                inline-flex
-                items-center
-                justify-center
-
-                rounded-full
-
-                text-[9px]
-                sm:text-xs
-
-                font-semibold
-                whitespace-nowrap
-
-                transition-all
-                duration-300
-
-                ${isAdminView
-                    ? `
-                            bg-white
-                            text-[var(--sidebar)]
-                            shadow-sm
-                        `
-                    : `
-                            text-white/65
-                            hover:text-white
-                            hover:bg-white/10
-                        `
-                }
-            `}
-        >
-            Admin
-        </button>
-
-    </div>
-
-);
-
-
-/* =========================================
-   Navbar
-========================================= */
-
-const Navbar = ({
-    onMenuClick
-}) => {
-
-    const {
-        navbar
-    } = homeContent;
+const Navbar = () => {
 
     const [search, setSearch] =
         useState("");
-
-    const location =
-        useLocation();
 
     const navigate =
         useNavigate();
 
 
-    const {
-        user,
-        isAuthenticated
-    } = useSelector(
-        state => state.auth
-    );
-
-
-    const isAdmin =
-        user?.role === "admin";
-
-
-    const isAdminView =
-        location.pathname.startsWith(
-            "/admin"
-        );
-
-
-    /* =========================================
-       Search
-    ========================================= */
-
     const handleSearch = (e) => {
 
         e.preventDefault();
 
-        const value = search.trim();
+        const value =
+            search.trim();
 
         if (!value) {
             navigate("/products");
@@ -211,39 +48,10 @@ const Navbar = ({
     };
 
 
-    /* =========================================
-       View Change
-    ========================================= */
-
-    const handleViewChange = (
-        view
-    ) => {
-
-        navigate(
-            view === "admin"
-                ? "/admin"
-                : "/"
-        );
-
-    };
-
-
     const clearSearch = () => {
         setSearch("");
         navigate("/products");
     };
-
-    const headerGrid =
-        isAdminView
-
-            ? `
-                grid-cols-[auto_minmax(0,1fr)_auto]
-            `
-
-            : `
-                grid-cols-[minmax(0,1fr)_auto]
-                lg:grid-cols-[auto_minmax(0,1fr)_auto]
-            `;
 
 
     return (
@@ -262,205 +70,51 @@ const Navbar = ({
         ">
 
 
-            {/* =================================
-                TOP BAR
-            ================================= */}
-
-            <div className="
-                h-10
-
-                grid
-
-                bg-[var(--sidebar)]
-                text-white
-            ">
-
-                <Container>
-
-                    <div className="
-                        h-full
-
-                        flex
-                        items-center
-                        justify-between
-
-                        gap-4
-                    ">
-                        <marquee
-                            className="block w-full min-w-0 text-[11px] sm:text-xs font-medium text-white/90 whitespace-nowrap"
-                            scrollamount="5" /* Controls the speed (higher is faster) */
-                            loop="infinite"
-                        >
-                            {navbar.announcement}
-                        </marquee>
-
-
-                        {isAuthenticated &&
-                            isAdmin && (
-
-                                <ViewToggle
-                                    isAdminView={
-                                        isAdminView
-                                    }
-                                    onChange={
-                                        handleViewChange
-                                    }
-                                />
-
-                            )}
-
-                    </div>
-
-                </Container>
-
-            </div>
-
-
-            {/* =================================
+            {/* ================================
                 MAIN HEADER
             ================================= */}
 
             <Container>
 
-                <div
-                    className={`
-                        py-3
-                        sm:py-4
+                <div className="
+                    py-3
+                    sm:py-4
 
-                        grid
+                    grid
 
-                        ${headerGrid}
+                    grid-cols-[auto_minmax(0,1fr)_auto]
 
-                        items-center
+                    items-center
 
-                        gap-x-3
-                        sm:gap-x-5
-                        lg:gap-x-8
+                    gap-x-3
+                    sm:gap-x-5
+                    lg:gap-x-8
 
-                        gap-y-3
-                    `}
-                >
-
-
-                    {/* ADMIN MOBILE MENU */}
-
-                    {isAdminView && (
-
-                        <div className="
-                            row-start-1
-                            col-start-1
-
-                            lg:hidden
-
-                            flex
-                            items-center
-                            justify-start
-                        ">
-
-                            <button
-                                type="button"
-                                onClick={onMenuClick}
-                                aria-label="Open admin menu"
-                                className="
-                                    w-9
-                                    h-9
-
-                                    inline-flex
-                                    items-center
-                                    justify-center
-
-                                    rounded-lg
-
-                                    text-[var(--text)]
-
-                                    hover:bg-[var(--surface-hover)]
-                                    hover:text-[var(--primary)]
-
-                                    active:scale-95
-
-                                    transition-all
-                                    duration-200
-                                "
-                            >
-                                <MenuIcon />
-                            </button>
-
-                        </div>
-
-                    )}
+                    gap-y-3
+                ">
 
 
                     {/* LOGO */}
 
                     <Link
-                        to={
-                            isAdminView
-                                ? "/admin"
-                                : "/"
-                        }
-                        className={`
+                        to="/"
+                        className="
                             min-w-0
                             max-w-full
 
                             overflow-hidden
 
-                            row-start-1
-
                             flex
                             items-center
 
                             justify-self-start
-
-                            ${isAdminView
-                                ? `
-                                        col-start-2
-                                        lg:col-start-1
-                                    `
-                                : `
-                                        col-start-1
-                                        lg:col-start-1
-                                    `
-                            }
-                        `}
+                        "
                     >
-
-                        <Logo
-                            size={45}
-                        />
-
+                        <Logo size={45} />
                     </Link>
 
 
-                    {/* USER MENU */}
-
-                    <div
-                        className={`
-                            shrink-0
-
-                            row-start-1
-
-                            justify-self-end
-
-                            ${isAdminView
-                                ? `
-                                        col-start-3
-                                    `
-                                : `
-                                        col-start-2
-                                        lg:col-start-3
-                                    `
-                            }
-                        `}
-                    >
-
-                        <UserMenu />
-
-                    </div>
-
-
-                    {/* =================================
-                        SEARCH
-                    ================================= */}
+                    {/* SEARCH */}
 
                     <div className="
                         min-w-0
@@ -471,7 +125,6 @@ const Navbar = ({
 
                         flex
                         items-center
-                        justify-center
 
                         lg:row-start-1
                         lg:col-start-2
@@ -479,9 +132,7 @@ const Navbar = ({
                     ">
 
                         <form
-                            onSubmit={
-                                handleSearch
-                            }
+                            onSubmit={handleSearch}
                             className="
                                 h-11
                                 w-full
@@ -499,39 +150,24 @@ const Navbar = ({
                                 border-[var(--border)]
 
                                 transition-all
-                                duration-200
 
                                 focus-within:border-[var(--primary)]
-
                                 focus-within:ring-2
-
                                 focus-within:ring-[var(--primary)]/10
                             "
                         >
 
                             <input
                                 type="text"
-
                                 value={search}
-
                                 onChange={(e) =>
-                                    setSearch(
-                                        e.target.value
-                                    )
+                                    setSearch(e.target.value)
                                 }
-
-                                placeholder={
-                                    isAdminView
-                                        ? "Search products, orders..."
-                                        : "Search products..."
-                                }
-
+                                placeholder="Search products..."
                                 aria-label="Search products"
-
                                 className="
                                     flex-1
                                     min-w-0
-
                                     h-full
 
                                     bg-transparent
@@ -549,8 +185,6 @@ const Navbar = ({
                             />
 
 
-                            {/* CLEAR SEARCH */}
-
                             {search && (
 
                                 <button
@@ -560,15 +194,13 @@ const Navbar = ({
                                     className="
                                         w-10
                                         h-full
-
                                         shrink-0
 
-                                        inline-flex
+                                        flex
                                         items-center
                                         justify-center
 
                                         text-[var(--text-light)]
-
                                         hover:text-[var(--text)]
 
                                         transition
@@ -580,20 +212,17 @@ const Navbar = ({
                             )}
 
 
-                            {/* SEARCH BUTTON */}
-
                             <button
                                 type="submit"
                                 aria-label="Search products"
                                 className="
                                     h-full
-
                                     w-12
                                     sm:w-14
 
                                     shrink-0
 
-                                    inline-flex
+                                    flex
                                     items-center
                                     justify-center
 
@@ -603,16 +232,27 @@ const Navbar = ({
                                     hover:bg-[var(--primary-dark)]
 
                                     transition-colors
-                                    duration-200
                                 "
                             >
-
                                 <SearchIcon />
-
                             </button>
 
                         </form>
 
+                    </div>
+
+
+                    {/* USER MENU */}
+
+                    <div className="
+                        shrink-0
+
+                        row-start-1
+                        col-start-3
+
+                        justify-self-end
+                    ">
+                        <UserMenu />
                     </div>
 
                 </div>
@@ -620,129 +260,105 @@ const Navbar = ({
             </Container>
 
 
-            {/* =================================
+            {/* ================================
                 CUSTOMER NAVIGATION
             ================================= */}
 
-            {!isAdminView && (
+            <div className="
+                border-t
+                border-[var(--border)]
+            ">
 
-                <div className="
-                    border-t
-                    border-[var(--border)]
-                ">
+                <Container className="!px-0">
 
-                    <Container className="!px-0">
+                    <nav className="
+                        h-14
 
-                        <nav className="
-                            h-14
+                        flex
+                        items-center
+                        justify-center
 
-                            flex
-                            items-center
-                            justify-center
+                        gap-1
+                        sm:gap-2
+                        md:gap-3
 
-                            gap-1
-                            sm:gap-2
-                            md:gap-3
+                        overflow-x-auto
+                    ">
 
-                            overflow-x-auto
-                        ">
+                        {customerNavigation.map(
+                            item => (
 
-                            {customerNavigation.map(
-                                item => (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    end={item.path === "/"}
+                                    className={({ isActive }) => `
+                                        h-14
 
-                                    <NavLink
-                                        key={
-                                            item.path
-                                        }
+                                        min-w-[64px]
+                                        sm:min-w-[105px]
 
-                                        to={
-                                            item.path
-                                        }
+                                        px-2
+                                        sm:px-4
 
-                                        end={
-                                            item.path ===
-                                            "/"
-                                        }
+                                        inline-flex
+                                        flex-col
 
-                                        className={({
+                                        items-center
+                                        justify-center
+
+                                        gap-1
+
+                                        rounded-xl
+
+                                        text-[10px]
+                                        sm:text-sm
+
+                                        font-medium
+                                        leading-none
+
+                                        whitespace-nowrap
+
+                                        transition-all
+                                        duration-200
+
+                                        ${
                                             isActive
-                                        }) => `
-                                            h-14
-
-                                            min-w-[64px]
-                                            sm:min-w-[105px]
-
-                                            px-2
-                                            sm:px-4
-
-                                            inline-flex
-                                            flex-col
-
-                                            items-center
-                                            justify-center
-
-                                            gap-1
-
-                                            rounded-xl
-
-                                            text-[10px]
-                                            sm:text-sm
-
-                                            font-medium
-
-                                            leading-none
-
-                                            whitespace-nowrap
-
-                                            transition-all
-                                            duration-200
-
-                                            ${isActive
                                                 ? `
-                                                        bg-[var(--primary-soft)]
-                                                        text-[var(--primary-dark)]
-                                                        font-semibold
-                                                    `
+                                                    bg-[var(--primary-soft)]
+                                                    text-[var(--primary-dark)]
+                                                    font-semibold
+                                                `
                                                 : `
-                                                        text-[var(--text)]
+                                                    text-[var(--text)]
+                                                    hover:bg-[var(--surface-hover)]
+                                                    hover:text-[var(--primary)]
+                                                `
+                                        }
+                                    `}
+                                >
 
-                                                        hover:bg-[var(--surface-hover)]
+                                    <NavigationIcon
+                                        type={item.icon}
+                                    />
 
-                                                        hover:text-[var(--primary)]
-                                                    `
-                                            }
-                                        `}
-                                    >
+                                    <span>
+                                        {item.label}
+                                    </span>
 
-                                        <NavigationIcon
-                                            type={
-                                                item.icon
-                                            }
-                                        />
+                                </NavLink>
 
-                                        <span>
-                                            {
-                                                item.label
-                                            }
-                                        </span>
+                            )
+                        )}
 
-                                    </NavLink>
+                    </nav>
 
-                                )
-                            )}
+                </Container>
 
-                        </nav>
-
-                    </Container>
-
-                </div>
-
-            )}
+            </div>
 
         </header>
-
     );
-
 };
 
 
